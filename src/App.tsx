@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {VideoPlayer} from './components/VideoPlayer';
 import './App.css';
+import { VideoPicker } from './components/VideoPicker';
 
 class App extends Component {
 
@@ -8,9 +9,7 @@ class App extends Component {
 
     return (
       <div className="App">
-        <header className="App-header">
-			<VideoPlayer> </VideoPlayer>
-        </header>
+			  <VideoPicker> </VideoPicker>
       </div>
     );
   }
