@@ -5,9 +5,15 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get('/', function (req, res) {
-    console.dir( res.req.query);
+app.get('/api/video/library', function (req, res) {
+    
+    var response = 
+    [
+        {name: "Harry potter", resourcePath: "/resources/harryPotter"},
+        {name: "The Matrix", resourcePath: "/resources/theMatrix"}
+    ]
+    res.send(response);
 });
 
-
-app.listen(3050)
+console.log("Listening on port 3050");
+app.listen(3050);

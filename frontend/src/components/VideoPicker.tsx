@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { VideoItem } from '../apis/VideoItem';
 
 class VideoPicker extends React.Component<any, any> {
 
@@ -11,13 +12,14 @@ class VideoPicker extends React.Component<any, any> {
 
     render() 
     {   
-        const videos = this.props.videos;
+        const videos : Array<VideoItem> = JSON.parse(this.props.videos);
         return (
             <div>
+                
                 <select name="VideoChoice">
                     {videos.map((x: any) => 
                     {
-                        return <option onClick={this.handleSelection}>{x}</option>;
+                        return <option onClick={this.handleSelection}>{x.name}</option>;
                     })}
                 </select>	
              </div>
@@ -34,6 +36,7 @@ class VideoPicker extends React.Component<any, any> {
 		this.props.onSelectChange(event.target.value);
     }
     
+ 
 }
 
 export { VideoPicker }

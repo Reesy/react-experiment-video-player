@@ -79,9 +79,7 @@ class Video extends React.Component<any, any> {
 	private async getVideos()
 	{
 		console.log("Calling get videos");
-		let localVideoOptions = ['The Matrix', 'The Matrix 2', 'The Matrix 3'];
 		let externalVideos = await this.videoApi.getVideos();
-		console.log("The thing returned");
 		this.setState({videoOptions: externalVideos})
 		this.setState({isListAvailable: true})
 	}
