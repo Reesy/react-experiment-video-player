@@ -12,20 +12,9 @@ class VideoPlayer extends React.Component<any, any> {
     render() 
     {
       return (
-
-		<div>
-			<div>		 
-				This is the current video: {this.state.videoTitle} 
-		  	</div>
-
-			<div>
-				<select name="VideoChoice">
-					<option onClick={this.handleSelection}>The Matrix</option>;
-					<option onClick={this.handleSelection}>The Matrix 2</option>;
-					<option onClick={this.handleSelection}>The Matrix 3</option>;
-				</select>	
-			</div>
-		</div>
+		  <div> 
+			  <p> PlaceHolder </p>
+		  </div>
       );
 	}
 	
