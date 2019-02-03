@@ -1,5 +1,5 @@
 {
-  "name": "video-picker",
+  "name": "video-picker-frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
