@@ -6,22 +6,25 @@ class VideoPlayer extends React.Component<any, any> {
     constructor(props: any)
     {
 	  super(props);
-	  this.state = {videoTitle: "No video picked" }
-	  this.handleSelection = this.handleSelection.bind(this);
     }
     render() 
     {
       return (
 		  <div> 
-			  <p> PlaceHolder </p>
+			  <p> Shit: {this.props.video.resourcePath}</p>
+			  <video width="320" height="240" controls src={this.fullResourcePath(this.props.video.resourcePath)}>
+			  </video> 
 		  </div>
       );
 	}
-	
-	private handleSelection(event: any)
+
+	private fullResourcePath(serverResource: string)
 	{
-		this.setState({videoTitle: event.target.value});
+		let fullPath = "http://localhost:3000" + serverResource;
+		console.log("Full path is: " + fullPath);
+		return fullPath
 	}
+	
 }
 
 export { VideoPlayer }

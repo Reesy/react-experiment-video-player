@@ -4,6 +4,7 @@ import logo from '../logo.svg'
 import { VideoPicker } from './VideoPicker';
 import { VideoApi } from '../apis/VideoApi';
 import { IVideoApi } from '../apis/IVideoApi';
+import { VideoPlayer } from './VideoPlayer';
 
 class Video extends React.Component<any, any> {
 
@@ -12,8 +13,8 @@ class Video extends React.Component<any, any> {
 	{
 		super(props);
 		this.state = {
-			videoTitle: "No video picked",
-			videoOptions: [""],
+			currentVideo: "",
+			videoLibrary: [],
 			isListAvailable: false 
 		}
 		this.handleSelection = this.handleSelection.bind(this);
@@ -37,12 +38,16 @@ class Video extends React.Component<any, any> {
 			mainContent =  
 			<div>
 				<div>		 
-					This is the current video: {this.state.videoTitle} 
+					This is the current video: {this.state.currentVideo.name} 
 				</div>
 
 				<VideoPicker 
-					videos={this.state.videoOptions}
+					library={this.state.videoLibrary}
 					onSelectChange={this.handleSelection}
+				/>
+
+				<VideoPlayer
+					video={this.state.currentVideo}
 				/>
 				
 			</div>
@@ -66,9 +71,11 @@ class Video extends React.Component<any, any> {
 	 * @description: Once a video selection occurs this will update local state.
 	 * @param event: The HTML event that triggered this function
 	 */
-	private handleSelection(videoTitle: string)
-	{
-		this.setState({videoTitle: videoTitle});
+	private handleSelection(selection: any)
+	{	
+		let parsedVideoLibrary = JSON.parse(this.state.videoLibrary);
+		let _currentVideo = parsedVideoLibrary.find((video : any) => video.name === selection);
+		this.setState({currentVideo: _currentVideo});
 	}
 	
 	/**
@@ -78,9 +85,8 @@ class Video extends React.Component<any, any> {
 	 */
 	private async getVideos()
 	{
-		console.log("Calling get videos");
 		let externalVideos = await this.videoApi.getVideos();
-		this.setState({videoOptions: externalVideos})
+		this.setState({videoLibrary: externalVideos})
 		this.setState({isListAvailable: true})
 	}
 }

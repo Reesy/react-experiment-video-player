@@ -12,7 +12,7 @@ class VideoPicker extends React.Component<any, any> {
 
     render() 
     {   
-        const videos : Array<VideoItem> = JSON.parse(this.props.videos);
+        const videos : Array<VideoItem> = JSON.parse(this.props.library);
         return (
             <div>
                 
