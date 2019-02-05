@@ -73,7 +73,7 @@ class Video extends React.Component<any, any> {
 	 */
 	private handleSelection(selection: any)
 	{	
-		let parsedVideoLibrary = JSON.parse(this.state.videoLibrary);
+		let parsedVideoLibrary = this.state.videoLibrary;
 		let _currentVideo = parsedVideoLibrary.find((video : any) => video.name === selection);
 		this.setState({currentVideo: _currentVideo});
 	}
@@ -85,8 +85,9 @@ class Video extends React.Component<any, any> {
 	 */
 	private async getVideos()
 	{
-		let externalVideos = await this.videoApi.getVideos();
+		let externalVideos: any = await this.videoApi.getVideos();
 		this.setState({videoLibrary: externalVideos})
+		this.setState({currentVideo: externalVideos[0]})
 		this.setState({isListAvailable: true})
 	}
 }

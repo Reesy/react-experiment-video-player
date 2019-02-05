@@ -12,14 +12,14 @@ class VideoPicker extends React.Component<any, any> {
 
     render() 
     {   
-        const videos : Array<VideoItem> = JSON.parse(this.props.library);
+        const videos : Array<VideoItem> = this.props.library;
         return (
             <div>
                 
-                <select name="VideoChoice">
+                <select name="VideoChoice" onChange={this.handleSelection}>
                     {videos.map((x: any) => 
                     {
-                        return <option onClick={this.handleSelection}>{x.name}</option>;
+                        return <option key={x.name}>{x.name}</option>;
                     })}
                 </select>	
              </div>
@@ -33,6 +33,7 @@ class VideoPicker extends React.Component<any, any> {
      */
 	private handleSelection(event: any)
 	{
+        console.log('selection occured');
 		this.props.onSelectChange(event.target.value);
     }
     

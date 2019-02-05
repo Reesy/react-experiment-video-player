@@ -21,9 +21,12 @@ export class VideoApi implements IVideoApi
         {
             method: "GET"
         }
-
         const uri = "http://localhost:3000/api/video/library"
-        return await this.APICaller.get(uri, options);  
+
+
+        let serverResponseString = await this.APICaller.get(uri, options);  
+        let parsedResponse = JSON.parse(serverResponseString);
+        return parsedResponse;
     }
 
 }
