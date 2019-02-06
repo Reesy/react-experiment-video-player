@@ -11,7 +11,7 @@ class VideoPlayer extends React.Component<any, any> {
     {
       return (
 		  <div> 
-			  <video width="320" height="240" controls src={this.fullResourcePath(this.props.video.resourcePath)}>
+			  <video width="640" height="360" controls src={this.fullResourcePath(this.props.video.resourcePath)}>
 			  </video> 
 		  </div>
       );

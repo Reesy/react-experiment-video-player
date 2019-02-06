@@ -36,20 +36,21 @@ class Video extends React.Component<any, any> {
 		{
 			//Renders the list of available videos once received from the service
 			mainContent =  
-			<div>
-				<div>		 
-					This is the current video: {this.state.currentVideo.name} 
-				</div>
-
-				<VideoPicker 
-					library={this.state.videoLibrary}
-					onSelectChange={this.handleSelection}
-				/>
+			<div className='video'>
 
 				<VideoPlayer
 					video={this.state.currentVideo}
 				/>
 				
+				<VideoPicker 
+					library={this.state.videoLibrary}
+					onSelectChange={this.handleSelection}
+				/>
+
+				<div>		 
+					This is the current video: {this.state.currentVideo.name} 
+				</div>
+			
 			</div>
 		}
 		else
