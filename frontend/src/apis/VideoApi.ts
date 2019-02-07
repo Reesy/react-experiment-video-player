@@ -1,6 +1,6 @@
+import { VideoItem } from "../../../sharedInterfaces/VideoItem";
 import { IVideoApi } from "./IVideoApi";
 import { request } from '../wrappers/request';
-import { VideoItem } from "./VideoItem";
 import { IRequest } from "../wrappers/IRequest";
 import { IRequestOptions } from "../wrappers/IRequestOptions";
 

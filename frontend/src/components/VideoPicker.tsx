@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { VideoItem } from '../apis/VideoItem';
+import { VideoItem } from '../../../sharedInterfaces/VideoItem';
 
 class VideoPicker extends React.Component<any, any> {
 

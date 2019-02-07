@@ -1,4 +1,4 @@
-import { VideoItem } from "./VideoItem";
+import { VideoItem } from "../../../sharedInterfaces/VideoItem";
 
 export interface IVideoApi
 {
