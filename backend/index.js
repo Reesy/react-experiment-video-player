@@ -3,10 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var bodyParser = require("body-parser");
 var Library = require("./services/Library");
+var path = require("path");
 var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static('videos'));
+var contentDirectory = path.join(__dirname, 'videos');
+app.use(express.static(contentDirectory));
 var library = new Library.Library();
 var cachedLibrary = library.getLibrary();
 app.get('/api/video/library', function (req, res) {

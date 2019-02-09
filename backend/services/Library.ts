@@ -1,6 +1,7 @@
 import { VideoItem } from "../../sharedInterfaces/VideoItem";
 import { ILibrary } from "./interfaces/ILibrary";
 import  fs  = require('fs');
+import path = require('path');
 
 export class Library implements ILibrary
 {
@@ -11,11 +12,7 @@ export class Library implements ILibrary
     constructor()
     {
         this.content = '';
-        this.videoItemCache = [
-            {
-                name: '',
-                resourceLocation: ''
-            }];
+        this.videoItemCache = [];
         this.scanLibrary();
     }
 
@@ -26,8 +23,8 @@ export class Library implements ILibrary
 
     public scanLibrary()
     {
-        console.log(process.cwd());
-        let LibraryFolderContent = fs.readdirSync('backend/videos');
+        let contentDirectory = path.join(__dirname, '..', 'videos');
+        let LibraryFolderContent = fs.readdirSync(contentDirectory);
         this.videoItemCache = this.buildLibrary(LibraryFolderContent);
     }
 

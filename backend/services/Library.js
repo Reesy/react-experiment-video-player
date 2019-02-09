@@ -1,23 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var fs = require("fs");
+var path = require("path");
 var Library = /** @class */ (function () {
     function Library() {
         this.content = '';
-        this.videoItemCache = [
-            {
-                name: '',
-                resourceLocation: ''
-            }
-        ];
+        this.videoItemCache = [];
         this.scanLibrary();
     }
     Library.prototype.getLibrary = function () {
         return this.videoItemCache;
     };
     Library.prototype.scanLibrary = function () {
-        console.log(process.cwd());
-        var LibraryFolderContent = fs.readdirSync('backend/videos');
+        var contentDirectory = path.join(__dirname, '..', 'videos');
+        var LibraryFolderContent = fs.readdirSync(contentDirectory);
         this.videoItemCache = this.buildLibrary(LibraryFolderContent);
     };
     Library.prototype.buildLibrary = function (filenames) {
