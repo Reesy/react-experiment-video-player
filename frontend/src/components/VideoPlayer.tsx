@@ -19,7 +19,7 @@ class VideoPlayer extends React.Component<any, any> {
 
 	private fullResourcePath(serverResource: string)
 	{
-		let fullPath = "http://localhost:3000" + serverResource;
+		let fullPath = "http://localhost:3050" + serverResource;
 		console.log("Full path is: " + fullPath);
 		return fullPath
 	}
