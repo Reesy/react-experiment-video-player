@@ -17,6 +17,7 @@ app.use(function (req, res, next) {
     next();
 });
 app.get('/api/video/library', function (req, res) {
+    console.log("Library api called from" + req.ip);
     res.send(cachedLibrary);
 });
 console.log("Listening on port 3050");

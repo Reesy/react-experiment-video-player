@@ -15,7 +15,7 @@ export class VideoApi implements IVideoApi
         this.APICaller = new request();
     }
 
-    async getVideos(): Promise<Array<VideoItem>>
+    public async getVideos(): Promise<Array<VideoItem>>
     {   
         const options: IRequestOptions = 
         {
@@ -23,10 +23,13 @@ export class VideoApi implements IVideoApi
         }
         const uri = "http://localhost:3050/api/video/library"
 
-
         let serverResponseString = await this.APICaller.get(uri, options);  
-        let parsedResponse = JSON.parse(serverResponseString);
+        let parsedResponse: Array<VideoItem> = JSON.parse(serverResponseString);
         return parsedResponse;
     }
 
+    public getVideoApiAddress(): string
+    {
+        return "http://localhost:3050"
+    }
 }

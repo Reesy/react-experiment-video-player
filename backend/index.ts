@@ -19,6 +19,7 @@ app.use(function(req, res, next) {
   
 app.get('/api/video/library', (req: express.Request, res: express.Response) =>
 {
+    console.log("Library api called from" + req.ip);
     res.send(cachedLibrary);
 });
 

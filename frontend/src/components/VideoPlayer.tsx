@@ -11,19 +11,11 @@ class VideoPlayer extends React.Component<any, any> {
     {
       return (
 		  <div> 
-			  <video width="640" height="360" controls src={this.fullResourcePath(this.props.video.resourceLocation)}>
+			  <video width="640" height="360" controls src={this.props.video.resourceLocation}>
 			  </video> 
 		  </div>
       );
-	}
-
-	private fullResourcePath(serverResource: string)
-	{
-		let fullPath = "http://localhost:3050" + serverResource;
-		console.log("Full path is: " + fullPath);
-		return fullPath
-	}
-	
+	}	
 }
 
 export { VideoPlayer }

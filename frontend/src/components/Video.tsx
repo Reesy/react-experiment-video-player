@@ -5,6 +5,7 @@ import { VideoPicker } from './VideoPicker';
 import { VideoApi } from '../apis/VideoApi';
 import { IVideoApi } from '../apis/IVideoApi';
 import { VideoPlayer } from './VideoPlayer';
+import { VideoItem } from "../../../sharedInterfaces/VideoItem";
 
 class Video extends React.Component<any, any> {
 
@@ -75,8 +76,8 @@ class Video extends React.Component<any, any> {
 	private handleSelection(selection: any)
 	{	
 		let parsedVideoLibrary = this.state.videoLibrary;
-		let _currentVideo = parsedVideoLibrary.find((video : any) => video.name === selection);
-		this.setState({currentVideo: _currentVideo});
+		let _currentVideo: VideoItem = parsedVideoLibrary.find((video : VideoItem) => video.name === selection);
+		this.setCurrentVideo(_currentVideo);
 	}
 	
 	/**
@@ -86,10 +87,26 @@ class Video extends React.Component<any, any> {
 	 */
 	private async getVideos()
 	{
-		let externalVideos: any = await this.videoApi.getVideos();
-		this.setState({videoLibrary: externalVideos})
-		this.setState({currentVideo: externalVideos[0]})
-		this.setState({isListAvailable: true})
+		let externalVideos: Array<VideoItem> = await this.videoApi.getVideos();
+		this.setState({videoLibrary: externalVideos});
+		this.setCurrentVideo(externalVideos[0]);
+		this.setState({isListAvailable: true});
+	}
+
+	/**
+	 * @method setCurrentVideo
+	 * @description This will set the api path on the current video
+	 */
+	private setCurrentVideo(VideoItem: VideoItem)
+	{
+		let completeApiPath = this.videoApi.getVideoApiAddress() + VideoItem.resourceLocation;
+		
+		let fullyAddressedVideoItem: VideoItem = 
+		{
+			name: VideoItem.name,
+			resourceLocation: completeApiPath
+		}
+		this.setState({currentVideo: fullyAddressedVideoItem});
 	}
 }
 

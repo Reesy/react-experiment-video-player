@@ -33,7 +33,6 @@ class VideoPicker extends React.Component<any, any> {
      */
 	private handleSelection(event: any)
 	{
-        console.log('selection occured');
 		this.props.onSelectChange(event.target.value);
     }
     
