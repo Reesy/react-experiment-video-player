@@ -2,6 +2,7 @@ import { VideoItem } from "../../sharedInterfaces/VideoItem";
 import { ILibrary } from "./interfaces/ILibrary";
 import  fs  = require('fs');
 import path = require('path');
+import { strict } from "assert";
 
 export class Library implements ILibrary
 {
@@ -32,18 +33,49 @@ export class Library implements ILibrary
     {
         let localVideoItem: any = [];
 
+        let subtitles: any = [];
+
         for(let fileName of filenames)
         {
-            let videoEntry: VideoItem =
+
+            if(fileName.indexOf('.srt') !== -1)
             {
-                name: fileName,
-                resourceLocation: "/" + fileName
+                //Will add a builder later that works off iso and does this logic more cleanly
+                let fullFilename = fileName.replace('.srt', '');
+                
+                //create a new entry subtitle entry if one doesn't exist
+                if(!subtitles[fullFilename])
+                {   
+                    subtitles[fullFilename] = [];
+                }
+
+                subtitles[fullFilename].push(fileName);
             }
-            
-            localVideoItem.push(videoEntry);
-        
+
         }
 
+        for(let fileName of filenames)
+        {
+
+            if(fileName.indexOf('.srt') === -1)
+            {
+                let videoEntry: VideoItem =
+                {
+                    name: fileName,
+                    resourceLocation: "/" + fileName
+                }
+
+                let fullFilename = fileName.replace('.mp4', '');
+                fullFilename = fileName.replace('.m4v', '');
+                if(subtitles[fullFilename])
+                {
+                    videoEntry.subtitles = subtitles[fullFilename];
+                }
+                
+                localVideoItem.push(videoEntry);
+                
+            }
+        }
         return localVideoItem;
     }
 

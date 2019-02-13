@@ -18,13 +18,33 @@ var Library = /** @class */ (function () {
     };
     Library.prototype.buildLibrary = function (filenames) {
         var localVideoItem = [];
+        var subtitles = [];
         for (var _i = 0, filenames_1 = filenames; _i < filenames_1.length; _i++) {
             var fileName = filenames_1[_i];
-            var videoEntry = {
-                name: fileName,
-                resourceLocation: "/" + fileName
-            };
-            localVideoItem.push(videoEntry);
+            if (fileName.indexOf('.srt') !== -1) {
+                //Will add a builder later that works off iso and does this logic more cleanly
+                var fullFilename = fileName.replace('.srt', '');
+                //create a new entry subtitle entry if one doesn't exist
+                if (!subtitles[fullFilename]) {
+                    subtitles[fullFilename] = [];
+                }
+                subtitles[fullFilename].push(fileName);
+            }
+        }
+        for (var _a = 0, filenames_2 = filenames; _a < filenames_2.length; _a++) {
+            var fileName = filenames_2[_a];
+            if (fileName.indexOf('.srt') === -1) {
+                var videoEntry = {
+                    name: fileName,
+                    resourceLocation: "/" + fileName
+                };
+                var fullFilename = fileName.replace('.mp4', '');
+                fullFilename = fileName.replace('.m4v', '');
+                if (subtitles[fullFilename]) {
+                    videoEntry.subtitles = subtitles[fullFilename];
+                }
+                localVideoItem.push(videoEntry);
+            }
         }
         return localVideoItem;
     };
