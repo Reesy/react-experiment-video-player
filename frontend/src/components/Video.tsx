@@ -6,6 +6,7 @@ import { VideoApi } from '../apis/VideoApi';
 import { IVideoApi } from '../apis/IVideoApi';
 import { VideoPlayer } from './VideoPlayer';
 import { VideoItem } from "../../../sharedInterfaces/VideoItem";
+import { SubtitlePicker } from './SubtitlePicker';
 
 class Video extends React.Component<any, any> {
 
@@ -16,9 +17,12 @@ class Video extends React.Component<any, any> {
 		this.state = {
 			currentVideo: "",
 			videoLibrary: [],
-			isListAvailable: false 
+			isListAvailable: false,
+			subtitles: [],
+			currentSubtitle: ""
 		}
-		this.handleSelection = this.handleSelection.bind(this);
+		this.handleVideoSelection = this.handleVideoSelection.bind(this);
+		this.handleSubtitleSelection = this.handleSubtitleSelection.bind(this);
 		this.getVideos = this.getVideos.bind(this);
 
 		this.videoApi = new VideoApi();
@@ -32,10 +36,25 @@ class Video extends React.Component<any, any> {
 	render() 
 	{
 		let mainContent;
-
+		let subtitleContent;
 		if(this.state.isListAvailable) 
 		{
 			//Renders the list of available videos once received from the service
+
+			if(this.state.subtitles.length < 1)
+			{
+				subtitleContent = <div></div>
+			}
+			else
+			{
+				subtitleContent =
+				<SubtitlePicker
+					subtitles={this.state.subtitles}
+					onSelectChange={this.handleSubtitleSelection}
+				/>
+			}
+
+
 			mainContent =  
 			<div className='video'>
 
@@ -45,9 +64,9 @@ class Video extends React.Component<any, any> {
 				
 				<VideoPicker 
 					library={this.state.videoLibrary}
-					onSelectChange={this.handleSelection}
+					onSelectChange={this.handleVideoSelection}
 				/>
-
+				{subtitleContent}
 				<div>		 
 					This is the current video: {this.state.currentVideo.name} 
 				</div>
@@ -73,13 +92,26 @@ class Video extends React.Component<any, any> {
 	 * @description: Once a video selection occurs this will update local state.
 	 * @param event: The HTML event that triggered this function
 	 */
-	private handleSelection(selection: any)
+	private handleVideoSelection(selection: any)
 	{	
 		let parsedVideoLibrary = this.state.videoLibrary;
 		let _currentVideo: VideoItem = parsedVideoLibrary.find((video : VideoItem) => video.name === selection);
 		this.setCurrentVideo(_currentVideo);
 	}
 	
+
+	/**
+	 * @method handleSelection()
+	 * @description: Once a video selection occurs this will update local state.
+	 * @param event: The HTML event that triggered this function
+	 */
+	private handleSubtitleSelection(selection: any)
+	{	
+		this.setState({currentSubtitle: selection});
+	}
+
+
+
 	/**
 	 * @method getVideos()
 	 * @description This will call out to an API to retrieve the names and location of available videos.
@@ -100,13 +132,22 @@ class Video extends React.Component<any, any> {
 	private setCurrentVideo(VideoItem: VideoItem)
 	{
 		let completeApiPath = this.videoApi.getVideoApiAddress() + VideoItem.resourceLocation;
-		
+
 		let fullyAddressedVideoItem: VideoItem = 
 		{
 			name: VideoItem.name,
 			resourceLocation: completeApiPath
 		}
 		this.setState({currentVideo: fullyAddressedVideoItem});
+
+		if(VideoItem.subtitles)
+		{
+			this.setState({subtitles: VideoItem.subtitles});
+		}
+		else
+		{
+			this.setState({subtitles: []});
+		}
 	}
 }
 

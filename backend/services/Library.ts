@@ -38,10 +38,10 @@ export class Library implements ILibrary
         for(let fileName of filenames)
         {
 
-            if(fileName.indexOf('.srt') !== -1)
+            if(fileName.indexOf('.vtt') !== -1)
             {
                 //Will add a builder later that works off iso and does this logic more cleanly
-                let fullFilename = fileName.replace('.srt', '');
+                let fullFilename = fileName.replace('.vtt', '');
                 
                 //create a new entry subtitle entry if one doesn't exist
                 if(!subtitles[fullFilename])
@@ -57,7 +57,7 @@ export class Library implements ILibrary
         for(let fileName of filenames)
         {
 
-            if(fileName.indexOf('.srt') === -1)
+            if(fileName.indexOf('.vtt') === -1)
             {
                 let videoEntry: VideoItem =
                 {
