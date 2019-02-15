@@ -36,25 +36,9 @@ class Video extends React.Component<any, any> {
 	render() 
 	{
 		let mainContent;
-		let subtitleContent;
 		if(this.state.isListAvailable) 
 		{
 			//Renders the list of available videos once received from the service
-
-			if(this.state.subtitles.length < 1)
-			{
-				subtitleContent = <div></div>
-			}
-			else
-			{
-				subtitleContent =
-				<SubtitlePicker
-					subtitles={this.state.subtitles}
-					onSelectChange={this.handleSubtitleSelection}
-				/>
-			}
-
-
 			mainContent =  
 			<div className='video'>
 
@@ -66,7 +50,11 @@ class Video extends React.Component<any, any> {
 					library={this.state.videoLibrary}
 					onSelectChange={this.handleVideoSelection}
 				/>
-				{subtitleContent}
+				
+				<SubtitlePicker
+					subtitles={this.state.subtitles}
+					onSelectChange={this.handleSubtitleSelection}
+				/>
 				<div>		 
 					This is the current video: {this.state.currentVideo.name} 
 				</div>

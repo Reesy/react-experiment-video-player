@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 class VideoPlayer extends React.Component<any, any> {
@@ -10,10 +9,10 @@ class VideoPlayer extends React.Component<any, any> {
     render() 
     {
       return (
-		  <div> 
-			  <video width="640" height="360" controls src={this.props.video.resourceLocation}>
-			  </video> 
-		  </div>
+        <div> 
+          <video width="640" height="360" controls src={this.props.video.resourceLocation}>
+          </video> 
+        </div>
       );
 	}	
 }

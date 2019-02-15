@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 class SubtitlePicker extends React.Component<any, any> {
@@ -12,16 +11,26 @@ class SubtitlePicker extends React.Component<any, any> {
     render() 
     {   
         const subtitles : Array<string> = this.props.subtitles;
-        return (
-            <div>
-                
+        let subtitleContent;
+        if(this.state.subtitles.length < 1)
+        {
+            subtitleContent = 
+            <div></div>
+        }
+        else
+        {
+            subtitleContent = 
+            <div>           
                 <select name="SubtitleChoice" onChange={this.handleSelection}>
                     {subtitles.map((subtitle: any) => 
                     {
                         return <option key={subtitle}>{subtitle}</option>;
                     })}
                 </select>	
-             </div>
+            </div>
+        }
+        return (
+            {subtitleContent}
         );
 	}
     
