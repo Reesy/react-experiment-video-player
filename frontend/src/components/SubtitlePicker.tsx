@@ -12,7 +12,7 @@ class SubtitlePicker extends React.Component<any, any> {
     {   
         const subtitles : Array<string> = this.props.subtitles;
         let subtitleContent;
-        if(this.state.subtitles.length < 1)
+        if(this.props.subtitles.length < 1)
         {
             subtitleContent = 
             <div></div>
@@ -30,7 +30,9 @@ class SubtitlePicker extends React.Component<any, any> {
             </div>
         }
         return (
-            {subtitleContent}
+            <div>
+               {subtitleContent}
+            </div>
         );
 	}
     
