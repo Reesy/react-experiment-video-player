@@ -2,6 +2,7 @@ import { Video } from "../../sharedInterfaces/Video";
 import { ILibrary } from "./interfaces/ILibrary";
 import  fs  = require('fs');
 import path = require('path');
+import { Subtitle } from "../../sharedInterfaces/Subtitle";
 
 export class Library implements ILibrary
 {
@@ -61,7 +62,7 @@ export class Library implements ILibrary
                 let videoEntry: Video =
                 {
                     name: fileName,
-                    resourceLocation: "/" + fileName
+                    path: "/" + fileName
                 }
 
                 let fullFilename = fileName.replace('.mp4', '');
@@ -78,9 +79,13 @@ export class Library implements ILibrary
         return localVideoItem;
     }
 
-    private writeLibrary()
+    private buildSubtitles(): Array<Subtitle>
     {
 
+    }
 
+    private buildVideo(): Array<Video>
+    {
+        
     }
 }
