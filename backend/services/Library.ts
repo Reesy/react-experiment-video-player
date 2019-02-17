@@ -1,8 +1,10 @@
-import { Video } from "../../sharedInterfaces/Video";
-import { ILibrary } from "./interfaces/ILibrary";
-import  fs  = require('fs');
+import fs  = require('fs');
 import path = require('path');
+import { ILibrary } from "./interfaces/ILibrary";
+import { Video } from "../../sharedInterfaces/Video";
+import { videoBuilder } from "../builders/videoBuilder";
 import { Subtitle } from "../../sharedInterfaces/Subtitle";
+import { subtitleBuilder } from "../builders/subtitleBuilder";
 
 export class Library implements ILibrary
 {
@@ -31,61 +33,57 @@ export class Library implements ILibrary
 
     private buildLibrary(filenames: Array<string>): Array<Video>
     {
-        let localVideoItem: any = [];
+        let videoFileNames: Array<string> = [];
 
-        let subtitles: any = [];
+        let subtitleFileNames: Array<string> = [];
 
         for(let fileName of filenames)
         {
-
             if(fileName.indexOf('.vtt') !== -1)
             {
-                //Will add a builder later that works off iso and does this logic more cleanly
-                let fullFilename = fileName.replace('.vtt', '');
-                
-                //create a new entry subtitle entry if one doesn't exist
-                if(!subtitles[fullFilename])
-                {   
-                    subtitles[fullFilename] = [];
-                }
-
-                subtitles[fullFilename].push(fileName);
+                subtitleFileNames.push(fileName);
             }
 
-        }
-
-        for(let fileName of filenames)
-        {
-
-            if(fileName.indexOf('.vtt') === -1)
+            if(fileName.indexOf('.mp4') !== -1)
             {
-                let videoEntry: Video =
-                {
-                    name: fileName,
-                    path: "/" + fileName
-                }
+                videoFileNames.push(fileName);
+            }
 
-                let fullFilename = fileName.replace('.mp4', '');
-                fullFilename = fileName.replace('.m4v', '');
-                if(subtitles[fullFilename])
-                {
-                    videoEntry.subtitles = subtitles[fullFilename];
-                }
-                
-                localVideoItem.push(videoEntry);
-                
+            if(fileName.indexOf('.m4v') !== -1)
+            {
+                videoFileNames.push(fileName);
             }
         }
-        return localVideoItem;
+        let subtitles; 
+        if(subtitleFileNames.length > 0)
+        {
+            subtitles = this.buildSubtitles(subtitleFileNames);
+        }
+        let videos = typeof(subtitles) !== 'undefined' ? this.buildVideos(videoFileNames, subtitles) : this.buildVideos(videoFileNames);
+        return videos;
     }
 
-    private buildSubtitles(): Array<Subtitle>
+    private buildSubtitles(fileNames: Array<string>): Array<Subtitle>
     {
+        let subtitles: Array<Subtitle> = [];
+        for(let fileName of fileNames)
+        {
+            let subtitle = new subtitleBuilder(fileName).buildSubtitle();
+            subtitles.push(subtitle);
+        }
 
+        return subtitles;
     }
 
-    private buildVideo(): Array<Video>
+    private buildVideos(fileNames: Array<string>, subtitles?: Array<Subtitle>): Array<Video>
     {
-        
-    }
+        let videos: Array<Video> = [];
+        for(let fileName of fileNames)
+        {
+            let video = new videoBuilder(fileName, subtitles).buildVideo();
+            videos.push(video);
+        }
+
+        return videos
+    }  
 }
