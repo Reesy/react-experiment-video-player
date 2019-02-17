@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { VideoItem } from '../../../sharedInterfaces/VideoItem';
+import { Video } from '../../../sharedInterfaces/Video';
 
 class VideoPicker extends React.Component<any, any> {
 
@@ -12,7 +12,7 @@ class VideoPicker extends React.Component<any, any> {
 
     render() 
     {   
-        const videos : Array<VideoItem> = this.props.library;
+        const videos : Array<Video> = this.props.library;
         return (
             <div>
                 

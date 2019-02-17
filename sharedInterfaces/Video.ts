@@ -1,5 +1,5 @@
 
-export interface VideoItem
+export interface Video
 {
     name: string,
     resourceLocation: string

@@ -1,14 +1,13 @@
-import { VideoItem } from "../../sharedInterfaces/VideoItem";
+import { Video } from "../../sharedInterfaces/Video";
 import { ILibrary } from "./interfaces/ILibrary";
 import  fs  = require('fs');
 import path = require('path');
-import { strict } from "assert";
 
 export class Library implements ILibrary
 {
     
     private content: string;
-    private videoItemCache: Array<VideoItem>;
+    private videoItemCache: Array<Video>;
 
     constructor()
     {
@@ -17,7 +16,7 @@ export class Library implements ILibrary
         this.scanLibrary();
     }
 
-    public getLibrary(): Array<VideoItem>
+    public getLibrary(): Array<Video>
     {
         return this.videoItemCache;
     }
@@ -29,7 +28,7 @@ export class Library implements ILibrary
         this.videoItemCache = this.buildLibrary(LibraryFolderContent);
     }
 
-    private buildLibrary(filenames: Array<string>): Array<VideoItem>
+    private buildLibrary(filenames: Array<string>): Array<Video>
     {
         let localVideoItem: any = [];
 
@@ -59,7 +58,7 @@ export class Library implements ILibrary
 
             if(fileName.indexOf('.vtt') === -1)
             {
-                let videoEntry: VideoItem =
+                let videoEntry: Video =
                 {
                     name: fileName,
                     resourceLocation: "/" + fileName

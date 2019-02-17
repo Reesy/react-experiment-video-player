@@ -1,8 +1,8 @@
-import { VideoItem } from "../../../sharedInterfaces/VideoItem";
+import { Video } from "../../../sharedInterfaces/Video";
 
 export interface ILibrary
 {
-    getLibrary(): Array<VideoItem>;
+    getLibrary(): Array<Video>;
 
     scanLibrary(): void;
 

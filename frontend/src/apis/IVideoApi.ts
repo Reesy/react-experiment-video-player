@@ -1,8 +1,8 @@
-import { VideoItem } from "../../../sharedInterfaces/VideoItem";
+import { Video} from "../../../sharedInterfaces/Video";
 
 export interface IVideoApi
 {
-    getVideos(): Promise<Array<VideoItem>>
+    getVideos(): Promise<Array<Video>>
 
     getVideoApiAddress(): string
 }

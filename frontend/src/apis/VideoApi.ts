@@ -1,4 +1,4 @@
-import { VideoItem } from "../../../sharedInterfaces/VideoItem";
+import { Video } from "../../../sharedInterfaces/Video";
 import { IVideoApi } from "./IVideoApi";
 import { request } from '../wrappers/request';
 import { IRequest } from "../wrappers/IRequest";
@@ -15,7 +15,7 @@ export class VideoApi implements IVideoApi
         this.APICaller = new request();
     }
 
-    public async getVideos(): Promise<Array<VideoItem>>
+    public async getVideos(): Promise<Array<Video>>
     {   
         const options: IRequestOptions = 
         {
@@ -24,7 +24,7 @@ export class VideoApi implements IVideoApi
         const uri = "http://localhost:3050/api/video/library"
 
         let serverResponseString = await this.APICaller.get(uri, options);  
-        let parsedResponse: Array<VideoItem> = JSON.parse(serverResponseString);
+        let parsedResponse: Array<Video> = JSON.parse(serverResponseString);
         return parsedResponse;
     }
 
