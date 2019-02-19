@@ -30,7 +30,7 @@ describe("subtitleBuilder", () =>
 
             it("Should throw an 'invalid fileName' error ", () => 
             {
-
+                chai.assert.fail()
             });
         });
 
@@ -40,7 +40,7 @@ describe("subtitleBuilder", () =>
             {
                 it("Should default the language to Unknown", () =>
                 {
-
+                    chai.assert.fail()
                 });
             });
 
@@ -48,7 +48,7 @@ describe("subtitleBuilder", () =>
             {
                 it("Should default the language to Unknown", () =>
                 {
-
+                    chai.assert.fail()
                 });
             });
 
@@ -56,12 +56,48 @@ describe("subtitleBuilder", () =>
             {
                 describe("And the Language is French", () =>
                 {
+                    it("Should return a subtitle object with name set to the filename", () =>
+                    {
+                        chai.assert.fail();
+                    });
 
+                    it("Should return a subtitle object with language 'French'", () =>
+                    {
+                        chai.assert.fail();
+                    });
+
+                    it("Should return a subtitle object with path referencing the french file", () =>
+                    {
+                        chai.assert.fail();
+                    });
+
+                    it("Should return a subtitle object with target which should be filename excluding extention", () =>
+                    {
+                        chai.assert.fail();
+                    });
                 });
 
                 describe("And the Language is Welsh", () =>
                 {
+                    it("Should return a subtitle object with name set to the filename", () =>
+                    {
+                        chai.assert.fail();
+                    });
 
+                    it("Should return a subtitle object with language 'Welsh'", () =>
+                    {
+                        chai.assert.fail();
+                    });
+
+                    it("Should return a subtitle object with path referencing the Welsh file", () =>
+                    {
+                        chai.assert.fail();
+                    });
+
+                    it("Should return a subtitle object with target which should be filename excluding extention", () =>
+                    {
+                        chai.assert.fail();
+                    });
                 });
             });
 
@@ -69,12 +105,48 @@ describe("subtitleBuilder", () =>
             {
                 describe("And the Language is French", () =>
                 {
+                    it("Should return a subtitle object with name set to the filename", () =>
+                    {
+                        chai.assert.fail();
+                    });
 
+                    it("Should return a subtitle object with language 'French'", () =>
+                    {
+                        chai.assert.fail();
+                    });
+
+                    it("Should return a subtitle object with path referencing the french file", () =>
+                    {
+                        chai.assert.fail();
+                    });
+
+                    it("Should return a subtitle object with target which should be filename excluding extention", () =>
+                    {
+                        chai.assert.fail();
+                    });
                 });
 
                 describe("And the Language is Welsh", () =>
                 {
+                    it("Should return a subtitle object with name set to the filename", () =>
+                    {
+                        chai.assert.fail();
+                    });
 
+                    it("Should return a subtitle object with language 'Welsh'", () =>
+                    {
+                        chai.assert.fail();
+                    });
+
+                    it("Should return a subtitle object with path referencing the Welsh file", () =>
+                    {
+                        chai.assert.fail();
+                    });
+
+                    it("Should return a subtitle object with target which should be filename excluding extention", () =>
+                    {
+                        chai.assert.fail();
+                    });
                 });
             });
 
