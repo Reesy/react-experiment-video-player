@@ -1,5 +1,4 @@
 import chai = require('chai');
-import mocha = require('mocha');
 import { subtitleBuilder } from '../../builders/subtitleBuilder';
 
 describe("subtitleBuilder", () =>
