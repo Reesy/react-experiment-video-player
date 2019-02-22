@@ -34,21 +34,42 @@ export class videoBuilder implements IvideoBuilder
         return Video;
     }
 
+    /**
+     * @private
+     * @name buildVideoName
+     * @description This will return the passed in video filename to the resulting video object. 
+     */
     private buildVideoName(): string
     {
         return ''
     }
 
+    /**
+     * @private
+     * @name buildVideoPath 
+     * @description This will returns the path to the video file on the host server
+     */
     private buildVideoPath(): string
     {
         return ''
     }
 
+    /**
+     * @private
+     * @name buildBaseName 
+     * @description This will return the base filename without any extensions to more easily map related subtitles
+     */
     private buildBaseName(): string
     {
         return ''
 
     }
+
+    /**
+     * @private
+     * @name buildVideoSubtitles
+     * @description This will append the passed in subtitles array to the resulting video object
+     */
     private buildVideoSubtitles(): Array<Subtitle> | void
     {
         return;
