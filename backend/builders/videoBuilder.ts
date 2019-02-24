@@ -6,13 +6,15 @@ import { Subtitle } from "../../sharedInterfaces/Subtitle";
 export class videoBuilder implements IvideoBuilder
 {
     private fileName: string;
+    private directory: string;
     private subtitles: any;
-
-    constructor(_fileName: string, subtitles?: Array<Subtitle>)
+    
+    constructor(_fileName: string, __directory: string, __subtitles?: Array<Subtitle>)
     {
         this.fileName = _fileName;
-        if(subtitles){
-            this.subtitles = subtitles;
+        this.directory = __directory;
+        if(__subtitles){
+            this.subtitles = __subtitles;
         }
     }
 

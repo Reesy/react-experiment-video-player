@@ -9,7 +9,7 @@ describe("subtitleBuilder", () =>
             let result: Subtitle;
             before(() =>
             {
-                let SubtitleBuilder = new subtitleBuilder('');
+                let SubtitleBuilder = new subtitleBuilder('', 'subtitlehost');
                 result = SubtitleBuilder.buildSubtitle();
             });
 
@@ -24,7 +24,7 @@ describe("subtitleBuilder", () =>
             let result: Subtitle;
             before(() =>
             {
-                let SubtitleBuilder = new subtitleBuilder(<any>null);
+                let SubtitleBuilder = new subtitleBuilder(<any>null, 'subtitlehost');
                 result = SubtitleBuilder.buildSubtitle();
             });
 
@@ -41,7 +41,7 @@ describe("subtitleBuilder", () =>
                 let result: Subtitle;
                 before(() =>
                 {
-                    let SubtitleBuilder = new subtitleBuilder('TheMatrix2.jjip.m4v');
+                    let SubtitleBuilder = new subtitleBuilder('TheMatrix2.jjip.vtt', 'subtitlehost');
                     result = SubtitleBuilder.buildSubtitle();
                 });
                 it("Should default the language to Unknown", () =>
@@ -56,14 +56,14 @@ describe("subtitleBuilder", () =>
 
                 it("Should return the filename", () =>
                 {
-                    chai.expect(result.name).to.equal('TheMatrix2.jjip.m4v');
+                    chai.expect(result.name).to.equal('TheMatrix2.jjip.vtt');
                 });
 
                 describe("And the file exists under hosted/videos", () =>
                 {
                     it("Should return a path of the directory plus filename", () =>
                     {
-                        chai.expect(result.path).to.equal('hosted/videos/TheMatrix2.jjip.m4v');
+                        chai.expect(result.path).to.equal('hosted/videos/TheMatrix2.jjip.vtt');
                     })
                 })
             });
@@ -73,7 +73,7 @@ describe("subtitleBuilder", () =>
                 let result: Subtitle;
                 before(() =>
                 {
-                    let SubtitleBuilder = new subtitleBuilder('TheMatrix2.jjip.m4v');
+                    let SubtitleBuilder = new subtitleBuilder('TheMatrix2.jjip.vtt', 'subtitlehost');
                     result = SubtitleBuilder.buildSubtitle();
                 });
                 it("Should default the language to Unknown", () =>
@@ -90,13 +90,13 @@ describe("subtitleBuilder", () =>
                     let result: Subtitle;
                     before(() =>
                     {
-                        let SubtitleBuilder = new subtitleBuilder('TheEnglishMovieThatIsntInEnglish.fr.m4v');
+                        let SubtitleBuilder = new subtitleBuilder('TheEnglishMovieThatIsntInEnglish.fr.vtt', 'subtitlehost');
                         result = SubtitleBuilder.buildSubtitle();
                     });
 
                     it("Should return a subtitle object with name set to the filename", () =>
                     {
-                        chai.expect(result.name).to.equal("TheEnglishMovieThatIsntInEnglish.fr.m4v");
+                        chai.expect(result.name).to.equal("TheEnglishMovieThatIsntInEnglish.fr.vtt");
                     });
 
                     it("Should return a subtitle object with language 'French'", () =>
@@ -107,7 +107,7 @@ describe("subtitleBuilder", () =>
                     {
                         it("Should return a subtitle object with path referencing the french file", () =>
                         {
-                            chai.expect(result.path).to.equal('/my/movies/TheEnglishMovieThatIsntInEnglish.fr.m4v');
+                            chai.expect(result.path).to.equal('/my/movies/TheEnglishMovieThatIsntInEnglish.fr.vtt');
                         });
     
                     })
@@ -123,13 +123,13 @@ describe("subtitleBuilder", () =>
                     let result: Subtitle;
                     before(() =>
                     {
-                        let SubtitleBuilder = new subtitleBuilder('rareMovieFromS4c.cy.m4v');
+                        let SubtitleBuilder = new subtitleBuilder('rareMovieFromS4c.cy.vtt', 'subtitlehost');
                         result = SubtitleBuilder.buildSubtitle();
                     });
 
                     it("Should return a subtitle object with name set to the filename", () =>
                     {
-                        chai.expect(result.name).to.equal("rareMovieFromS4c.cy.m4v");
+                        chai.expect(result.name).to.equal("rareMovieFromS4c.cy.vtt");
                     });
 
                     it("Should return a subtitle object with language 'Welsh'", () =>
@@ -140,7 +140,7 @@ describe("subtitleBuilder", () =>
                     {
                         it("Should return a subtitle object with path referencing the french file", () =>
                         {
-                            chai.expect(result.path).to.equal('/my/movies/rareMovieFromS4c.cy.m4v');
+                            chai.expect(result.path).to.equal('/my/movies/rareMovieFromS4c.cy.vtt');
                         });
     
                     })
@@ -159,13 +159,13 @@ describe("subtitleBuilder", () =>
                     let result: Subtitle;
                     before(() =>
                     {
-                        let SubtitleBuilder = new subtitleBuilder('TheEnglishMovieThatIsntInEnglish.fre.m4v');
+                        let SubtitleBuilder = new subtitleBuilder('TheEnglishMovieThatIsntInEnglish.fre.vtt', 'subtitlehost');
                         result = SubtitleBuilder.buildSubtitle();
                     });
 
                     it("Should return a subtitle object with name set to the filename", () =>
                     {
-                        chai.expect(result.name).to.equal("TheEnglishMovieThatIsntInEnglish.fre.m4v");
+                        chai.expect(result.name).to.equal("TheEnglishMovieThatIsntInEnglish.fre.vtt");
                     });
 
                     it("Should return a subtitle object with language 'French'", () =>
@@ -176,7 +176,7 @@ describe("subtitleBuilder", () =>
                     {
                         it("Should return a subtitle object with path referencing the french file", () =>
                         {
-                            chai.expect(result.path).to.equal('/my/movies/TheEnglishMovieThatIsntInEnglish.fre.m4v');
+                            chai.expect(result.path).to.equal('/my/movies/TheEnglishMovieThatIsntInEnglish.fre.vtt');
                         });
     
                     })
@@ -192,13 +192,13 @@ describe("subtitleBuilder", () =>
                     let result: Subtitle;
                     before(() =>
                     {
-                        let SubtitleBuilder = new subtitleBuilder('rareMovieFromS4c.cym.m4v');
+                        let SubtitleBuilder = new subtitleBuilder('rareMovieFromS4c.cym.vtt', 'subtitlehost');
                         result = SubtitleBuilder.buildSubtitle();
                     });
 
                     it("Should return a subtitle object with name set to the filename", () =>
                     {
-                        chai.expect(result.name).to.equal("rareMovieFromS4c.cym.m4v");
+                        chai.expect(result.name).to.equal("rareMovieFromS4c.cym.vtt");
                     });
 
                     it("Should return a subtitle object with language 'Welsh'", () =>
@@ -209,7 +209,7 @@ describe("subtitleBuilder", () =>
                     {
                         it("Should return a subtitle object with path referencing the french file", () =>
                         {
-                            chai.expect(result.path).to.equal('/my/movies/rareMovieFromS4c.cym.m4v');
+                            chai.expect(result.path).to.equal('/my/movies/rareMovieFromS4c.cym.vtt');
                         });
     
                     })

@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 var contentDirectory = path.join(__dirname, 'videos');
 app.use(express.static(contentDirectory));
-var library = new Library.Library();
+var library = new Library.Library(contentDirectory);
 var cachedLibrary = library.getLibrary();
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");

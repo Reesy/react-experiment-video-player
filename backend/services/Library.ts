@@ -11,11 +11,13 @@ export class Library implements ILibrary
     
     private content: string;
     private videoItemCache: Array<Video>;
+    private contentDirectory: string;
 
-    constructor()
+    constructor(__contentDirectory: string)
     {
         this.content = '';
         this.videoItemCache = [];
+        this.contentDirectory = __contentDirectory;
         this.scanLibrary();
     }
 
@@ -68,7 +70,7 @@ export class Library implements ILibrary
         let subtitles: Array<Subtitle> = [];
         for(let fileName of fileNames)
         {
-            let subtitle = new subtitleBuilder(fileName).buildSubtitle();
+            let subtitle = new subtitleBuilder(fileName, this.contentDirectory).buildSubtitle();
             subtitles.push(subtitle);
         }
 
@@ -80,7 +82,7 @@ export class Library implements ILibrary
         let videos: Array<Video> = [];
         for(let fileName of fileNames)
         {
-            let video = new videoBuilder(fileName, subtitles).buildVideo();
+            let video = new videoBuilder(fileName, this.contentDirectory, subtitles).buildVideo();
             videos.push(video);
         }
 
