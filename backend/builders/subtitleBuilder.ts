@@ -1,7 +1,7 @@
 import { IsubtitleBuilder } from "./interfaces/IsubtitleBuilder";
 import { Subtitle } from "../../sharedInterfaces/Subtitle";
 import path = require('path');
-
+import {ISO6391, ISO6392} from "../constants/languages";
 
 export class subtitleBuilder implements IsubtitleBuilder
 {
@@ -9,6 +9,11 @@ export class subtitleBuilder implements IsubtitleBuilder
     private directory: string
     constructor(__fileName: string, __directory: string)
     {
+
+        if(typeof(__fileName) === 'undefined' || __fileName === null || __fileName === '')
+        {
+            throw new Error('Invalid filename');
+        }
         this.fileName = __fileName;
         this.directory = __directory;
     }
@@ -58,6 +63,37 @@ export class subtitleBuilder implements IsubtitleBuilder
      */
     private buildSubtitleLanguage(): string
     {
+        let languageCodeCapture = this.fileName.match(/[^.]([^.]*)/);
+        if(languageCodeCapture === null)
+        {
+            return 'Unknown'
+        }
+
+        let languageCode = languageCodeCapture[0];
+        console.log("Language code" + languageCodeCapture);
+        if(languageCode.length === 2)
+        {
+            let result = Object.getPrototypeOf(ISO6391)[languageCode];
+            return result;
+        }
+        else if(languageCode.length === 3)
+        {
+            let result = Object.keys(ISO6392).indexOf(languageCode);
+            return result[name];
+        }
+        else 
+        {
+            return 'Unknown'
+        }
+
+        //If no letter between two dots
+            //return 'Unknown'
+        //If two letter 
+            //look up ISO6391
+        //If three letter
+            //look up ISO6392
+        //If neither
+            //return 'Unknown'
         return ''
     }
 
@@ -69,7 +105,13 @@ export class subtitleBuilder implements IsubtitleBuilder
      */
     private buildSubtitleTarget(): string
     {
-        return ''
+        let target = this.fileName.match(/[^.]*/);
+
+        if(target === null)
+        {
+            throw 'Subtitle target was undiscovered';
+        }
+        return target[0]
     }
 
 };

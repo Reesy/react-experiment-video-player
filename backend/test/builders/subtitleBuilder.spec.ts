@@ -2,35 +2,47 @@ import chai = require('chai');
 import { subtitleBuilder } from '../../builders/subtitleBuilder';
 import { Subtitle } from '../../../sharedInterfaces/Subtitle';
 
-describe("subtitleBuilder", () =>
+describe.only("subtitleBuilder", () =>
 {
         describe("When called with an empty fileName", () => 
         {
-            let result: Subtitle;
+            let result: any;
             before(() =>
             {
-                let SubtitleBuilder = new subtitleBuilder('', 'subtitlehost');
-                result = SubtitleBuilder.buildSubtitle();
+                try
+                {
+                    result = new subtitleBuilder('', 'subtitlehost')
+                }
+                catch(__error)
+                {
+                    result = __error;
+                }
             });
 
-            it("Should throw an 'invalid fileName' error ", () => 
+            it("Should throw an 'Invalid filename' error ", () => 
             {
-                chai.expect(result).to.equal("Invalid filename");
+                chai.expect(result.message).to.eql('Invalid filename');
             })
         });
 
         describe("When called with a null fileName", () =>
         {
-            let result: Subtitle;
+            let result: any;
             before(() =>
             {
-                let SubtitleBuilder = new subtitleBuilder(<any>null, 'subtitlehost');
-                result = SubtitleBuilder.buildSubtitle();
+                try
+                {
+                    result = new subtitleBuilder('', 'subtitlehost')
+                }
+                catch(__error)
+                {
+                    result = __error;
+                }
             });
 
-            it("Should throw an 'invalid fileName' error ", () => 
+            it("Should throw an 'Invalid filename' error ", () => 
             {
-                chai.expect(result).to.equal("Invalid filename");
+                chai.expect(result.message).to.eql('Invalid filename');
             });
         });
 
@@ -41,12 +53,12 @@ describe("subtitleBuilder", () =>
                 let result: Subtitle;
                 before(() =>
                 {
-                    let SubtitleBuilder = new subtitleBuilder('TheMatrix2.jjip.vtt', 'subtitlehost');
+                    let SubtitleBuilder = new subtitleBuilder('TheMatrix2.jjip.vtt', 'hosted/videos');
                     result = SubtitleBuilder.buildSubtitle();
                 });
                 it("Should default the language to Unknown", () =>
                 {
-                    chai.expect(result.language).to.equal('Unknwon');
+                    chai.expect(result.language).to.equal('Unknown');
                 });
 
                 it("Should return a target that it is the filename without any extensions", () =>
@@ -78,7 +90,7 @@ describe("subtitleBuilder", () =>
                 });
                 it("Should default the language to Unknown", () =>
                 {
-                    chai.expect(result.language).to.equal('Unknwon');
+                    chai.expect(result.language).to.equal('Unknown');
                 });
 
             });
@@ -90,7 +102,7 @@ describe("subtitleBuilder", () =>
                     let result: Subtitle;
                     before(() =>
                     {
-                        let SubtitleBuilder = new subtitleBuilder('TheEnglishMovieThatIsntInEnglish.fr.vtt', 'subtitlehost');
+                        let SubtitleBuilder = new subtitleBuilder('TheEnglishMovieThatIsntInEnglish.fr.vtt', '/my/movies');
                         result = SubtitleBuilder.buildSubtitle();
                     });
 
@@ -123,7 +135,7 @@ describe("subtitleBuilder", () =>
                     let result: Subtitle;
                     before(() =>
                     {
-                        let SubtitleBuilder = new subtitleBuilder('rareMovieFromS4c.cy.vtt', 'subtitlehost');
+                        let SubtitleBuilder = new subtitleBuilder('rareMovieFromS4c.cy.vtt', '/my/movies');
                         result = SubtitleBuilder.buildSubtitle();
                     });
 
@@ -159,7 +171,7 @@ describe("subtitleBuilder", () =>
                     let result: Subtitle;
                     before(() =>
                     {
-                        let SubtitleBuilder = new subtitleBuilder('TheEnglishMovieThatIsntInEnglish.fre.vtt', 'subtitlehost');
+                        let SubtitleBuilder = new subtitleBuilder('TheEnglishMovieThatIsntInEnglish.fre.vtt', '/my/movies');
                         result = SubtitleBuilder.buildSubtitle();
                     });
 
@@ -209,7 +221,7 @@ describe("subtitleBuilder", () =>
                     {
                         it("Should return a subtitle object with path referencing the french file", () =>
                         {
-                            chai.expect(result.path).to.equal('/my/movies/rareMovieFromS4c.cym.vtt');
+                            chai.expect(result.path).to.equal('subtitlehost/rareMovieFromS4c.cym.vtt');
                         });
     
                     })
