@@ -2,7 +2,7 @@ import chai = require('chai');
 import { subtitleBuilder } from '../../builders/subtitleBuilder';
 import { Subtitle } from '../../../sharedInterfaces/Subtitle';
 
-describe.only("subtitleBuilder", () =>
+describe("subtitleBuilder", () =>
 {
         describe("When called with an empty fileName", () => 
         {
@@ -32,7 +32,7 @@ describe.only("subtitleBuilder", () =>
             {
                 try
                 {
-                    result = new subtitleBuilder('', 'subtitlehost')
+                    result = new subtitleBuilder(<any>null, 'subtitlehost')
                 }
                 catch(__error)
                 {

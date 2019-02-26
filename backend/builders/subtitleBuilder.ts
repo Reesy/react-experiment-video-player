@@ -73,11 +73,19 @@ export class subtitleBuilder implements IsubtitleBuilder
         if(languageCode.length === 2)
         {
             let result = ISO6391[languageCode];
+            if(typeof(result) === "undefined")
+            {
+                return 'Unknown';
+            }
             return result.name;
         }
         else if(languageCode.length === 3)
         {
             let result = ISO6392[languageCode];
+            if(typeof(result) === "undefined")
+            {
+                return 'Unknown';
+            }
             return result.name[0];
         }
         else 

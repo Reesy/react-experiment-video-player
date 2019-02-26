@@ -7,49 +7,45 @@ describe("videoBuilder", () =>
 {
         describe("When called with an empty fileName", () => 
         {
-            let result: Video;
+            let result: any;
             before(() =>
             {
-                let VideoBuilder = new videoBuilder('', 'videohost');
-                result = VideoBuilder.buildVideo();
+                try
+                {
+                    result = new videoBuilder('', 'videohost')
+                }
+                catch(__error)
+                {
+                    result = __error;
+                }
             });
 
             it("Should throw an 'Invalid video filename' error ", () => 
             {
-                chai.expect(result).to.equal("Invalid video filename");
+                chai.expect(result.message).to.equal("Invalid video filename");
             })
         });
 
         describe("When called with a null fileName", () =>
         {
-            let result: Video;
+            let result: any;
             before(() =>
             {
-                let VideoBuilder = new videoBuilder(<any>null, 'videohost');
-                result = VideoBuilder.buildVideo();
+                try
+                {
+                    result = new videoBuilder(<any>null, 'videohost')
+                }
+                catch(__error)
+                {
+                    result = __error;
+                }
             });
 
-            it("Should throw an 'Null video filename' error", () => 
+            it("Should throw an 'Invalid video filename' error ", () => 
             {
-                chai.expect(result).to.equal("Null video filename");
-            });
+                chai.expect(result.message).to.equal("Invalid video filename");
+            })
         });
-
-        describe("When called with a filename of an invalid extension", () =>
-        {
-            let result: Video;
-            before(() =>
-            {
-                let VideoBuilder = new videoBuilder('MyInvalidFilename.avi', 'videohost');
-                result = VideoBuilder.buildVideo();
-            });
-
-            it("Should throw an 'Invalid video extention' error ", () => 
-            {
-                chai.expect(result).to.equal("Invalid video extention");
-            });
-
-        })
 
         describe("When called with a valid filename ending with .mp4 or .m4v", () =>
         {
@@ -133,7 +129,7 @@ describe("videoBuilder", () =>
                         subtitles.push(SubtitleBuilder_3.buildSubtitle());
                         subtitles.push(SubtitleBuilder_4.buildSubtitle());
                         subtitles.push(SubtitleBuilder_5.buildSubtitle());
-                        let VideoBuilder = new videoBuilder('Lost in translation.mp4', 'videohost');
+                        let VideoBuilder = new videoBuilder('Lost in translation.mp4', 'videohost', subtitles);
                         result = VideoBuilder.buildVideo();
                     })
                     it("Should return a video object with name as filename", () =>

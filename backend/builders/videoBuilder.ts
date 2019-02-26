@@ -1,7 +1,7 @@
 import { IvideoBuilder } from "./interfaces/IvideoBuilder";
 import { Video } from "../../sharedInterfaces/Video";
 import { Subtitle } from "../../sharedInterfaces/Subtitle";
-
+import path = require('path');
 
 export class videoBuilder implements IvideoBuilder
 {
@@ -9,11 +9,16 @@ export class videoBuilder implements IvideoBuilder
     private directory: string;
     private subtitles: any;
     
-    constructor(_fileName: string, __directory: string, __subtitles?: Array<Subtitle>)
+    constructor(__fileName: string, __directory: string, __subtitles?: Array<Subtitle>)
     {
-        this.fileName = _fileName;
+        if(typeof(__fileName) === 'undefined' || __fileName === null || __fileName === '')
+        {
+            throw new Error('Invalid video filename');
+        }
+        this.fileName = __fileName;
         this.directory = __directory;
-        if(__subtitles){
+        if(__subtitles)
+        {
             this.subtitles = __subtitles;
         }
     }
@@ -43,7 +48,7 @@ export class videoBuilder implements IvideoBuilder
      */
     private buildVideoName(): string
     {
-        return ''
+        return this.fileName;
     }
 
     /**
@@ -53,7 +58,7 @@ export class videoBuilder implements IvideoBuilder
      */
     private buildVideoPath(): string
     {
-        return ''
+        return path.join(this.directory, this.fileName);
     }
 
     /**
@@ -63,7 +68,13 @@ export class videoBuilder implements IvideoBuilder
      */
     private buildBaseName(): string
     {
-        return ''
+        let target = this.fileName.match(/[^.]*/);
+
+        if(target === null)
+        {
+            throw 'Basename could not be resolved'
+        }
+        return target[0]
 
     }
 
@@ -74,6 +85,11 @@ export class videoBuilder implements IvideoBuilder
      */
     private buildVideoSubtitles(): Array<Subtitle> | void
     {
+        if(this.subtitles)
+        {
+            return this.subtitles;
+        }
+
         return;
     }
 
