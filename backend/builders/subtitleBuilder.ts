@@ -63,38 +63,27 @@ export class subtitleBuilder implements IsubtitleBuilder
      */
     private buildSubtitleLanguage(): string
     {
-        let languageCodeCapture = this.fileName.match(/[^.]([^.]*)/);
+        let languageCodeCapture = this.fileName.match(/\.(.*?)\./);
         if(languageCodeCapture === null)
         {
             return 'Unknown'
         }
 
-        let languageCode = languageCodeCapture[0];
-        console.log("Language code" + languageCodeCapture);
+        let languageCode = languageCodeCapture[1];
         if(languageCode.length === 2)
         {
-            let result = Object.getPrototypeOf(ISO6391)[languageCode];
-            return result;
+            let result = ISO6391[languageCode];
+            return result.name;
         }
         else if(languageCode.length === 3)
         {
-            let result = Object.keys(ISO6392).indexOf(languageCode);
-            return result[name];
+            let result = ISO6392[languageCode];
+            return result.name[0];
         }
         else 
         {
             return 'Unknown'
         }
-
-        //If no letter between two dots
-            //return 'Unknown'
-        //If two letter 
-            //look up ISO6391
-        //If three letter
-            //look up ISO6392
-        //If neither
-            //return 'Unknown'
-        return ''
     }
 
     /**

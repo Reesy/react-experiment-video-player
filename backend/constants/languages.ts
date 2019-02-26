@@ -1,6 +1,6 @@
 
 
-export const ISO6391 = {
+export const ISO6391: any = {
     "ab":{
         "name":"Abkhaz",
         "native":"аҧсуа"
@@ -731,7 +731,7 @@ export const ISO6391 = {
     }
 }
 
-export const ISO6392 = {
+export const ISO6392: any = {
 	"aar":
 	{
 		"name":["Afar"],
