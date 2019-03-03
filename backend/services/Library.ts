@@ -12,12 +12,14 @@ export class Library implements ILibrary
     private content: string;
     private videoItemCache: Array<Video>;
     private contentDirectory: string;
+    private serverDirectory: string;
 
-    constructor(__contentDirectory: string)
+    constructor(__contentDirectory: string, __serverDirectory: string)
     {
         this.content = '';
         this.videoItemCache = [];
         this.contentDirectory = __contentDirectory;
+        this.serverDirectory = __serverDirectory;
         this.scanLibrary();
     }
 
@@ -70,7 +72,7 @@ export class Library implements ILibrary
         let subtitles: Array<Subtitle> = [];
         for(let subtitleFile of __subtitleFiles)
         {
-            let subtitle = new subtitleBuilder(subtitleFile, this.contentDirectory).buildSubtitle();
+            let subtitle = new subtitleBuilder(subtitleFile, this.serverDirectory).buildSubtitle();
             subtitles.push(subtitle);
         }
 
@@ -82,7 +84,7 @@ export class Library implements ILibrary
         let videos: Array<Video> = [];
         for(let videoFile of __videoFiles)
         {
-            let VideoBuilder: videoBuilder = new videoBuilder(videoFile, this.contentDirectory);
+            let VideoBuilder: videoBuilder = new videoBuilder(videoFile, this.serverDirectory);
             let video = VideoBuilder.buildVideo(); 
 
             if(__subtitles)
@@ -90,7 +92,6 @@ export class Library implements ILibrary
                 let matchedSubtitles: Subtitle[] = __subtitles.filter(sub => sub.target === video.baseName);
                 if(matchedSubtitles.length > 0)
                 {
-                    console.log(matchedSubtitles);
                     video.subtitles = matchedSubtitles;
                 }
             }

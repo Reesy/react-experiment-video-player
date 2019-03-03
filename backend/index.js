@@ -5,11 +5,12 @@ var bodyParser = require("body-parser");
 var Library = require("./services/Library");
 var path = require("path");
 var app = express();
+var ServedVideoLocation = 'videos';
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-var contentDirectory = path.join(__dirname, 'videos');
+var contentDirectory = path.join(__dirname, ServedVideoLocation);
 app.use(express.static(contentDirectory));
-var library = new Library.Library(contentDirectory);
+var library = new Library.Library(contentDirectory, '');
 var cachedLibrary = library.getLibrary();
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");

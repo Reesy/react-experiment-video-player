@@ -30,6 +30,6 @@ export class VideoApi implements IVideoApi
 
     public getVideoApiAddress(): string
     {
-        return "http://localhost:3050"
+        return "http://localhost:3050/"
     }
 }

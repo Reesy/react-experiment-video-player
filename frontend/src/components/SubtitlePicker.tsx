@@ -24,7 +24,7 @@ class SubtitlePicker extends React.Component<any, any> {
                 <select name="SubtitleChoice" onChange={this.handleSelection}>
                     {subtitles.map((subtitle: any) => 
                     {
-                        return <option key={subtitle}>{subtitle}</option>;
+                        return <option key={subtitle.name}>{subtitle.language}</option>;
                     })}
                 </select>	
             </div>
