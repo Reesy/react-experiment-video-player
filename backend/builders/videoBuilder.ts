@@ -9,7 +9,7 @@ export class videoBuilder implements IvideoBuilder
     private directory: string;
     private subtitles: any;
     
-    constructor(__fileName: string, __directory: string, __subtitles?: Array<Subtitle>)
+    constructor(__fileName: string, __directory: string)
     {
         if(typeof(__fileName) === 'undefined' || __fileName === null || __fileName === '')
         {
@@ -17,10 +17,6 @@ export class videoBuilder implements IvideoBuilder
         }
         this.fileName = __fileName;
         this.directory = __directory;
-        if(__subtitles)
-        {
-            this.subtitles = __subtitles;
-        }
     }
 
     public buildVideo(): Video
@@ -28,17 +24,26 @@ export class videoBuilder implements IvideoBuilder
         let name = this.buildVideoName();
         let path = this.buildVideoPath();
         let baseName = this.buildBaseName();
-        let subtitles = this.buildVideoSubtitles();
         let Video: Video = {
             name: name,
             path: path,
             baseName: baseName,
         }
-        if(subtitles)
+        if(this.subtitles)
         {
-            Video.subtitles = subtitles;
+            Video.subtitles = this.subtitles;
         }
         return Video;
+    }
+
+    /**
+     * @name buildVideoSubtitles
+     * @description This will append the passed in subtitles array to the resulting video object
+     */
+    public buildVideoSubtitles(__subtitles: Array<Subtitle>): void
+    {
+        this.subtitles = __subtitles;
+        return;
     }
 
     /**
@@ -76,21 +81,6 @@ export class videoBuilder implements IvideoBuilder
         }
         return target[0]
 
-    }
-
-    /**
-     * @private
-     * @name buildVideoSubtitles
-     * @description This will append the passed in subtitles array to the resulting video object
-     */
-    private buildVideoSubtitles(): Array<Subtitle> | void
-    {
-        if(this.subtitles)
-        {
-            return this.subtitles;
-        }
-
-        return;
     }
 
 }

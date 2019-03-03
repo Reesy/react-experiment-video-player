@@ -88,7 +88,8 @@ describe("videoBuilder", () =>
                     {
                         let SubtitleBuilder = new subtitleBuilder('skyfall.jp.vtt', 'subtitleHost');
                         let subtitle = SubtitleBuilder.buildSubtitle();
-                        let VideoBuilder = new videoBuilder('skyfall.mp4', 'videohost', [subtitle]);
+                        let VideoBuilder = new videoBuilder('skyfall.mp4', 'videohost');
+                        VideoBuilder.buildVideoSubtitles([subtitle]);
                         result = VideoBuilder.buildVideo();
                     })
                     it("Should return a video object with name as filename", () =>
@@ -129,7 +130,8 @@ describe("videoBuilder", () =>
                         subtitles.push(SubtitleBuilder_3.buildSubtitle());
                         subtitles.push(SubtitleBuilder_4.buildSubtitle());
                         subtitles.push(SubtitleBuilder_5.buildSubtitle());
-                        let VideoBuilder = new videoBuilder('Lost in translation.mp4', 'videohost', subtitles);
+                        let VideoBuilder = new videoBuilder('Lost in translation.mp4', 'videohost');
+                        VideoBuilder.buildVideoSubtitles(subtitles);
                         result = VideoBuilder.buildVideo();
                     })
                     it("Should return a video object with name as filename", () =>

@@ -65,24 +65,36 @@ export class Library implements ILibrary
         return videos;
     }
 
-    private buildSubtitles(fileNames: Array<string>): Array<Subtitle>
+    private buildSubtitles(__subtitleFiles: Array<string>): Array<Subtitle>
     {
         let subtitles: Array<Subtitle> = [];
-        for(let fileName of fileNames)
+        for(let subtitleFile of __subtitleFiles)
         {
-            let subtitle = new subtitleBuilder(fileName, this.contentDirectory).buildSubtitle();
+            let subtitle = new subtitleBuilder(subtitleFile, this.contentDirectory).buildSubtitle();
             subtitles.push(subtitle);
         }
 
         return subtitles;
     }
 
-    private buildVideos(fileNames: Array<string>, subtitles?: Array<Subtitle>): Array<Video>
+    private buildVideos(__videoFiles: Array<string>, __subtitles?: Array<Subtitle>): Array<Video>
     {
         let videos: Array<Video> = [];
-        for(let fileName of fileNames)
+        for(let videoFile of __videoFiles)
         {
-            let video = new videoBuilder(fileName, this.contentDirectory, subtitles).buildVideo();
+            let VideoBuilder: videoBuilder = new videoBuilder(videoFile, this.contentDirectory);
+            let video = VideoBuilder.buildVideo(); 
+
+            if(__subtitles)
+            {
+                let matchedSubtitles: Subtitle[] = __subtitles.filter(sub => sub.target === video.baseName);
+                if(matchedSubtitles.length > 0)
+                {
+                    console.log(matchedSubtitles);
+                    video.subtitles = matchedSubtitles;
+                }
+            }
+            
             videos.push(video);
         }
 

@@ -117,20 +117,21 @@ class App extends React.Component<any, any> {
 	 * @method setCurrentVideo
 	 * @description This will set the api path on the current video
 	 */
-	private setCurrentVideo(VideoItem: Video)
+	private setCurrentVideo(_video: Video)
 	{
-		let completeApiPath = this.videoApi.getVideoApiAddress() + VideoItem.resourceLocation;
+		let completeApiPath = this.videoApi.getVideoApiAddress() + _video.path;
 
 		let fullyAddressedVideoItem: Video = 
 		{
-			name: VideoItem.name,
-			resourceLocation: completeApiPath
+			name: _video.name,
+			baseName: _video.baseName,
+			path: completeApiPath
 		}
 		this.setState({currentVideo: fullyAddressedVideoItem});
 
-		if(VideoItem.subtitles)
+		if(_video.subtitles)
 		{
-			this.setState({subtitles: VideoItem.subtitles});
+			this.setState({subtitles: _video.subtitles});
 		}
 		else
 		{
