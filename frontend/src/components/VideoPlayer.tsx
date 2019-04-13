@@ -10,37 +10,34 @@ class VideoPlayer extends React.Component<any, any> {
     }
     render() 
     {
-        let playerStyle = 
-        {
-           // display: "flex"
-           background: "white"
-        }
-
         let videoStyle = 
         {
+            position: "absolute" as "absolute",
+            background: "black",
             display: "flex",
-            width: "640px",
             height: "360px",
-            background: "black"
+            width: "640px",
+            opacity: 0.5
         }
 
         let groupStyle = 
         {
-            background: "white",
             display: "flex",
-            alignItems: "flex-end",
+            marginTop: "335px",
+            background: "white",
             height: "25px",
-            paddingBottom: "5px",
+            width: "640px",
+            position: "relative" as "relative",
+            opacity: 0.5
         }
 
         let buttonStyle = 
         {
-            display: "flex",
-            fontSize: "20px",
-            color: "grey",
-            border: "none", /* Remove borders */
             background: "none",
-            cursor: "pointer"
+            border: "none",
+            color: "grey",
+            cursor: "pointer",
+            fontSize: "20px"
         }
 
         {/* <div className="progress">
@@ -49,10 +46,7 @@ class VideoPlayer extends React.Component<any, any> {
         </progress>
     </div> */}
         return (
-            <div style={playerStyle}> 
-                {/* <div style={videoStyle}>
-
-                </div> */}
+            <div> 
                 <video src={this.props.video.path} className="mainVideo" style={videoStyle}>
                     <track kind="subtitles" src="test.vtt" label="English" srcLang="en" default />
                     <track kind="subtitles" src="test2.vtt" label="Spanish" srcLang="es" />

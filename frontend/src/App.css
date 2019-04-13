@@ -1,13 +1,13 @@
 .App {
-  text-align: center;
   background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  font-size: calc(10px + 2vmin);
   color: white;
+  height: 100vh;
+}
+
+.videoPlayer{
+  height: 360px;
+  width: 640px;
+  display: flex;
 }
 
 .App-logo {
@@ -17,11 +17,6 @@
 
 .App-link {
   color: #61dafb;
-}
-
-.video {
-  margin: 20px;
-  flex-direction: row;
 }
 
 @keyframes App-logo-spin {

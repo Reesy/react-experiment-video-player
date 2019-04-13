@@ -35,30 +35,41 @@ class App extends React.Component<any, any> {
 	}
 	render() 
 	{
+		
 		let mainContent;
 		if(this.state.isListAvailable) 
 		{
 			//Renders the list of available videos once received from the service
 			mainContent =  
-			<div className='video'>
+			<div>
 
-				<VideoPlayer
-					video={this.state.currentVideo}
-				/>
-				
-				<VideoPicker 
-					library={this.state.videoLibrary}
-					onSelectChange={this.handleVideoSelection}
-				/>
-				
-				<SubtitlePicker
-					subtitles={this.state.subtitles}
-					onSelectChange={this.handleSubtitleSelection}
-				/>
-				<div>		 
-					This is the current video: {this.state.currentVideo.name} 
+				<div className="videoPlayer">
+
+					<VideoPlayer
+						video={this.state.currentVideo}
+					/>
+
 				</div>
-			
+
+				<div className='toolbar'>
+
+					<VideoPicker 
+						library={this.state.videoLibrary}
+						onSelectChange={this.handleVideoSelection}
+					/>
+					
+					<SubtitlePicker
+						subtitles={this.state.subtitles}
+						onSelectChange={this.handleSubtitleSelection}
+					/>
+
+					<div>		 
+						This is the current video: {this.state.currentVideo.name} 
+					</div>
+				
+				</div>
+				
+
 			</div>
 		}
 		else
@@ -97,8 +108,6 @@ class App extends React.Component<any, any> {
 	{	
 		this.setState({currentSubtitle: selection});
 	}
-
-
 
 	/**
 	 * @method getVideos()
