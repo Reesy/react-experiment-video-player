@@ -1,4 +1,4 @@
-import * as rp from 'request-promise-native';
+import axios, { AxiosRequestConfig } from 'axios';
 import { IRequestOptions } from './IRequestOptions';
 import { IRequest } from './IRequest';
 /**
@@ -6,10 +6,6 @@ import { IRequest } from './IRequest';
  */
 export class request implements IRequest
 {
-    constructor()
-    {
-
-    }
     
     /**
      * 
@@ -20,7 +16,7 @@ export class request implements IRequest
     {
         this.validateURI(uri);
         let transformedOptions = this.tranformOptions(options);
-        return rp.get(uri, transformedOptions);
+        return axios.get(uri, transformedOptions);
     }
 
     /**
@@ -32,7 +28,7 @@ export class request implements IRequest
     {
         this.validateURI(uri);
         let transformedOptions = this.tranformOptions(options);
-        return rp.post(uri, transformedOptions);
+        return axios.post(uri, transformedOptions);
     }
     
     /**
@@ -44,7 +40,7 @@ export class request implements IRequest
     {
         this.validateURI(uri);
         let transformedOptions = this.tranformOptions(options);
-        return rp.put(uri, transformedOptions);
+        return axios.put(uri, transformedOptions);
     }
 
     /**
@@ -56,7 +52,7 @@ export class request implements IRequest
     {
         this.validateURI(uri);
         let transformedOptions = this.tranformOptions(options);
-        return rp.delete(uri, transformedOptions);
+        return axios.delete(uri, transformedOptions);
     }
 
     /**
@@ -67,7 +63,7 @@ export class request implements IRequest
     {
         if(typeof(uri) === "undefined" || uri === "")
         {
-            throw "URI is mising in request";
+            throw new Error("URI is mising in request"); 
         }
 
         return;
@@ -78,8 +74,8 @@ export class request implements IRequest
      * @description Transforms 
      * @param {IRequestOptions} options 
      */
-    private tranformOptions(options: IRequestOptions): rp.RequestPromiseOptions
+    private tranformOptions(options: IRequestOptions): AxiosRequestConfig
     {
-        return <rp.RequestPromiseOptions>options;
+        return options as AxiosRequestConfig;
     }
 }
