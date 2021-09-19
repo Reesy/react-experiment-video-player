@@ -1,4 +1,4 @@
-import { Video } from "../../../sharedInterfaces/Video";
+import { Video } from "./Video";
 
 export interface IvideoBuilder
 {

@@ -1,4 +1,4 @@
-import { Video } from "../../../sharedInterfaces/Video";
+import { Video } from "../interfaces/Video";
 import { IVideoApi } from "./IVideoApi";
 import { request } from '../wrappers/request';
 import { IRequest } from "../wrappers/IRequest";

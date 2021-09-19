@@ -5,7 +5,7 @@ import { VideoPicker } from './components/VideoPicker';
 import { VideoApi } from './apis/VideoApi';
 import { IVideoApi } from './apis/IVideoApi';
 import { VideoPlayer } from './components/VideoPlayer';
-import { Video } from "../../sharedInterfaces/Video";
+import { Video } from "./interfaces/Video";
 import { SubtitlePicker } from './components/SubtitlePicker';
 
 class App extends React.Component<any, any> {

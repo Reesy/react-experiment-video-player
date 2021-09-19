@@ -1,4 +1,4 @@
-import { Subtitle } from "../../../sharedInterfaces/Subtitle";
+import { Subtitle } from "./Subtitle";
 
 export interface IsubtitleBuilder
 {

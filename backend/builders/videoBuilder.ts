@@ -1,6 +1,6 @@
-import { IvideoBuilder } from "./interfaces/IvideoBuilder";
-import { Video } from "../../sharedInterfaces/Video";
-import { Subtitle } from "../../sharedInterfaces/Subtitle";
+import { IvideoBuilder } from "../interfaces/IvideoBuilder";
+import { Video } from "../interfaces/Video";
+import { Subtitle } from "../interfaces/Subtitle";
 import path = require('path');
 
 export class videoBuilder implements IvideoBuilder

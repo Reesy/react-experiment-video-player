@@ -1,4 +1,4 @@
-import { Video} from "../../../sharedInterfaces/Video";
+import { Video} from "../interfaces/Video";
 
 export interface IVideoApi
 {

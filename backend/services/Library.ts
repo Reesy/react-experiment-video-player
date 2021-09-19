@@ -1,9 +1,9 @@
 import fs  = require('fs');
 import path = require('path');
-import { ILibrary } from "./interfaces/ILibrary";
-import { Video } from "../../sharedInterfaces/Video";
+import { ILibrary } from "../interfaces/ILibrary";
+import { Video } from "../interfaces/Video";
 import { videoBuilder } from "../builders/videoBuilder";
-import { Subtitle } from "../../sharedInterfaces/Subtitle";
+import { Subtitle } from "../interfaces/Subtitle";
 import { subtitleBuilder } from "../builders/subtitleBuilder";
 
 export class Library implements ILibrary
@@ -31,8 +31,16 @@ export class Library implements ILibrary
     public scanLibrary()
     {
         let contentDirectory = path.join(__dirname, '..', 'videos');
-        let LibraryFolderContent = fs.readdirSync(contentDirectory);
-        this.videoItemCache = this.buildLibrary(LibraryFolderContent);
+
+        if (fs.existsSync(contentDirectory))
+        {
+            let LibraryFolderContent = fs.readdirSync(contentDirectory);
+            this.videoItemCache = this.buildLibrary(LibraryFolderContent);
+        }
+        else
+        {
+            console.log('Video directory not found');
+        }
     }
 
     private buildLibrary(filenames: Array<string>): Array<Video>

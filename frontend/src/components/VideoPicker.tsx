@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Video } from '../../../sharedInterfaces/Video';
+import { Video } from '../interfaces/Video';
 
 class VideoPicker extends React.Component<any, any> {
 

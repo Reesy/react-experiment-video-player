@@ -1,7 +1,7 @@
 import chai = require('chai');
 import { videoBuilder } from '../../builders/videoBuilder';
 import { subtitleBuilder } from '../../builders/subtitleBuilder';
-import { Video } from "../../../sharedInterfaces/Video";
+import { Video } from "../../interfaces/Video";
 
 describe("videoBuilder", () =>
 {

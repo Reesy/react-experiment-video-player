@@ -4,10 +4,7 @@ import 'font-awesome/css/font-awesome.min.css';
 class VideoPlayer extends React.Component<any, any> {
 
     public buttonPlay: any;
-    constructor(props: any)
-    {
-      super(props);
-    }
+
     render() 
     {
         let videoStyle = 

@@ -1,6 +1,6 @@
 import chai = require('chai');
 import { subtitleBuilder } from '../../builders/subtitleBuilder';
-import { Subtitle } from '../../../sharedInterfaces/Subtitle';
+import { Subtitle } from '../../interfaces/Subtitle';
 
 describe("subtitleBuilder", () =>
 {

@@ -1,5 +1,5 @@
-import { IsubtitleBuilder } from "./interfaces/IsubtitleBuilder";
-import { Subtitle } from "../../sharedInterfaces/Subtitle";
+import { IsubtitleBuilder } from "../interfaces/IsubtitleBuilder";
+import { Subtitle } from "../interfaces/Subtitle";
 import path = require('path');
 import {ISO6391, ISO6392} from "../constants/languages";
 
