@@ -30,11 +30,10 @@ export class Library implements ILibrary
 
     public scanLibrary()
     {
-        let contentDirectory = path.join(__dirname, '..', 'videos');
 
-        if (fs.existsSync(contentDirectory))
+        if (fs.existsSync(this.contentDirectory))
         {
-            let LibraryFolderContent = fs.readdirSync(contentDirectory);
+            let LibraryFolderContent = fs.readdirSync(this.contentDirectory);
             this.videoItemCache = this.buildLibrary(LibraryFolderContent);
         }
         else

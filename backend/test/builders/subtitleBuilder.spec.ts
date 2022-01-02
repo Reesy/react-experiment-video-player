@@ -1,4 +1,5 @@
 import chai = require('chai');
+import path = require('path');
 import { subtitleBuilder } from '../../builders/subtitleBuilder';
 import { Subtitle } from '../../interfaces/Subtitle';
 
@@ -75,8 +76,8 @@ describe("subtitleBuilder", () =>
                 {
                     it("Should return a path of the directory plus filename", () =>
                     {
-                        chai.expect(result.path).to.equal('hosted/videos/TheMatrix2.jjip.vtt');
-                    })
+                        chai.expect(result.path).to.equal(path.join('hosted', 'videos', 'TheMatrix2.jjip.vtt'));                  
+                    });
                 })
             });
 
@@ -119,7 +120,7 @@ describe("subtitleBuilder", () =>
                     {
                         it("Should return a subtitle object with path referencing the french file", () =>
                         {
-                            chai.expect(result.path).to.equal('/my/movies/TheEnglishMovieThatIsntInEnglish.fr.vtt');
+                            chai.expect(result.path).to.equal(path.join('/my', 'movies', 'TheEnglishMovieThatIsntInEnglish.fr.vtt'));
                         });
     
                     })
@@ -152,7 +153,8 @@ describe("subtitleBuilder", () =>
                     {
                         it("Should return a subtitle object with path referencing the french file", () =>
                         {
-                            chai.expect(result.path).to.equal('/my/movies/rareMovieFromS4c.cy.vtt');
+                           
+                            chai.expect(result.path).to.equal( path.join('/my', 'movies', 'rareMovieFromS4c.cy.vtt'));
                         });
     
                     })
@@ -188,7 +190,7 @@ describe("subtitleBuilder", () =>
                     {
                         it("Should return a subtitle object with path referencing the french file", () =>
                         {
-                            chai.expect(result.path).to.equal('/my/movies/TheEnglishMovieThatIsntInEnglish.fre.vtt');
+                            chai.expect(result.path).to.equal(path.join('/my', 'movies', 'TheEnglishMovieThatIsntInEnglish.fre.vtt'));
                         });
     
                     })
@@ -221,7 +223,7 @@ describe("subtitleBuilder", () =>
                     {
                         it("Should return a subtitle object with path referencing the french file", () =>
                         {
-                            chai.expect(result.path).to.equal('subtitlehost/rareMovieFromS4c.cym.vtt');
+                            chai.expect(result.path).to.equal(path.join('subtitlehost', 'rareMovieFromS4c.cym.vtt'));
                         });
     
                     })

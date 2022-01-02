@@ -4,7 +4,7 @@ import Library = require('./services/Library');
 import path = require('path');
 
 const app = express();
-const ServedVideoLocation = 'videos'
+const ServedVideoLocation = '../videos'
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));

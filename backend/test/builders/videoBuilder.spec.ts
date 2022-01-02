@@ -1,4 +1,5 @@
 import chai = require('chai');
+import path = require('path');
 import { videoBuilder } from '../../builders/videoBuilder';
 import { subtitleBuilder } from '../../builders/subtitleBuilder';
 import { Video } from "../../interfaces/Video";
@@ -64,7 +65,7 @@ describe("videoBuilder", () =>
 
                 it("Should return a video object with path as the filepath on the host server", () =>
                 {
-                    chai.expect(result.path).to.equal('videohost/Interstellar.mp4');
+                    chai.expect(result.path).to.equal(path.join('videohost', 'Interstellar.mp4'));
                 });
 
                 it("Should return a video object with baseName as the extensionless filename", () =>
@@ -99,7 +100,8 @@ describe("videoBuilder", () =>
     
                     it("Should return a video object with path as the filepath on the host server", () =>
                     {
-                        chai.expect(result.path).to.equal('videohost/skyfall.mp4');
+                        
+                        chai.expect(result.path).to.equal(path.join('videohost', 'skyfall.mp4'));
                     });
     
                     it("Should return a video object with baseName as the extensionless filename", () =>
@@ -141,7 +143,8 @@ describe("videoBuilder", () =>
     
                     it("Should return a video object with path as the filepath on the host server", () =>
                     {
-                        chai.expect(result.path).to.equal('videohost/Lost in translation.mp4');
+                     
+                        chai.expect(result.path).to.equal(path.join('videohost', 'Lost in translation.mp4'));
                     });
     
                     it("Should return a video object with baseName as the extensionless filename", () =>
