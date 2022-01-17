@@ -45,7 +45,7 @@ class VideoPlayer extends React.Component<any, any> {
                 <div id="video-controls" className="controls" data-state="hidden" style={groupStyle}>
                     <button id="playPause" type="button" onClick={this.playOrPause} className="fa fa-play" style={buttonStyle}></button>
                     <button id="subtitle" type="button" className="fa fa-language" style={buttonStyle}></button>
-                    <button id="fs" type="button" data-state="go-fullscreen" className="fa fa-expand" style={buttonStyle}></button>
+                    <button id="fs" type="button" onClick={this.setFullScreen} data-state="go-fullscreen" className="fa fa-expand" style={buttonStyle}></button>
                 </div>
             </div>
         );
@@ -66,6 +66,19 @@ class VideoPlayer extends React.Component<any, any> {
             playPauseButton.className = "fa fa-play";
         }
      
+    }
+
+    private setFullScreen(event: any)
+    {
+        let videoElement: any = document.getElementsByClassName('mainVideo')[0];
+        if(videoElement.requestFullscreen)
+        {
+            videoElement.requestFullscreen();
+        }
+        else if(videoElement.mozRequestFullScreen)
+        {
+            videoElement.mozRequestFullScreen();
+        }
     }
 
 }
