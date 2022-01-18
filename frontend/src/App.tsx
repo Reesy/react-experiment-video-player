@@ -76,7 +76,10 @@ class App extends React.Component<any, any> {
 		{
 			//Renders the react logo as a loading screen.
 			mainContent = 
-			<img src={logo} className="App-logo" alt="logo" />
+			<div>
+				<img src={logo} className="App-logo" alt="logo" />
+				<p> Attempting to retrieve videos, if this takes too long please contact the site owner.</p>
+			</div>
 		}
 
 		return (
