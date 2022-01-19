@@ -7,6 +7,7 @@ import { IVideoApi } from './apis/IVideoApi';
 import { VideoPlayer } from './components/VideoPlayer';
 import { Video } from "./interfaces/Video";
 import { SubtitlePicker } from './components/SubtitlePicker';
+import BroadcastListener  from './components/BroadcastListener';
 
 class App extends React.Component<any, any> {
 
@@ -63,6 +64,8 @@ class App extends React.Component<any, any> {
 						onSelectChange={this.handleSubtitleSelection}
 					/>
 
+					<BroadcastListener />
+					
 					<div>		 
 						This is the current video: {this.state.currentVideo.name} 
 					</div>
