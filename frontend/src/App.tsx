@@ -7,7 +7,7 @@ import { IVideoApi } from './apis/IVideoApi';
 import { VideoPlayer } from './components/VideoPlayer';
 import { Video } from "./interfaces/Video";
 import { SubtitlePicker } from './components/SubtitlePicker';
-import BroadcastListener  from './components/BroadcastListener';
+import GroupWatcher  from './components/GroupWatcher';
 
 class App extends React.Component<any, any> {
 
@@ -20,7 +20,8 @@ class App extends React.Component<any, any> {
 			videoLibrary: [],
 			isListAvailable: false,
 			subtitles: [],
-			currentSubtitle: ""
+			currentSubtitle: "",
+			rooms: []
 		}
 		this.handleVideoSelection = this.handleVideoSelection.bind(this);
 		this.handleSubtitleSelection = this.handleSubtitleSelection.bind(this);
@@ -63,9 +64,8 @@ class App extends React.Component<any, any> {
 						subtitles={this.state.subtitles}
 						onSelectChange={this.handleSubtitleSelection}
 					/>
-
-					<BroadcastListener />
 					
+					<GroupWatcher />
 					<div>		 
 						This is the current video: {this.state.currentVideo.name} 
 					</div>
