@@ -6,8 +6,10 @@ import { VideoApi } from './apis/VideoApi';
 import { IVideoApi } from './apis/IVideoApi';
 import { VideoPlayer } from './components/VideoPlayer';
 import { Video } from "./interfaces/Video";
+import { Room } from "./interfaces/Room";
 import { SubtitlePicker } from './components/SubtitlePicker';
-import GroupWatcher  from './components/GroupWatcher';
+
+let websocket: WebSocket;
 
 class App extends React.Component<any, any> {
 
@@ -21,15 +23,26 @@ class App extends React.Component<any, any> {
 			isListAvailable: false,
 			subtitles: [],
 			currentSubtitle: "",
-			rooms: []
+			isPaused: true,
+			isGroupWatching: false,
+            connected: false,
+			pauseState: "paused",
 		}
 		this.handleVideoSelection = this.handleVideoSelection.bind(this);
 		this.handleSubtitleSelection = this.handleSubtitleSelection.bind(this);
+		this.handleVideoStateChange = this.handleVideoStateChange.bind(this);
+		this.updatePlayState = this.updatePlayState.bind(this);
+        this.createConnection = this.createConnection.bind(this);
 		this.getVideos = this.getVideos.bind(this);
 
 		this.videoApi = new VideoApi();
 
 	}
+
+	destructor()
+    {
+        websocket.close();
+    };
 
 	componentWillMount()
 	{
@@ -44,11 +57,13 @@ class App extends React.Component<any, any> {
 			//Renders the list of available videos once received from the service
 			mainContent =  
 			<div>
-
 				<div className="videoPlayer">
 
 					<VideoPlayer
 						video={this.state.currentVideo}
+						pauseState={this.state.pauseState}
+						connectedState={this.state.connected}
+                        updatePlayState={this.updatePlayState}
 					/>
 
 				</div>
@@ -65,11 +80,7 @@ class App extends React.Component<any, any> {
 						onSelectChange={this.handleSubtitleSelection}
 					/>
 					
-					<GroupWatcher />
-					<div>		 
-						This is the current video: {this.state.currentVideo.name} 
-					</div>
-				
+
 				</div>
 				
 
@@ -80,14 +91,44 @@ class App extends React.Component<any, any> {
 			//Renders the react logo as a loading screen.
 			mainContent = 
 			<div>
+			
 				<img src={logo} className="App-logo" alt="logo" />
 				<p> Attempting to retrieve videos, if this takes too long please contact the site owner.</p>
 			</div>
 		}
+        
+        let roomContent;
+        if (this.state.connected === true)
+        {
+            roomContent = 
+            <div>
+                <p>
+                    <button
+                        className="Main-button"
+                        onClick={this.updatePlayState}>
+                        Send pause update
+                    </button>
+                </p>
 
+            </div>
+        }
+        else
+        {
+            roomContent = 
+            <div>
+                <p>
+                    <button
+                        onClick={this.createConnection}>
+                        Connect
+                    </button>
+                </p>
+            </div>
+        }
 		return (
 			<div className="App">
 				{mainContent}
+                {roomContent}
+                <p> Playback is {this.state.pauseState} </p> 
 			</div>
 		);
 	}
@@ -153,6 +194,51 @@ class App extends React.Component<any, any> {
 			this.setState({subtitles: []});
 		}
 	}
+
+	private handleVideoStateChange(isPaused: boolean)
+	{
+		console.log("Function was fired");
+	}
+
+	
+    private updatePlayState()
+    {   
+        console.log('Inside send message');
+        websocket.send("Update");;
+        if (this.state.pauseState === "paused")
+        {
+            this.setState({ pauseState: "playing" });
+        }
+        else if (this.state.pauseState === "playing")
+        {
+            this.setState({ pauseState: "paused" });
+        };        
+    };
+
+    private createConnection()
+    {
+        console.log("Inside create connection");
+        this.setState({ connected: true });
+        websocket = new WebSocket('ws://localhost:7070');
+
+        websocket.onopen = (event: Event) =>
+        {
+            console.log('Websocket opened');
+            
+        };
+
+        websocket.onclose = (event: CloseEvent) =>
+        {
+            console.log('Websocket closed');
+        };
+    
+        websocket.onmessage = (event: MessageEvent) =>
+        {
+            console.log('Recieved: ', event.data);
+            this.setState({ pauseState: event.data });
+        };
+
+    }
 }
 
 export default App
