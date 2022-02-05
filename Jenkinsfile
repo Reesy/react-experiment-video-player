@@ -16,7 +16,7 @@ pipeline {
       steps {
         dir(path: 'frontend') {
           nodejs('Node 16') {
-            sh 'npm i'
+            sh 'npm i --timing'
           }
         }
       }
