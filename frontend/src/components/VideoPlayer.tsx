@@ -73,13 +73,10 @@ class VideoPlayer extends React.Component<any, any> {
                     <track kind="subtitles" src="test2.vtt" label="Spanish" srcLang="es" />
                 </video>
                 <div id="video-controls" className="controls" data-state="hidden" style={groupStyle}>
-                    <button id="playPause" type="button" onClick={this.playOrPause} className={this.props.pauseState !== "paused" ? "fa fa-play" : "fa fa-pause"} style={buttonStyle}></button>
+                    <button id="playPause" type="button" onClick={this.playOrPause} className={this.props.pauseState !== "paused" ? "fa fa-pause": "fa fa-play" } style={buttonStyle}></button>
                     <button id="subtitle" type="button" className="fa fa-language" style={buttonStyle}></button>
                     <button id="fs" type="button" onClick={this.setFullScreen} data-state="go-fullscreen" className="fa fa-expand" style={buttonStyle}></button>
                 </div>
-                <h1>
-                {this.props.pauseState}
-                </h1>
             </div>
       
         );
@@ -87,23 +84,9 @@ class VideoPlayer extends React.Component<any, any> {
 
     private playOrPause(event: any)
     {
-        if (this.props.connectedState)
-        {
-            this.props.updatePlayState();
-        };
-        let videoElement: any = document.getElementsByClassName('mainVideo')[0];
-        let playPauseButton: any = document.getElementById('playPause');
-        if(videoElement.paused)
-        {
-            videoElement.play();
-            playPauseButton.className = "fa fa-pause";
-        }
-        else
-        {
-            videoElement.pause();
-            playPauseButton.className = "fa fa-play";
-        }
-     
+
+        this.props.updatePlayState();
+
     }
 
     private setFullScreen(event: any)

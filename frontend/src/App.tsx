@@ -202,9 +202,12 @@ class App extends React.Component<any, any> {
 
 	
     private updatePlayState()
-    {   
-        console.log('Inside send message');
-        websocket.send("Update");;
+    {  
+		if (this.state.connected === true)
+		{
+			websocket.send("Update");
+		}
+        
         if (this.state.pauseState === "paused")
         {
             this.setState({ pauseState: "playing" });
