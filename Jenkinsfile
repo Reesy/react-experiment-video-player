@@ -1,7 +1,7 @@
 pipeline {
   agent any
   stages {
-    stage('Install backend') {
+    stage('Install') {
       parallel {
         stage('Install backend') {
           steps {
@@ -30,7 +30,7 @@ pipeline {
       }
     }
 
-    stage('Build backend') {
+    stage('Build') {
       parallel {
         stage('Build backend') {
           steps {
@@ -59,7 +59,7 @@ pipeline {
       }
     }
 
-    stage('Test backend') {
+    stage('Test') {
       steps {
         dir(path: 'backend') {
           nodejs('Node 16') {
