@@ -14,7 +14,7 @@ pipeline {
 
     stage('Install frontend') {
       steps {
-        dir(path: 'client') {
+        dir(path: 'frontend') {
           nodejs('Node 16') {
             sh 'npm i'
           }
