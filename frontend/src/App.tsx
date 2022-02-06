@@ -6,7 +6,6 @@ import { VideoApi } from './apis/VideoApi';
 import { IVideoApi } from './apis/IVideoApi';
 import { VideoPlayer } from './components/VideoPlayer';
 import { Video } from "./interfaces/Video";
-import { Room } from "./interfaces/Room";
 import { SubtitlePicker } from './components/SubtitlePicker';
 
 let websocket: WebSocket;
