@@ -1,0 +1,20 @@
+
+
+.imageParent
+{
+    background-color: brown;
+}
+
+.image
+{
+    width: inherit;
+    height: inherit;
+    background-color: darkred;
+    image-rendering: -webkit-optimize-contrast;
+}
+
+
+.layout
+{
+    background-color: green;
+}

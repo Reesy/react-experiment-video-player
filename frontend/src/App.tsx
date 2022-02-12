@@ -1,6 +1,6 @@
 import './App.css';
 import React from 'react';
-import { VideoPicker } from './components/VideoPicker';
+import  VideoPicker  from './components/VideoPicker';
 import { VideoApi } from './apis/VideoApi';
 import { IVideoApi } from './apis/IVideoApi';
 import { VideoPlayer } from './components/VideoPlayer';
