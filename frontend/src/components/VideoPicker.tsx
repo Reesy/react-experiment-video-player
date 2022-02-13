@@ -19,7 +19,7 @@ interface State
 
 export default class VideoPicker extends React.Component<Props, State>
 {
-    static itemCount : number = 200;
+    static itemCount : number = 164;
 
     static defaultProps: any = {
         cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }
@@ -89,10 +89,12 @@ export default class VideoPicker extends React.Component<Props, State>
         
         if (typeof(this.props.library) === "undefined")
         {
+            console.log('Returned early');
             return;
         }
+        console.log(this.state.layouts);
         let elements: JSX.Element[] = [];
-        
+
         this.props.library.forEach((video: Video, index: number) => 
         {
             let offsetIndex = index + 1; //This is to offset the index to match the react-grid-layout's layout which starts at 1.
@@ -130,6 +132,18 @@ export default class VideoPicker extends React.Component<Props, State>
     }
     
     render() {
+
+
+        if (typeof(this.props.library) === "undefined" || this.props.library.length === 0 || typeof(this.state.layouts) === "undefined")
+        {
+           
+           return (
+                <div>
+                    <h1>Loading...</h1>
+                </div>
+           );
+
+        }
         return (
             <div>
                 <ResponsiveReactGridLayout
