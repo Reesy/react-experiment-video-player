@@ -1,13 +1,15 @@
 import * as React from "react";
 import { Layout, Layouts, Responsive as ResponsiveGridLayout, WidthProvider } from "react-grid-layout";
+import { Video } from "../interfaces/Video";
 import '../styles/VideoPicker.css';
 
 const ResponsiveReactGridLayout = WidthProvider(ResponsiveGridLayout);
 
-interface Props 
+export interface Props 
 {
     cols: {};
     onSelectChange: (event: any) => void;
+    library: Video[];
 }
 
 interface State 
@@ -17,7 +19,7 @@ interface State
 
 export default class VideoPicker extends React.Component<Props, State>
 {
-    static itemCount : number = 98;
+    static itemCount : number = 200;
 
     static defaultProps: any = {
         cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }
@@ -84,17 +86,34 @@ export default class VideoPicker extends React.Component<Props, State>
      */
     private createDOM (_elementCount: number): any
     {
-        let elements: any[] = [];
-
-        for (let element = 1; element <= _elementCount; element++) 
+        
+        if (typeof(this.props.library) === "undefined")
         {
+            return;
+        }
+        let elements: JSX.Element[] = [];
+        
+        this.props.library.forEach((video: Video, index: number) => 
+        {
+            let offsetIndex = index + 1; //This is to offset the index to match the react-grid-layout's layout which starts at 1.
             let elementDOM: JSX.Element = 
-            <div className="imageParent" key={element}>
-                <img id = "About time movie 1" className="image" src="https://xl.movieposterdb.com/13_06/2013/2194499/xl_2194499_c0435606.jpg?v=2021-10-22%2017:59:47" alt="About Time" onMouseDown={ e => {window.alert( e.currentTarget.id) }} />
+            <div className="imageParent" key={offsetIndex}>
+                <img id={offsetIndex.toString()} className="image" src="https://xl.movieposterdb.com/13_06/2013/2194499/xl_2194499_c0435606.jpg?v=2021-10-22%2017:59:47" alt="About Time" onMouseDown={ e => {window.alert( e.currentTarget.id) }} />
             </div>
             elements.push(elementDOM);
-        }
+        });
 
+
+        
+        // for (let element = 1; element <= _elementCount; element++) 
+        // {
+        //     let elementDOM: JSX.Element = 
+        //     <div className="imageParent" key={element}>
+        //         <img id = "About time movie 1" className="image" src="https://xl.movieposterdb.com/13_06/2013/2194499/xl_2194499_c0435606.jpg?v=2021-10-22%2017:59:47" alt="About Time" onMouseDown={ e => {window.alert( e.currentTarget.id) }} />
+        //     </div>
+        //     elements.push(elementDOM);
+        // }
+        console.log(elements)
         return elements;
     };
 

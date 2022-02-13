@@ -5,6 +5,7 @@ import { VideoApi } from './apis/VideoApi';
 import { IVideoApi } from './apis/IVideoApi';
 import { VideoPlayer } from './components/VideoPlayer';
 import { Video } from "./interfaces/Video";
+import { Subtitle } from './interfaces/Subtitle';
 import { SubtitlePicker } from './components/SubtitlePicker';
 
 let websocket: WebSocket;
@@ -16,14 +17,35 @@ enum appRoutes
     videoPage
 };
 
-class App extends React.Component<any, any> {
+
+enum pauseState
+{
+    paused = "paused",
+    playing = "playing"
+};
+
+interface AppState
+{
+    currentVideo: Video,
+    videoLibrary: Video[], //this might be wrong
+    isListAvailable: boolean,
+    subtitles: Subtitle[],
+    currentSubtitle: string,
+    isPaused: boolean,
+    isGroupWatching: boolean,
+    connected:  boolean,
+    pauseState: pauseState,
+    appRoutes: appRoutes
+};
+
+class App extends React.Component<any, AppState> {
 
     private videoApi: IVideoApi;
     constructor(props: any)
     {
         super(props);
         this.state = {
-            currentVideo: "",
+            currentVideo: {} as Video,
             videoLibrary: [],
             isListAvailable: false,
             subtitles: [],
@@ -31,7 +53,7 @@ class App extends React.Component<any, any> {
             isPaused: true,
             isGroupWatching: false,
             connected: false,
-            pauseState: "paused",
+            pauseState: pauseState.paused,
             appRoutes: appRoutes.homePage
         }
         this.handleVideoSelection = this.handleVideoSelection.bind(this);
@@ -150,7 +172,7 @@ class App extends React.Component<any, any> {
     {
         this.setState({ appRoutes: appRoutes.videoPage });
         let parsedVideoLibrary = this.state.videoLibrary;
-        let _currentVideo: Video = parsedVideoLibrary.find((video: Video) => video.name === selection);
+        let _currentVideo: Video = parsedVideoLibrary.find((video: Video) => video.name === selection) as Video; //Not sure if this is correct
         this.setCurrentVideo(_currentVideo);
 
     }
@@ -220,11 +242,11 @@ class App extends React.Component<any, any> {
 
         if (this.state.pauseState === "paused")
         {
-            this.setState({ pauseState: "playing" });
+            this.setState({ pauseState: pauseState.playing });
         }
         else if (this.state.pauseState === "playing")
         {
-            this.setState({ pauseState: "paused" });
+            this.setState({ pauseState: pauseState.paused });
         };
     };
 
