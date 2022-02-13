@@ -5,6 +5,9 @@
     background-color: brown;
 }
 
+.imageParent:hover {
+    border:5px solid #b217b4;
+ }
 .image
 {
     width: inherit;
@@ -12,7 +15,6 @@
     background-color: darkred;
     image-rendering: -webkit-optimize-contrast;
 }
-
 
 .layout
 {

@@ -168,13 +168,10 @@ class App extends React.Component<any, AppState> {
      * @description: Once a video selection occurs this will update local state.
      * @param event: The HTML event that triggered this function
      */
-    private handleVideoSelection(selection: any)
+    private handleVideoSelection(selection: Video)
     {
         this.setState({ appRoutes: appRoutes.videoPage });
-        let parsedVideoLibrary = this.state.videoLibrary;
-        let _currentVideo: Video = parsedVideoLibrary.find((video: Video) => video.name === selection) as Video; //Not sure if this is correct
-        this.setCurrentVideo(_currentVideo);
-
+        this.setCurrentVideo(selection);
     }
 
 
