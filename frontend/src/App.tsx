@@ -112,6 +112,7 @@ class App extends React.Component<any, AppState> {
             mainContent =
                 <div>
                     <VideoPicker
+                        videoApi={this.videoApi}
                         library={this.state.videoLibrary}
                         onSelectChange={this.handleVideoSelection}
                     />

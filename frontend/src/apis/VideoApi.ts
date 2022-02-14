@@ -32,4 +32,10 @@ export class VideoApi implements IVideoApi
     {
         return "http://localhost:3050/"
     }
+
+    public getThumbnailApiAddress(): string
+    {
+        return "http://localhost:3050/"
+    }
+
 }

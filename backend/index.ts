@@ -13,6 +13,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 let contentDirectory = path.join(__dirname, ServedVideoLocation);
 let thumbnailDirectory = path.join(__dirname, ServedThumbnailLocation);
 app.use(express.static(contentDirectory));
+app.use(express.static(thumbnailDirectory));
 
 let library = new Library.Library(contentDirectory, '', thumbnailDirectory);
 let cachedLibrary = library.getLibrary();

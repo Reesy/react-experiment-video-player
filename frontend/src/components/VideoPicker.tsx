@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Layout, Layouts, Responsive as ResponsiveGridLayout, WidthProvider } from "react-grid-layout";
+import { IVideoApi } from "../apis/IVideoApi";
 import { Video } from "../interfaces/Video";
 import '../styles/VideoPicker.css';
 
@@ -10,16 +11,20 @@ export interface Props
     cols: {};
     onSelectChange: (event: any) => void;
     library: Video[];
+    videoApi: IVideoApi;
 }
 
 interface State 
 {
     layouts: Layouts;
+    thumbnailPath: string
 }
 
 export default class VideoPicker extends React.Component<Props, State>
 {
     static itemCount: number = 164;
+
+
 
     static defaultProps: any = {
         cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }
@@ -34,7 +39,8 @@ export default class VideoPicker extends React.Component<Props, State>
             const layouts: Layouts = VideoPicker.createLayouts(itemCount);
 
             let newState: State = {
-                layouts: layouts
+                layouts: layouts,
+                thumbnailPath: prevState.thumbnailPath //this is persisted, will likely change this to dynamically obtain each thumbnail in the future. 
             };
 
             return newState;
@@ -67,9 +73,12 @@ export default class VideoPicker extends React.Component<Props, State>
             xs: [],
             xxs: []
         };
+        let thumbnailPath = this.props.videoApi.getThumbnailApiAddress();
+
 
         this.state = {
-            layouts: layouts
+            layouts: layouts,
+            thumbnailPath: thumbnailPath
         };
     }
 
@@ -140,14 +149,20 @@ export default class VideoPicker extends React.Component<Props, State>
         }
         let elements: JSX.Element[] = [];
 
+        let thumbnail : string = "no_thumbnail.jpg";
+        
         this.props.library.forEach((video: Video, index: number) => 
         {
+            if (video.thumbnail !== null && video.thumbnail !== "")
+            {
+                thumbnail = this.state.thumbnailPath + "/" + video.thumbnail;
+            }
             let offsetIndex = index + 1; //This is to offset the index to match the react-grid-layout's layout which starts at 1.
             let elementDOM: JSX.Element =
                 <div className="imageParent" key={offsetIndex}>
                     <img id={offsetIndex.toString()} 
                           className="image" 
-                          src="https://xl.movieposterdb.com/13_06/2013/2194499/xl_2194499_c0435606.jpg?v=2021-10-22%2017:59:47" 
+                          src={thumbnail}
                           alt={video.name} 
                           onMouseDown={e => { 
                             this.handleSelection(video);
