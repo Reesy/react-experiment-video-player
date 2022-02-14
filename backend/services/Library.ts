@@ -5,7 +5,10 @@ import { Video } from "../interfaces/Video";
 import { videoBuilder } from "../builders/videoBuilder";
 import { Subtitle } from "../interfaces/Subtitle";
 import { subtitleBuilder } from "../builders/subtitleBuilder";
+let dice = require('fast-dice-coefficient');
 
+
+const thumbnailConfidence: number = 0.5; 
 export class Library implements ILibrary
 {
     
@@ -13,13 +16,19 @@ export class Library implements ILibrary
     private videoItemCache: Array<Video>;
     private contentDirectory: string;
     private serverDirectory: string;
+    private thumbnailDirectory: string;
+    private thumbnailCache: Array<string>;
 
-    constructor(__contentDirectory: string, __serverDirectory: string)
+    constructor(__contentDirectory: string, 
+                __serverDirectory: string,
+                __thumbnailDirectory: string)
     {
         this.content = '';
         this.videoItemCache = [];
+        this.thumbnailCache = [];
         this.contentDirectory = __contentDirectory;
         this.serverDirectory = __serverDirectory;
+        this.thumbnailDirectory = __thumbnailDirectory;
         this.scanLibrary();
     }
 
@@ -31,15 +40,29 @@ export class Library implements ILibrary
     public scanLibrary()
     {
 
-        if (fs.existsSync(this.contentDirectory))
+        if (!fs.existsSync(this.contentDirectory))
         {
-            let LibraryFolderContent = fs.readdirSync(this.contentDirectory);
-            this.videoItemCache = this.buildLibrary(LibraryFolderContent);
+            throw new Error('Invalid content directory');
         }
-        else
+
+        let LibraryFolderContent = fs.readdirSync(this.contentDirectory);
+
+        let thumnbailContent;
+        if (typeof(this.thumbnailDirectory) !== 'undefined' && this.thumbnailDirectory !== null && this.thumbnailDirectory !== '')
         {
-            console.log('Video directory not found');
-        }
+            if (fs.existsSync(this.thumbnailDirectory))
+            {
+                thumnbailContent = fs.readdirSync(this.thumbnailDirectory);
+                this.thumbnailCache = thumnbailContent
+            } 
+            else
+            {
+                console.log('Provided thumbnail directory does not exist');
+            };
+        };
+
+        this.videoItemCache = this.buildLibrary(LibraryFolderContent);
+        
     }
 
     private buildLibrary(filenames: Array<string>): Array<Video>
@@ -47,6 +70,8 @@ export class Library implements ILibrary
         let videoFileNames: Array<string> = [];
 
         let subtitleFileNames: Array<string> = [];
+
+        let thumbnailFileNames: Array<string> = [];
 
         for(let fileName of filenames)
         {
@@ -58,21 +83,66 @@ export class Library implements ILibrary
             if(fileName.indexOf('.mp4') !== -1)
             {
                 videoFileNames.push(fileName);
+                thumbnailFileNames.push(this.searchForThumbnail(fileName));
             }
 
             if(fileName.indexOf('.m4v') !== -1)
             {
                 videoFileNames.push(fileName);
+                thumbnailFileNames.push(this.searchForThumbnail(fileName));
             }
+
+            
         }
-        let subtitles; 
+        let subtitles: Array<Subtitle> = []; 
         if(subtitleFileNames.length > 0)
         {
             subtitles = this.buildSubtitles(subtitleFileNames);
-        }
-        let videos = typeof(subtitles) !== 'undefined' ? this.buildVideos(videoFileNames, subtitles) : this.buildVideos(videoFileNames);
+        };
+        
+        let videos = this.buildVideos(videoFileNames, subtitles, thumbnailFileNames);
         return videos;
     }
+
+
+
+    private similarity(__firstString: string, __secondString: string): number
+    {
+       
+        let firstString = __firstString.toLowerCase()
+        let secondString = __secondString.toLowerCase()
+
+        let firstStrippedFullStops = firstString.replace('.', '')
+        let secondStrippedFullStops = secondString.replace('.', '')
+
+        return dice(firstStrippedFullStops, secondStrippedFullStops);
+
+    };
+
+    private searchForThumbnail(__fileName: string ): string
+    {
+
+        let thumbnailFileName = ''; 
+
+        let strippedMP4Extention = __fileName.replace('.mp4', '');
+        let strippedM4VExtention = strippedMP4Extention.replace('.m4v', '');
+
+        this.thumbnailCache.find((element) => {
+            
+
+            let extenstionStrippedFile = element.replace('.jpg', '');
+         //   console.log('Simulariy between ' + strippedM4VExtention + ' and ' + extenstionStrippedFile + ' is ' + this.similarity(strippedM4VExtention, extenstionStrippedFile));
+            if (this.similarity(extenstionStrippedFile, strippedM4VExtention) > thumbnailConfidence)
+            {
+                thumbnailFileName = element;
+                
+                return true;
+            }
+
+        });
+
+        return thumbnailFileName;
+    };
 
     private buildSubtitles(__subtitleFiles: Array<string>): Array<Subtitle>
     {
@@ -86,15 +156,17 @@ export class Library implements ILibrary
         return subtitles;
     }
 
-    private buildVideos(__videoFiles: Array<string>, __subtitles?: Array<Subtitle>): Array<Video>
+    private buildVideos(__videoFiles: Array<string>, __subtitles: Array<Subtitle>, __thumbnails: Array<string>): Array<Video>
     {
         let videos: Array<Video> = [];
+
+        let count = 0; //should probably change this to a loop. 
         for(let videoFile of __videoFiles)
         {
             let VideoBuilder: videoBuilder = new videoBuilder(videoFile, this.serverDirectory);
             let video = VideoBuilder.buildVideo(); 
 
-            if(__subtitles)
+            if(__subtitles.length > 0)
             {
                 let matchedSubtitles: Subtitle[] = __subtitles.filter(sub => sub.target === video.baseName);
                 if(matchedSubtitles.length > 0)
@@ -102,10 +174,12 @@ export class Library implements ILibrary
                     video.subtitles = matchedSubtitles;
                 }
             }
-            
+            video.thumbnail = __thumbnails[count];
+            count ++;
             videos.push(video);
         }
 
         return videos
     }  
+
 }

@@ -21,4 +21,11 @@ export interface Video
      *  The list of possible subtitles associated with a video
      */
     subtitles?: Array<Subtitle>;
+
+    /**
+     * The path to the thumbnail image
+     */
+     thumbnail?: string;
+
+     
 }

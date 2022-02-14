@@ -6,14 +6,15 @@ import path = require('path');
 
 const app = express();
 const ServedVideoLocation = '../videos'
-
+const ServedThumbnailLocation = '../thumbnails'
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 let contentDirectory = path.join(__dirname, ServedVideoLocation);
+let thumbnailDirectory = path.join(__dirname, ServedThumbnailLocation);
 app.use(express.static(contentDirectory));
 
-let library = new Library.Library(contentDirectory, '');
+let library = new Library.Library(contentDirectory, '', thumbnailDirectory);
 let cachedLibrary = library.getLibrary();
 
 app.use((req, res, next) => 
