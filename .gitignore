@@ -26,4 +26,5 @@ yarn-error.log*
 # content
 frontend/public/content
 backend/videos/**
+backend/thumbnails/**
 **/**/*.js
