@@ -46,15 +46,6 @@ export class videoBuilder implements IvideoBuilder
         this.subtitles = __subtitles;
         return;
     }
-    /**
-     * @name buildThumbnail
-     * @Description This will try to find a thumbnail that matches the video name, as a jpg. By default it will check if there is a 
-     * thumbnail folder in the same directory as the video, but if another folder is passed in as an argument it will have precedence.
-     */
-    public buildThumbnail(_thumbnailDirectory?: string): void
-    {
-        throw new Error("Method not implemented.");
-    }
 
     /**
      * @private

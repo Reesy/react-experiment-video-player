@@ -160,56 +160,6 @@ describe("videoBuilder", () =>
             });
         });
 
-
-
-        //I want to call 'buildThumbnail' on the videoBuilder class, and I want it to search for a thumbnail folder, once found I want to match the filename of the video with the filename of the thumbnail
-        describe("When called with an existing thumbnail", () =>
-        {
-            let result: Video;
-            before(() =>
-            {
-                let VideoBuilder = new videoBuilder('Interstellar.mp4', 'videohost');
-                result = VideoBuilder.buildVideo();
-                VideoBuilder.buildThumbnail();
-            });
-
-            it("Should return a video object with name as filename", () =>
-            {
-                chai.expect(result.name).to.equal('Interstellar.mp4');
-            });
-
-            it("Should return a video object with a thumbnail", () => 
-            {
-                chai.expect(result.thumbnail).to.be.a('string');
-            });
-        });
-
-        describe("When called with a non-existing thumbnail", () =>
-        {
-            let result: Video;
-            before(() =>
-            {
-                let VideoBuilder = new videoBuilder('King_Arthur.mp4', 'videohost');
-                result = VideoBuilder.buildVideo();
-                VideoBuilder.buildThumbnail();
-            });
-
-            it("Should return a video object with name as filename", () =>
-            {
-                chai.expect(result.name).to.equal('King_Arthur.mp4');
-            });
-
-            it("Should not return a thumbnail matching the filename", () =>
-            {
-                chai.expect(result.thumbnail).to.not.equal('King_Arthur.jpg');
-            });
-
-            it("Should return a missing thumbnail thumnail", () => 
-            {
-                chai.expect(result.thumbnail).to.be.a('string');
-                chai.expect(result.thumbnail).to.equal('missing.jpg');
-            });
-        });
     });
 
 
