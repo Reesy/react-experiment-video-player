@@ -14,9 +14,9 @@ let websocket: WebSocket;
 enum appRoutes
 {
     homePage,
-    videoPage
+    videoPage,
+    roomPage
 };
-
 
 enum pauseState
 {
@@ -119,6 +119,10 @@ class App extends React.Component<any, AppState> {
                 </div>
 
         }
+        else if(this.state.appRoutes === appRoutes.roomPage)
+        {
+            mainContent = <div> </div>
+        }
         else
         {
             mainContent =
@@ -153,6 +157,15 @@ class App extends React.Component<any, AppState> {
                             })
                         }}>
                         Home
+                    </button>
+                    <button
+                        onClick={() =>
+                        {
+                            this.setState({
+                                appRoutes: appRoutes.roomPage
+                            })
+                        }}>
+                        Rooms
                     </button>
                 </header>
                 
