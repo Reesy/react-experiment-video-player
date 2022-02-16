@@ -7,6 +7,7 @@ import { VideoPlayer } from './components/VideoPlayer';
 import { Video } from "./interfaces/Video";
 import { Subtitle } from './interfaces/Subtitle';
 import { SubtitlePicker } from './components/SubtitlePicker';
+import  RoomPicker  from './components/RoomPicker';
 
 let websocket: WebSocket;
 
@@ -121,7 +122,12 @@ class App extends React.Component<any, AppState> {
         }
         else if(this.state.appRoutes === appRoutes.roomPage)
         {
-            mainContent = <div> </div>
+            mainContent = 
+            <div>
+                <RoomPicker
+                    videoApi={this.videoApi}
+                />
+            </div>
         }
         else
         {

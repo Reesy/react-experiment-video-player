@@ -1,9 +1,11 @@
+import { IVideoState } from "./IVideoState";
+
 
 export interface Room
 {
     roomID: string;
-    socketID: string;
+    socketIDs: Array<string>;
     roomName: string;
-    videoPosition: number;
-    isPaused: boolean;
+    videoState: IVideoState;
+    connections: Array<string>;
 };

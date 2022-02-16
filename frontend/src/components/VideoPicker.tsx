@@ -6,7 +6,7 @@ import '../styles/VideoPicker.css';
 
 const ResponsiveReactGridLayout = WidthProvider(ResponsiveGridLayout);
 
-export interface Props 
+interface VideoProps 
 {
     cols: {};
     onSelectChange: (event: any) => void;
@@ -14,13 +14,13 @@ export interface Props
     videoApi: IVideoApi;
 }
 
-interface State 
+interface VideoState 
 {
     layouts: Layouts;
     thumbnailPath: string
 }
 
-export default class VideoPicker extends React.Component<Props, State>
+export default class VideoPicker extends React.Component<VideoProps, VideoState>
 {
     static itemCount: number = 164;
 
@@ -30,7 +30,7 @@ export default class VideoPicker extends React.Component<Props, State>
         cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }
     };
 
-    static getDerivedStateFromProps(nextProps: Props, prevState: State)
+    static getDerivedStateFromProps(nextProps: VideoProps, prevState: VideoState)
     {
         if (nextProps.library.length !== prevState.layouts["lg"].length)
         {
@@ -38,7 +38,7 @@ export default class VideoPicker extends React.Component<Props, State>
             let itemCount = nextProps.library.length;
             const layouts: Layouts = VideoPicker.createLayouts(itemCount);
 
-            let newState: State = {
+            let newState: VideoState = {
                 layouts: layouts,
                 thumbnailPath: prevState.thumbnailPath //this is persisted, will likely change this to dynamically obtain each thumbnail in the future. 
             };
@@ -48,7 +48,7 @@ export default class VideoPicker extends React.Component<Props, State>
         return null;
     }
 
-    componentDidUpdate(prevProps: Props, prevState: State)
+    componentDidUpdate(prevProps: VideoProps, prevState: VideoState)
     {
         if (prevProps.library !== this.props.library)
         {
