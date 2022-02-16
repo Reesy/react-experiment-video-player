@@ -3,6 +3,9 @@ import bodyParser = require('body-parser');
 import * as WebSocket from 'ws';
 import Library = require('./services/Library');
 import path = require('path');
+import { Rooms } from "./services/Rooms";
+import { IRooms } from "./interfaces/IRooms";
+import { Room } from "./interfaces/Room";
 
 const app = express();
 const ServedVideoLocation = '../videos'
@@ -17,6 +20,9 @@ app.use(express.static(thumbnailDirectory));
 
 let library = new Library.Library(contentDirectory, '', thumbnailDirectory);
 let cachedLibrary = library.getLibrary();
+
+let rooms: IRooms = new Rooms();
+
 
 app.use((req, res, next) => 
 {
@@ -35,6 +41,39 @@ app.get('/api/video/scanLibrary', (req: express.Request, res: express.Response) 
 {
   library.scanLibrary();
   res.send("Beginning scan");
+});
+
+
+app.get('/api/rooms', (req: express.Request, res: express.Response) =>
+{
+  res.send(rooms.getRooms());
+});
+
+app.get('/api/room', (req: express.Request, res: express.Response) =>
+{
+  let roomID : any = req.query.roomID!;
+  try 
+  {
+    let room = rooms.getRoom(roomID);
+    res.send(room);
+  }
+  catch (error)
+  {
+    res.send(error);
+  };
+ 
+});
+
+app.post('/api/room', (req: express.Request, res: express.Response) =>
+{
+  let request = req.body;
+
+  let room: Room = rooms.createRoom(request.roomID, request.socketIDs, request.roomName, request.videoState, request.connections);
+
+  rooms.addRoom(room);
+  
+  res.send(room);
+
 });
 
 console.log("Listening on port 3050");
