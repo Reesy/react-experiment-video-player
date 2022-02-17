@@ -8,6 +8,8 @@ import { Video } from "./interfaces/Video";
 import { Subtitle } from './interfaces/Subtitle';
 import { SubtitlePicker } from './components/SubtitlePicker';
 import  RoomPicker  from './components/RoomPicker';
+import { Room } from './interfaces/Room';
+import { IVideoState } from './interfaces/IVideoState';
 
 let websocket: WebSocket;
 
@@ -19,7 +21,7 @@ enum appRoutes
     roomPage
 };
 
-enum pauseState
+export enum pauseState
 {
     paused = "paused",
     playing = "playing"
@@ -42,6 +44,8 @@ interface AppState
 class App extends React.Component<any, AppState> {
 
     private videoApi: IVideoApi;
+
+    private currentRoom: Room; 
     constructor(props: any)
     {
         super(props);
@@ -57,6 +61,11 @@ class App extends React.Component<any, AppState> {
             pauseState: pauseState.paused,
             appRoutes: appRoutes.homePage
         }
+
+        this.currentRoom = {
+        } as Room;
+
+
         this.handleVideoSelection = this.handleVideoSelection.bind(this);
         this.handleSubtitleSelection = this.handleSubtitleSelection.bind(this);
         this.handleVideoStateChange = this.handleVideoStateChange.bind(this);
@@ -252,29 +261,67 @@ class App extends React.Component<any, AppState> {
 
     private updatePlayState()
     {
-        if (this.state.connected === true)
-        {
-            websocket.send("Update");
-        }
+
 
         if (this.state.pauseState === "paused")
         {
-            this.setState({ pauseState: pauseState.playing });
+                this.setState({ pauseState: pauseState.playing });
+            
+                if (this.state.connected === true)
+                {
+                    let newPlayingState: IVideoState =
+                    {
+                        playingState: pauseState.playing,
+                        videoPosition: 0
+                    };
+
+                    this.currentRoom.videoState = newPlayingState;
+        
+                    websocket.send(JSON.stringify(this.currentRoom));
+                }
         }
         else if (this.state.pauseState === "playing")
         {
-            this.setState({ pauseState: pauseState.paused });
+                this.setState({ pauseState: pauseState.paused });
+            
+                if (this.state.connected === true)
+                {
+                    let newPlayingState: IVideoState =
+                    {
+                        playingState: pauseState.paused,
+                        videoPosition: 0
+                    };
+
+                    this.currentRoom.videoState = newPlayingState;
+        
+                    websocket.send(JSON.stringify(this.currentRoom));
+        
+                };
         };
     };
 
     private createConnection()
-    {
-        console.log("Inside create connection");
+    {   
+
         this.setState({ connected: true });
         websocket = new WebSocket('ws://localhost:7070');
 
         websocket.onopen = (event: Event) =>
-        {
+        {   
+            let newPlayingState: IVideoState =
+            {
+                playingState: this.state.pauseState,
+                videoPosition: 0
+            };
+    
+            let randomNumber = Math.floor(Math.random() * 100);
+            let newRoom: Room = {
+                roomID: randomNumber.toString(),
+                roomName: 'Jimbobs room',
+                videoState: newPlayingState,
+            }
+            this.currentRoom = newRoom;
+            websocket.send(JSON.stringify(newRoom));
             console.log('Websocket opened');
 
         };

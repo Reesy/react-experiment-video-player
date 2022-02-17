@@ -1,7 +1,7 @@
 import React from 'react';
 import '../styles/GroupWatcher.css';
-// = new WebSocket('ws://localhost:7070');
-let websocket: WebSocket;
+// // = new WebSocket('ws://localhost:7070');
+// let websocket: WebSocket;
 
 class GroupWatcher extends React.Component<any, any> 
 {

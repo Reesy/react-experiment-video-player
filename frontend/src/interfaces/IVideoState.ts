@@ -1,13 +1,9 @@
+import { pauseState } from "../App";
 
-enum playingState
-{
-    paused = "paused",
-    playing = "playing"
-};
 
 export interface IVideoState
 {
-    playingState: playingState;
+    playingState: pauseState;
 
     videoPosition: number;
 

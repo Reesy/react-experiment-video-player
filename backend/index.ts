@@ -6,6 +6,7 @@ import path = require('path');
 import { Rooms } from "./services/Rooms";
 import { IRooms } from "./interfaces/IRooms";
 import { Room } from "./interfaces/Room";
+import { IVideoState, playingState } from "./interfaces/IVideoState";
 
 const app = express();
 const ServedVideoLocation = '../videos'
@@ -87,6 +88,35 @@ wss.on('connection', (ws) =>
 {
   ws.on('message', (message) =>
   {
+
+    let data = JSON.parse(message.toString());
+
+    if (typeof(data.roomID) !== 'undefined')
+    {
+
+      //If there is no room we create one, otherwise we update the play state. Later on we will need to see what the video positions for all clients are and sync them if they go outside of a pre-defined allowable range (half a second maybe??)
+      if (typeof(rooms.getRoom(data.roomID).roomID) === 'undefined')
+      { 
+        //search if a room exists. 
+        rooms.addRoom(rooms.createRoom(data.roomID, [],  data.roomName, data.videoState, []));  
+      }
+      else
+      {
+        let currentlyPlaying: playingState = isPaused === true ? playingState.paused : playingState.playing;
+
+        let videoState: IVideoState = {
+          playingState: currentlyPlaying,
+          videoPosition: 0
+        }
+
+        rooms.updateRoomState(data.roomID, videoState);
+
+      }
+
+    }
+
+
+   // let data = JSON.parse(message);
     isPaused = !isPaused;
     wss.clients.forEach((client) =>
     {

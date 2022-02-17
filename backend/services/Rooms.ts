@@ -11,6 +11,33 @@ export class Rooms implements IRooms
     {
 
     }
+    
+    public updateRoomState(_roomID: string, _videoState: IVideoState): void
+    {
+
+        for (let room of this.rooms)
+        {
+            if (room.roomID === _roomID)
+            {
+                room.videoState = _videoState;
+                break;
+            }
+        }
+        // let room = this.getRoom(_roomID);
+
+
+        return;
+        // //Search this.rooms for room with room id and replace with video state
+        // let room = this.rooms.find((room) => room.roomID === _roomID)
+
+        // if (typeof(room) !== 'undefined')
+        // {
+        //     room.videoState = _videoState;
+        // }
+
+    }
+
+
     createRoom(roomID: string, socketIDs: string[], roomName: string, videoState: IVideoState, connections: string[]): Room
     {
         let newRoom: Room = {
@@ -39,12 +66,13 @@ export class Rooms implements IRooms
 
         let room = this.rooms.find(room => room.roomID === _roomID);
 
-        if (typeof(room) !== "undefined")
+
+        if (typeof(room) === "undefined")
         {
-            return room;
+            return {} as Room;
         };  
        
-        throw new Error("Room not found");
+        return room;
     }
     
 }

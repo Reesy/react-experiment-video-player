@@ -17,4 +17,6 @@ export interface IRooms
                videoState: IVideoState,
                connections: Array<string>): Room
 
+    updateRoomState(_roomID: string, _videoState: IVideoState): void
+
 }

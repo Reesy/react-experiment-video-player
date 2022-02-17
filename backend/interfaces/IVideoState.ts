@@ -1,5 +1,5 @@
 
-enum playingState
+export enum playingState
 {
     paused = "paused",
     playing = "playing"
