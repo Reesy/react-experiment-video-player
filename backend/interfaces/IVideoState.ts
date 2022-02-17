@@ -7,6 +7,8 @@ export enum playingState
 
 export interface IVideoState
 {
+    videoPath: string;
+
     playingState: playingState;
 
     videoPosition: number;

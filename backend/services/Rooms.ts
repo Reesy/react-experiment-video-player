@@ -38,11 +38,10 @@ export class Rooms implements IRooms
     }
 
 
-    createRoom(roomID: string, socketIDs: string[], roomName: string, videoState: IVideoState, connections: string[]): Room
+    createRoom(roomID: string, roomName: string, videoState: IVideoState, connections: string[]): Room
     {
         let newRoom: Room = {
             roomID: roomID,
-            socketIDs: socketIDs,
             roomName: roomName,
             videoState: videoState,
             connections: connections

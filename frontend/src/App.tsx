@@ -10,7 +10,7 @@ import { SubtitlePicker } from './components/SubtitlePicker';
 import  RoomPicker  from './components/RoomPicker';
 import { Room } from './interfaces/Room';
 import { IVideoState } from './interfaces/IVideoState';
-
+import { v4 as uuidv4 } from 'uuid';
 let websocket: WebSocket;
 
 // temporary, will use react-router for this
@@ -271,6 +271,7 @@ class App extends React.Component<any, AppState> {
                 {
                     let newPlayingState: IVideoState =
                     {
+                        videoPath: this.state.currentVideo.path,
                         playingState: pauseState.playing,
                         videoPosition: 0
                     };
@@ -288,6 +289,7 @@ class App extends React.Component<any, AppState> {
                 {
                     let newPlayingState: IVideoState =
                     {
+                        videoPath: this.state.currentVideo.path,
                         playingState: pauseState.paused,
                         videoPosition: 0
                     };
@@ -310,14 +312,15 @@ class App extends React.Component<any, AppState> {
         {   
             let newPlayingState: IVideoState =
             {
+                videoPath: this.state.currentVideo.path,
                 playingState: this.state.pauseState,
                 videoPosition: 0
             };
     
-            let randomNumber = Math.floor(Math.random() * 100);
+            let randomNumber = uuidv4();
             let newRoom: Room = {
                 roomID: randomNumber.toString(),
-                roomName: 'Jimbobs room',
+                roomName: this.state.currentVideo.name,
                 videoState: newPlayingState,
             }
             this.currentRoom = newRoom;

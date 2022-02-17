@@ -69,7 +69,7 @@ app.post('/api/room', (req: express.Request, res: express.Response) =>
 {
   let request = req.body;
 
-  let room: Room = rooms.createRoom(request.roomID, request.socketIDs, request.roomName, request.videoState, request.connections);
+  let room: Room = rooms.createRoom(request.roomID, request.roomName, request.videoState, request.connections);
 
   rooms.addRoom(room);
   
@@ -98,13 +98,14 @@ wss.on('connection', (ws) =>
       if (typeof(rooms.getRoom(data.roomID).roomID) === 'undefined')
       { 
         //search if a room exists. 
-        rooms.addRoom(rooms.createRoom(data.roomID, [],  data.roomName, data.videoState, []));  
+        rooms.addRoom(rooms.createRoom(data.roomID, data.roomName, data.videoState, []));  
       }
       else
       {
         let currentlyPlaying: playingState = isPaused === true ? playingState.paused : playingState.playing;
 
         let videoState: IVideoState = {
+          videoPath: data.videoState.videoPath,
           playingState: currentlyPlaying,
           videoPosition: 0
         }

@@ -12,7 +12,6 @@ export interface IRooms
     getRoom(_roomID: string): Room
 
     createRoom(roomID: string, 
-               socketIDs: Array<string>,
                roomName: string,
                videoState: IVideoState,
                connections: Array<string>): Room

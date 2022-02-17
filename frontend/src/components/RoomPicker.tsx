@@ -41,7 +41,15 @@ export default class RoomPicker extends React.Component<RoomProps, RoomState>
         let content;
         if (typeof(this.state) !== "undefined" && this.state !== null)
         {
-            content = this.state.rooms[0].roomName;
+            if (this.state.rooms.length > 0)
+            {
+                content = this.state.rooms[0].roomName;
+            }
+            else
+            {
+                content = "There are no groups watching together at the moment.";
+            }
+
         }
         else
         {
