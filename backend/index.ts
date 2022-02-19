@@ -126,6 +126,14 @@ wss.on('connection', (ws: extendedWS) =>
            
             let room: Room = rooms.getRoom(data.roomID);
             
+
+            //If current connection doesn't exist in connections, assume it's a join room event and add it.
+
+            if (room.connections.indexOf(ws.connectionID) === -1)
+            {
+                room.connections.push(ws.connectionID);
+            }
+
             let currentlyPlaying: playingState = room.videoState.playingState === playingState.playing ? playingState.paused : playingState.playing;
             
             let videoState: IVideoState = {
@@ -141,7 +149,9 @@ wss.on('connection', (ws: extendedWS) =>
                 
                 //TODO: There may need to be an extra check in here to avoid sending an update state to the same client (although this might be better) 
                 if (room.connections.includes(client.connectionID))
-                {
+                {   
+                    //We only broadcast the pause state for now, it might be that we also broadcast back the video position,
+                    //Then on the client side we take that value and if it goes over a range we skip video position. 
                     console.log('Sending message from ' + ws.connectionID + ' to ' + client.connectionID);
                     client.send(currentlyPlaying);
                 }

@@ -6,6 +6,7 @@ import { Room } from "../interfaces/Room";
 interface RoomProps 
 {
     videoApi: IVideoApi;
+    roomSelection: (room: Room) => void;
 }
 
 
@@ -34,7 +35,20 @@ export default class RoomPicker extends React.Component<RoomProps, RoomState>
             });
     };
 
-    
+    // [
+    //     {
+    //         "roomID": "e704d5e7-ee51-4ade-9fed-3fda76ef7745",
+    //         "roomName": "7796da5574c19e239d4f5de4fbfe020f-480p.mp4",
+    //         "videoState": {
+    //             "videoPath": "http://localhost:3050/7796da5574c19e239d4f5de4fbfe020f-480p.mp4",
+    //             "playingState": "paused",
+    //             "videoPosition": 0
+    //         },
+    //         "connections": [
+    //             "be74d0ec-61e7-4a5a-8b14-432b6fa1ebef"
+    //         ]
+    //     }
+    // ]
 
     render(): React.ReactNode {
         
@@ -43,7 +57,21 @@ export default class RoomPicker extends React.Component<RoomProps, RoomState>
         {
             if (this.state.rooms.length > 0)
             {
-                content = this.state.rooms[0].roomName;
+                content = <div>
+                    <h1>Rooms</h1>
+                    <ul>
+                        {this.state.rooms.map((room: Room) =>
+                            <li key={room.roomID}>
+                                <p>Video being watched: {room.roomName} </p>
+                                <button onClick={() => {this.props.roomSelection(room)}}> Join watch session. </button>
+                            </li>
+                        )}
+                    </ul>
+                        
+                </div>
+                
+                
+                // this.state.rooms[0].roomName;
             }
             else
             {

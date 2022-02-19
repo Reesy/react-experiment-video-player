@@ -72,6 +72,7 @@ class App extends React.Component<any, AppState> {
         this.updatePlayState = this.updatePlayState.bind(this);
         this.createConnection = this.createConnection.bind(this);
         this.getVideos = this.getVideos.bind(this);
+        this.joinRoom = this.joinRoom.bind(this);
 
         this.videoApi = new VideoApi();
 
@@ -135,6 +136,7 @@ class App extends React.Component<any, AppState> {
             <div>
                 <RoomPicker
                     videoApi={this.videoApi}
+                    roomSelection={this.joinRoom}
                 />
             </div>
         }
@@ -300,6 +302,35 @@ class App extends React.Component<any, AppState> {
         
                 };
         };
+    };
+
+    //Todo: Extract socket code out of app entirely, there's some duplication here.
+    private joinRoom(_room: Room)
+    {
+        //Connect to websocket
+        this.setState({ connected: true });
+        websocket = new WebSocket('ws://localhost:7070');
+
+        websocket.onopen = (event: Event) =>
+        {   
+
+            this.currentRoom = _room;
+            websocket.send(JSON.stringify(_room));
+            this.setState({ appRoutes: appRoutes.videoPage });
+            console.log('Websocket opened');
+        };
+
+        websocket.onclose = (event: CloseEvent) =>
+        {
+            console.log('Websocket closed');
+        };
+
+        websocket.onmessage = (event: MessageEvent) =>
+        {
+            console.log('Recieved: ', event.data);
+            this.setState({ pauseState: event.data });
+        };
+
     };
 
     private createConnection()
