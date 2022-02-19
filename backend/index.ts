@@ -84,8 +84,6 @@ app.listen(3050);
 
 const wss: WebSocket.Server = new WebSocket.Server({ port: 7070 });
 
-let isPaused = true;
-
 interface extendedWS extends WebSocket
 {
     connectionID: string;
@@ -106,33 +104,49 @@ wss.on('connection', (ws: extendedWS) =>
 
         let data = JSON.parse(message.toString());
 
-        if (typeof (data.roomID) !== 'undefined')
+        if (typeof (data.roomID) === 'undefined')
+        {
+            //Message isn't of the correct format and this should through an error.
+
+            throw new Error("Message is not of the correct format");
+        };
+
+
+        if (typeof (rooms.getRoom(data.roomID).roomID) === 'undefined')
         {
 
-            if (typeof (rooms.getRoom(data.roomID).roomID) === 'undefined')
-            {
-
-                let connections: Array<string> = [];
-                connections.push(ws.connectionID);
-                //search if a room exists. 
-                rooms.addRoom(rooms.createRoom(data.roomID, data.roomName, data.videoState, connections));
-
-            }
-            else
-            {
-                let currentlyPlaying: playingState = isPaused === true ? playingState.paused : playingState.playing;
-
-                let videoState: IVideoState = {
-                    videoPath: data.videoState.videoPath,
-                    playingState: currentlyPlaying,
-                    videoPosition: 0
-                }
-
-                rooms.updateRoomState(data.roomID, videoState);
-
-            }
+            let connections: Array<string> = [];
+            connections.push(ws.connectionID);
+            //search if a room exists. 
+            rooms.addRoom(rooms.createRoom(data.roomID, data.roomName, data.videoState, connections));
 
         }
+        else
+        {
+           
+            let room: Room = rooms.getRoom(data.roomID);
+            
+            let currentlyPlaying: playingState = room.videoState.playingState === playingState.playing ? playingState.paused : playingState.playing;
+            
+            let videoState: IVideoState = {
+                videoPath: data.videoState.videoPath,
+                playingState: currentlyPlaying,
+                videoPosition: 0
+            }
+
+            rooms.updateRoomState(data.roomID, videoState);
+
+            wss.clients.forEach((client: any) =>
+            {
+                
+                //TODO: There may need to be an extra check in here to avoid sending an update state to the same client (although this might be better) 
+                if (room.connections.includes(client.connectionID))
+                {
+                    console.log('Sending message from ' + ws.connectionID + ' to ' + client.connectionID);
+                    client.send(currentlyPlaying);
+                }
+            });
+        };
 
 
     });
