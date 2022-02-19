@@ -126,23 +126,28 @@ wss.on('connection', (ws: extendedWS) =>
            
             let room: Room = rooms.getRoom(data.roomID);
             
-
+            let currentlyPlaying: playingState = room.videoState.playingState;
             //If current connection doesn't exist in connections, assume it's a join room event and add it.
 
             if (room.connections.indexOf(ws.connectionID) === -1)
             {
                 room.connections.push(ws.connectionID);
             }
-
-            let currentlyPlaying: playingState = room.videoState.playingState === playingState.playing ? playingState.paused : playingState.playing;
+            else
+            {
+                currentlyPlaying =  room.videoState.playingState === playingState.playing ? playingState.paused : playingState.playing;
             
-            let videoState: IVideoState = {
-                videoPath: data.videoState.videoPath,
-                playingState: currentlyPlaying,
-                videoPosition: 0
-            }
+                let videoState: IVideoState = {
+                    videoPath: data.videoState.videoPath,
+                    playingState: currentlyPlaying,
+                    videoPosition: 0
+                }
+    
+                rooms.updateRoomState(data.roomID, videoState);
+    
 
-            rooms.updateRoomState(data.roomID, videoState);
+            };
+
 
             wss.clients.forEach((client: any) =>
             {

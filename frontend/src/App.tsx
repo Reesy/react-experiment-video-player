@@ -315,9 +315,23 @@ class App extends React.Component<any, AppState> {
         {   
 
             this.currentRoom = _room;
+
+
+            //set current video here, by finding the video in the library
+
+            let _currentVideo : Video = this.state.videoLibrary.find(x => x.name === _room.roomName)!;
+
+
+            if (typeof(_currentVideo) === "undefined")
+            {
+                throw new Error("Video not found, Library may have updated between page load and room join");
+            };
+
+            this.setCurrentVideo(_currentVideo);
+
             websocket.send(JSON.stringify(_room));
             this.setState({ appRoutes: appRoutes.videoPage });
-            console.log('Websocket opened');
+            console.log('Joined room, websocket open.');
         };
 
         websocket.onclose = (event: CloseEvent) =>
