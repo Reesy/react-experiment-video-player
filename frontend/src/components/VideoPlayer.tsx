@@ -65,6 +65,23 @@ class VideoPlayer extends React.Component<any, any> {
             cursor: "pointer",
             fontSize: "20px"
         }
+        //I want to get the current time from the video player:
+        let videoElement: any = document.getElementsByClassName('mainVideo')[0];
+
+
+        let currentTime = 999;
+        let duration = 999;
+        let percentage: number = 0;
+
+        if (typeof(videoElement) !== 'undefined')
+        {
+
+
+            currentTime = videoElement.currentTime;
+            duration = videoElement.duration;
+            percentage = currentTime / duration;
+
+        }
 
         return (
             <div> 
@@ -77,6 +94,13 @@ class VideoPlayer extends React.Component<any, any> {
                     <button id="subtitle" type="button" className="fa fa-language" style={buttonStyle}></button>
                     <button id="fs" type="button" onClick={this.setFullScreen} data-state="go-fullscreen" className="fa fa-expand" style={buttonStyle}></button>
                 </div>
+                <br></br>
+                <br></br>
+                <br></br>
+                <br></br>
+                <p>currentTime: {currentTime}</p>
+                <p>duration: {duration}</p>
+                <p>percentage: {percentage}</p>
             </div>
       
         );
