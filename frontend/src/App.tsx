@@ -235,6 +235,10 @@ class App extends React.Component<any, AppState> {
      */
     private setCurrentVideo(_video: Video)
     {
+
+
+        //TODO: We have too many video objects, need to consolidate them into one object and add video position 
+        //and maybe a time stamp to that object
         let completeApiPath = this.videoApi.getVideoApiAddress() + _video.path;
 
         let fullyAddressedVideoItem: Video =
