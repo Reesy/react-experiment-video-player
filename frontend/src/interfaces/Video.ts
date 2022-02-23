@@ -1,4 +1,5 @@
 import { Subtitle } from "./Subtitle";
+import { pauseState } from "../App";
 
 export interface Video
 {
@@ -27,5 +28,13 @@ export interface Video
      */
     thumbnail?: string;
 
-    
-}
+    /**
+     *  Enum describing if the video is currently playing or not
+     */
+    playingState: pauseState;
+
+    /**
+     *  Current time of the video
+     */
+    videoPosition: number;
+};

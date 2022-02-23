@@ -1,9 +1,9 @@
-import { IVideoState } from "./IVideoState";
+import { Video } from "./Video";
 
 
 export interface Room
 {
     roomID: string;
     roomName: string;
-    videoState: IVideoState;
+    videoState: Video;
 };

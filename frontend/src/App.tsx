@@ -9,8 +9,8 @@ import { Subtitle } from './interfaces/Subtitle';
 import { SubtitlePicker } from './components/SubtitlePicker';
 import  RoomPicker  from './components/RoomPicker';
 import { Room } from './interfaces/Room';
-import { IVideoState } from './interfaces/IVideoState';
 import { v4 as uuidv4 } from 'uuid';
+
 let websocket: WebSocket;
 
 // temporary, will use react-router for this
@@ -38,7 +38,8 @@ interface AppState
     isGroupWatching: boolean,
     connected:  boolean,
     pauseState: pauseState,
-    appRoutes: appRoutes
+    appRoutes: appRoutes,
+    videoPosition: number
 };
 
 class App extends React.Component<any, AppState> {
@@ -59,7 +60,8 @@ class App extends React.Component<any, AppState> {
             isGroupWatching: false,
             connected: false,
             pauseState: pauseState.paused,
-            appRoutes: appRoutes.homePage
+            appRoutes: appRoutes.homePage,
+            videoPosition: 0
         }
 
         this.currentRoom = {
@@ -111,7 +113,7 @@ class App extends React.Component<any, AppState> {
                     <p>
                         <button
                             onClick={this.createConnection}>
-                            Connect
+                            Create Room
                         </button>
                     </p>
                 </div>
@@ -245,7 +247,9 @@ class App extends React.Component<any, AppState> {
         {
             name: _video.name,
             baseName: _video.baseName,
-            path: completeApiPath
+            path: completeApiPath,
+            playingState: _video.playingState,
+            videoPosition: _video.videoPosition,
         }
         this.setState({ currentVideo: fullyAddressedVideoItem });
 
@@ -275,11 +279,13 @@ class App extends React.Component<any, AppState> {
             
                 if (this.state.connected === true)
                 {
-                    let newPlayingState: IVideoState =
+                    let newPlayingState: Video =
                     {
-                        videoPath: this.state.currentVideo.path,
+                        path: this.state.currentVideo.path,
                         playingState: pauseState.playing,
-                        videoPosition: 0
+                        videoPosition: this.state.currentVideo.videoPosition,
+                        name: this.state.currentVideo.name,
+                        baseName: this.state.currentVideo.baseName,
                     };
 
                     this.currentRoom.videoState = newPlayingState;
@@ -293,11 +299,13 @@ class App extends React.Component<any, AppState> {
             
                 if (this.state.connected === true)
                 {
-                    let newPlayingState: IVideoState =
+                    let newPlayingState: Video =
                     {
-                        videoPath: this.state.currentVideo.path,
+                        path: this.state.currentVideo.path,
                         playingState: pauseState.paused,
-                        videoPosition: 0
+                        videoPosition: this.state.currentVideo.videoPosition,
+                        name: this.state.currentVideo.name,
+                        baseName: this.state.currentVideo.baseName
                     };
 
                     this.currentRoom.videoState = newPlayingState;
@@ -359,11 +367,13 @@ class App extends React.Component<any, AppState> {
 
         websocket.onopen = (event: Event) =>
         {   
-            let newPlayingState: IVideoState =
+            let newPlayingState: Video =
             {
-                videoPath: this.state.currentVideo.path,
+                path: this.state.currentVideo.path,
                 playingState: this.state.pauseState,
-                videoPosition: 0
+                videoPosition: this.state.videoPosition,
+                name: this.state.currentVideo.name,
+                baseName: this.state.currentVideo.baseName
             };
     
             let randomNumber = uuidv4();
