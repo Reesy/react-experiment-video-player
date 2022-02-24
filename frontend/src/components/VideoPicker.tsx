@@ -61,7 +61,7 @@ export default class VideoPicker extends React.Component<VideoPickerProps, Video
         };
     }
 
-    constructor(_props: any)
+    constructor(_props: VideoPickerProps)
     {
         super(_props);
         this.handleSelection = this.handleSelection.bind(this);

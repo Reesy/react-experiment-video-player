@@ -259,45 +259,24 @@ class App extends React.Component<any, AppState> {
 
     private updatePlayState()
     {
-
-
         if (this.state.currentVideo.playingState === "paused")
         {
                 this.setState({ currentVideo: { playingState: "playing" } as Video }); // Probably a BUG here TODO
       
-            
                 if (this.state.connected === true)
                 {
-                    let newPlayingState: Video =
-                    {
-                        path: this.state.currentVideo.path,
-                        playingState: this.state.currentVideo.playingState,
-                        videoPosition: this.state.currentVideo.videoPosition,
-                        name: this.state.currentVideo.name,
-                        baseName: this.state.currentVideo.baseName,
-                    };
-
-                    this.currentRoom.video = newPlayingState;
+                    this.currentRoom.video = this.state.currentVideo
         
                     websocket.send(JSON.stringify(this.currentRoom));
                 }
         }
         else if (this.state.currentVideo.playingState === "playing")
         {   
-                this.setState({ currentVideo: { playingState: "paused" } as Video }); // Probably a BUG here TODO
+                this.setState({ currentVideo: { playingState: "paused" } as Video });
                 
                 if (this.state.connected === true)
                 {
-                    let newPlayingState: Video =
-                    {
-                        path: this.state.currentVideo.path,
-                        playingState: this.state.currentVideo.playingState,
-                        videoPosition: this.state.currentVideo.videoPosition,
-                        name: this.state.currentVideo.name,
-                        baseName: this.state.currentVideo.baseName
-                    };
-
-                    this.currentRoom.video = newPlayingState;
+                     this.currentRoom.video = this.state.currentVideo;
         
                     websocket.send(JSON.stringify(this.currentRoom));
         
@@ -316,7 +295,6 @@ class App extends React.Component<any, AppState> {
         {   
 
             this.currentRoom = _room;
-
 
             //set current video here, by finding the video in the library
 
@@ -344,9 +322,7 @@ class App extends React.Component<any, AppState> {
         {
             console.log('Recieved: ', event.data);
 
-            this.setState({ currentVideo: { playingState: event.data } as Video }); //This probably needs work too TODO
-            // this.setState()
-            // this.setState({ pauseState: event.data });
+            this.setState({ currentVideo: { playingState: event.data } as Video });
         };
 
     };
@@ -358,21 +334,12 @@ class App extends React.Component<any, AppState> {
         websocket = new WebSocket('ws://localhost:7070');
 
         websocket.onopen = (event: Event) =>
-        {   
-            let newPlayingState: Video =
-            {
-                path: this.state.currentVideo.path,
-                playingState: this.state.currentVideo.playingState,
-                videoPosition: this.state.videoPosition,
-                name: this.state.currentVideo.name,
-                baseName: this.state.currentVideo.baseName
-            };
-    
+        {       
             let randomNumber = uuidv4();
             let newRoom: Room = {
                 roomID: randomNumber.toString(),
                 roomName: this.state.currentVideo.name,
-                video: newPlayingState,
+                video: this.state.currentVideo,
             }
             this.currentRoom = newRoom;
             websocket.send(JSON.stringify(newRoom));
@@ -388,8 +355,7 @@ class App extends React.Component<any, AppState> {
         websocket.onmessage = (event: MessageEvent) =>
         {
             console.log('Recieved: ', event.data);
-            this.setState({ currentVideo: { playingState: event.data } as Video }); //This probably needs work too TODO
-          //  this.setState({ pauseState: event.data });
+            this.setState({ currentVideo: { playingState: event.data } as Video });
         };
 
     }
