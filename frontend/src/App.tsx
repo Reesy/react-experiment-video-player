@@ -277,7 +277,7 @@ class App extends React.Component<any, AppState> {
                         baseName: this.state.currentVideo.baseName,
                     };
 
-                    this.currentRoom.videoState = newPlayingState;
+                    this.currentRoom.video = newPlayingState;
         
                     websocket.send(JSON.stringify(this.currentRoom));
                 }
@@ -297,7 +297,7 @@ class App extends React.Component<any, AppState> {
                         baseName: this.state.currentVideo.baseName
                     };
 
-                    this.currentRoom.videoState = newPlayingState;
+                    this.currentRoom.video = newPlayingState;
         
                     websocket.send(JSON.stringify(this.currentRoom));
         
@@ -372,7 +372,7 @@ class App extends React.Component<any, AppState> {
             let newRoom: Room = {
                 roomID: randomNumber.toString(),
                 roomName: this.state.currentVideo.name,
-                videoState: newPlayingState,
+                video: newPlayingState,
             }
             this.currentRoom = newRoom;
             websocket.send(JSON.stringify(newRoom));

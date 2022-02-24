@@ -5,5 +5,5 @@ export interface Room
 {
     roomID: string;
     roomName: string;
-    videoState: Video;
+    video: Video;
 };

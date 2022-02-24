@@ -1,6 +1,6 @@
 
-import { IVideoState } from "./IVideoState";
 import { Room } from "./Room"
+import { Video } from "./Video";
 
 export interface IRooms
 {
@@ -13,9 +13,9 @@ export interface IRooms
 
     createRoom(roomID: string, 
                roomName: string,
-               videoState: IVideoState,
+               video: Video,
                connections: Array<string>): Room
 
-    updateRoomState(_roomID: string, _videoState: IVideoState): void
+    updateRoomState(_roomID: string, _video: Video): void
 
 }

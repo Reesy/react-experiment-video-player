@@ -6,8 +6,9 @@ import path = require('path');
 import { Rooms } from "./services/Rooms";
 import { IRooms } from "./interfaces/IRooms";
 import { Room } from "./interfaces/Room";
-import { IVideoState, playingState } from "./interfaces/IVideoState";
+import { Video } from "./interfaces/Video";
 import { v4 as uuidv4 } from 'uuid';
+import { playingState } from "./interfaces/Video";
 
 
 const app = express();
@@ -118,7 +119,7 @@ wss.on('connection', (ws: extendedWS) =>
             let connections: Array<string> = [];
             connections.push(ws.connectionID);
             //search if a room exists. 
-            rooms.addRoom(rooms.createRoom(data.roomID, data.roomName, data.videoState, connections));
+            rooms.addRoom(rooms.createRoom(data.roomID, data.roomName, data.video, connections));
 
         }
         else
@@ -126,7 +127,7 @@ wss.on('connection', (ws: extendedWS) =>
            
             let room: Room = rooms.getRoom(data.roomID);
             
-            let currentlyPlaying: playingState = room.videoState.playingState;
+            let currentlyPlaying: playingState = room.video.playingState;
             //If current connection doesn't exist in connections, assume it's a join room event and add it.
 
             if (room.connections.indexOf(ws.connectionID) === -1)
@@ -135,15 +136,13 @@ wss.on('connection', (ws: extendedWS) =>
             }
             else
             {
-                currentlyPlaying =  room.videoState.playingState === playingState.playing ? playingState.paused : playingState.playing;
-            
-                let videoState: IVideoState = {
-                    videoPath: data.videoState.videoPath,
-                    playingState: currentlyPlaying,
-                    videoPosition: 0
-                }
+                currentlyPlaying =  room.video.playingState === playingState.playing ? playingState.paused : playingState.playing;
+                
+                let video: Video = room.video;
+
+                video.playingState = currentlyPlaying;
     
-                rooms.updateRoomState(data.roomID, videoState);
+                rooms.updateRoomState(data.roomID, video);
     
 
             };
@@ -176,47 +175,3 @@ wss.on('connection', (ws: extendedWS) =>
 });
 
 console.log('Awaiting connections');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// isPaused = !isPaused;
-// wss.clients.forEach((client) =>
-// {
-
-//   if (client !== ws && client.readyState === WebSocket.OPEN) 
-//   {
-
-
-//     // read the room state and if client.connection exists in connections then send the message
-
-//     let currentRooms: Array<Room> = rooms.getRooms();
-
-//     currentRooms.forEach((room) =>
-//     {
-//       if (room.connections.includes(ws.connectionID))
-//       {
-
-
-//         let message = isPaused ? 'paused' : 'playing';
-//         console.log('sending message to clients (that didnt trigger the event): ', message);
-//         client.send(message);
-//       }
-//     });
-
-//   };
-// });
