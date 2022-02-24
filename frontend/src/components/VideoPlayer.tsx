@@ -1,16 +1,23 @@
 import React from 'react';
 import 'font-awesome/css/font-awesome.min.css';
+import { Video } from '../interfaces/Video';
 
-class VideoPlayer extends React.Component<any, any> {
+interface VideoPlayerProps 
+{
+    video: Video;
+    updatePlayState: () => void;
+};
+
+class VideoPlayer extends React.Component<VideoPlayerProps, any> {
 
     public buttonPlay: any;
     
 
     //I want the screen to re-render when props change
-    public shouldComponentUpdate(nextProps: any, nextState: any) 
+    public shouldComponentUpdate(nextProps: VideoPlayerProps, nextState: any) 
     {
         
-        if (nextProps.pauseState !== this.props.pauseState) 
+        if (nextProps.video.playingState !== this.props.video.playingState) 
         {
             let videoElement: any = document.getElementsByClassName('mainVideo')[0];
             if(videoElement.paused)
@@ -90,7 +97,7 @@ class VideoPlayer extends React.Component<any, any> {
                     <track kind="subtitles" src="test2.vtt" label="Spanish" srcLang="es" />
                 </video>
                 <div id="video-controls" className="controls" data-state="hidden" style={groupStyle}>
-                    <button id="playPause" type="button" onClick={this.playOrPause} className={this.props.pauseState !== "paused" ? "fa fa-pause": "fa fa-play" } style={buttonStyle}></button>
+                    <button id="playPause" type="button" onClick={this.playOrPause} className={this.props.video.playingState !== "paused" ? "fa fa-pause": "fa fa-play" } style={buttonStyle}></button>
                     <button id="subtitle" type="button" className="fa fa-language" style={buttonStyle}></button>
                     <button id="fs" type="button" onClick={this.setFullScreen} data-state="go-fullscreen" className="fa fa-expand" style={buttonStyle}></button>
                 </div>

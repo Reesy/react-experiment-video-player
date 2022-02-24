@@ -1,6 +1,13 @@
 import React from 'react';
+import { Subtitle } from '../interfaces/Subtitle';
 
-class SubtitlePicker extends React.Component<any, any> {
+
+interface SubtitlePickerProps
+{
+    subtitles: Array<Subtitle>
+    handleSubtitleSelection: (subtitle: Subtitle) => void;
+}
+class SubtitlePicker extends React.Component<SubtitlePickerProps, any> {
 
     constructor(props: any)
     {
@@ -10,7 +17,7 @@ class SubtitlePicker extends React.Component<any, any> {
 
     render() 
     {   
-        const subtitles : Array<string> = this.props.subtitles;
+        const subtitles : Array<Subtitle> = this.props.subtitles;
         let subtitleContent;
         if(this.props.subtitles.length < 1)
         {
@@ -43,7 +50,7 @@ class SubtitlePicker extends React.Component<any, any> {
      */
 	private handleSelection(event: any)
 	{
-		this.props.onSelectChange(event.target.value);
+		this.props.handleSubtitleSelection(event.target.value);
     }
     
  

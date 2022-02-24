@@ -31,13 +31,8 @@ interface AppState
 {
     currentVideo: Video,
     videoLibrary: Video[], //this might be wrong
-    isListAvailable: boolean,
     subtitles: Subtitle[],
-    currentSubtitle: string,
-    isPaused: boolean,
-    isGroupWatching: boolean,
     connected:  boolean,
-    pauseState: pauseState,
     appRoutes: appRoutes,
     videoPosition: number
 };
@@ -47,19 +42,17 @@ class App extends React.Component<any, AppState> {
     private videoApi: IVideoApi;
 
     private currentRoom: Room; 
+    
     constructor(props: any)
     {
         super(props);
         this.state = {
-            currentVideo: {} as Video,
+            currentVideo: {
+                playingState: pauseState.paused,
+            } as Video,
             videoLibrary: [],
-            isListAvailable: false,
             subtitles: [],
-            currentSubtitle: "",
-            isPaused: true,
-            isGroupWatching: false,
             connected: false,
-            pauseState: pauseState.paused,
             appRoutes: appRoutes.homePage,
             videoPosition: 0
         }
@@ -70,7 +63,6 @@ class App extends React.Component<any, AppState> {
 
         this.handleVideoSelection = this.handleVideoSelection.bind(this);
         this.handleSubtitleSelection = this.handleSubtitleSelection.bind(this);
-        this.handleVideoStateChange = this.handleVideoStateChange.bind(this);
         this.updatePlayState = this.updatePlayState.bind(this);
         this.createConnection = this.createConnection.bind(this);
         this.getVideos = this.getVideos.bind(this);
@@ -149,15 +141,14 @@ class App extends React.Component<any, AppState> {
                     <div className="videoPlayer">
                         <VideoPlayer
                             video={this.state.currentVideo}
-                            pauseState={this.state.pauseState}
-                            connectedState={this.state.connected}
+                           // pauseState={this.state.pauseState}
                             updatePlayState={this.updatePlayState}
                         />
                     </div>
                     <div className='toolbar'>
                         <SubtitlePicker
                             subtitles={this.state.subtitles}
-                            onSelectChange={this.handleSubtitleSelection}
+                            handleSubtitleSelection={this.handleSubtitleSelection}
                         />
                     </div>
                     {roomContent}
@@ -190,7 +181,7 @@ class App extends React.Component<any, AppState> {
                 
                 {mainContent}
                 <div>
-                    <p> Playback is {this.state.pauseState} </p>
+                    <p> Playback is {this.state.currentVideo.playingState} </p>
                 </div>
             </div>
         );
@@ -215,7 +206,8 @@ class App extends React.Component<any, AppState> {
      */
     private handleSubtitleSelection(selection: any)
     {
-        this.setState({ currentSubtitle: selection });
+        console.log('Maybe this will do something');
+      //  this.setState({ currentSubtitle: selection });
     }
 
     /**
@@ -228,7 +220,6 @@ class App extends React.Component<any, AppState> {
         let externalVideos: Array<Video> = await this.videoApi.getVideos();
         this.setState({ videoLibrary: externalVideos });
         this.setCurrentVideo(externalVideos[0]);
-        this.setState({ isListAvailable: true });
     }
 
     /**
@@ -238,10 +229,13 @@ class App extends React.Component<any, AppState> {
     private setCurrentVideo(_video: Video)
     {
 
-
-        //TODO: We have too many video objects, need to consolidate them into one object and add video position 
-        //and maybe a time stamp to that object
+        //TODO, maybe a time stamp on the object
         let completeApiPath = this.videoApi.getVideoApiAddress() + _video.path;
+
+        if (typeof(_video.playingState) === 'undefined')
+        {
+            _video.playingState = pauseState.paused;
+        }
 
         let fullyAddressedVideoItem: Video =
         {
@@ -263,26 +257,21 @@ class App extends React.Component<any, AppState> {
         }
     }
 
-    private handleVideoStateChange(isPaused: boolean)
-    {
-        console.log("Function was fired");
-    }
-
-
     private updatePlayState()
     {
 
 
-        if (this.state.pauseState === "paused")
+        if (this.state.currentVideo.playingState === "paused")
         {
-                this.setState({ pauseState: pauseState.playing });
+                this.setState({ currentVideo: { playingState: "playing" } as Video }); // Probably a BUG here TODO
+      
             
                 if (this.state.connected === true)
                 {
                     let newPlayingState: Video =
                     {
                         path: this.state.currentVideo.path,
-                        playingState: pauseState.playing,
+                        playingState: this.state.currentVideo.playingState,
                         videoPosition: this.state.currentVideo.videoPosition,
                         name: this.state.currentVideo.name,
                         baseName: this.state.currentVideo.baseName,
@@ -293,16 +282,16 @@ class App extends React.Component<any, AppState> {
                     websocket.send(JSON.stringify(this.currentRoom));
                 }
         }
-        else if (this.state.pauseState === "playing")
-        {
-                this.setState({ pauseState: pauseState.paused });
-            
+        else if (this.state.currentVideo.playingState === "playing")
+        {   
+                this.setState({ currentVideo: { playingState: "paused" } as Video }); // Probably a BUG here TODO
+                
                 if (this.state.connected === true)
                 {
                     let newPlayingState: Video =
                     {
                         path: this.state.currentVideo.path,
-                        playingState: pauseState.paused,
+                        playingState: this.state.currentVideo.playingState,
                         videoPosition: this.state.currentVideo.videoPosition,
                         name: this.state.currentVideo.name,
                         baseName: this.state.currentVideo.baseName
@@ -354,7 +343,10 @@ class App extends React.Component<any, AppState> {
         websocket.onmessage = (event: MessageEvent) =>
         {
             console.log('Recieved: ', event.data);
-            this.setState({ pauseState: event.data });
+
+            this.setState({ currentVideo: { playingState: event.data } as Video }); //This probably needs work too TODO
+            // this.setState()
+            // this.setState({ pauseState: event.data });
         };
 
     };
@@ -370,7 +362,7 @@ class App extends React.Component<any, AppState> {
             let newPlayingState: Video =
             {
                 path: this.state.currentVideo.path,
-                playingState: this.state.pauseState,
+                playingState: this.state.currentVideo.playingState,
                 videoPosition: this.state.videoPosition,
                 name: this.state.currentVideo.name,
                 baseName: this.state.currentVideo.baseName
@@ -396,7 +388,8 @@ class App extends React.Component<any, AppState> {
         websocket.onmessage = (event: MessageEvent) =>
         {
             console.log('Recieved: ', event.data);
-            this.setState({ pauseState: event.data });
+            this.setState({ currentVideo: { playingState: event.data } as Video }); //This probably needs work too TODO
+          //  this.setState({ pauseState: event.data });
         };
 
     }
