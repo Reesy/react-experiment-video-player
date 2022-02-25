@@ -1,5 +1,11 @@
 import { Subtitle } from "./Subtitle";
-import { pauseState } from "../App";
+
+
+export enum pauseState
+{
+    paused = "paused",
+    playing = "playing"
+};
 
 export interface Video
 {

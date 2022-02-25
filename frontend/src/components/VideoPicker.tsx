@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Layout, Layouts, Responsive as ResponsiveGridLayout, WidthProvider } from "react-grid-layout";
 import { IVideoApi } from "../apis/IVideoApi";
+import { VideoApi } from "../apis/VideoApi";
 import { Video } from "../interfaces/Video";
 import '../styles/VideoPicker.css';
 
@@ -9,22 +10,20 @@ const ResponsiveReactGridLayout = WidthProvider(ResponsiveGridLayout);
 interface VideoPickerProps 
 {
     cols: {};
-    onSelectChange: (event: any) => void;
-    library: Video[];
-    videoApi: IVideoApi;
+    selectVideo: (video: Video) => void;
 }
 
 interface VideoPickerState 
 {
+    library: Video[];
     layouts: Layouts;
     thumbnailPath: string
 }
 
 export default class VideoPicker extends React.Component<VideoPickerProps, VideoPickerState>
 {
-    static itemCount: number = 164;
 
-
+    private videoApi: IVideoApi;
 
     static defaultProps: any = {
         cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }
@@ -32,40 +31,31 @@ export default class VideoPicker extends React.Component<VideoPickerProps, Video
 
     static getDerivedStateFromProps(nextProps: VideoPickerProps, prevState: VideoPickerState)
     {
-        if (nextProps.library.length !== prevState.layouts["lg"].length)
+        console.log('Inside derived state from props');
+        if (prevState.library.length !== prevState.layouts["lg"].length)
         {
 
-            let itemCount = nextProps.library.length;
+            let itemCount = prevState.library.length;
             const layouts: Layouts = VideoPicker.createLayouts(itemCount);
 
             let newState: VideoPickerState = {
                 layouts: layouts,
-                thumbnailPath: prevState.thumbnailPath //this is persisted, will likely change this to dynamically obtain each thumbnail in the future. 
+                thumbnailPath: prevState.thumbnailPath, //this is persisted, will likely change this to dynamically obtain each thumbnail in the future. 
+                library: prevState.library
             };
 
             return newState;
         };
         return null;
-    }
+    };
 
-    componentDidUpdate(prevProps: VideoPickerProps, prevState: VideoPickerState)
-    {
-        if (prevProps.library !== this.props.library)
-        {
-            let itemCount = this.props.library.length;
-            const layouts = VideoPicker.createLayouts(itemCount);
-
-            this.setState({
-                layouts: layouts
-            });
-        };
-    }
 
     constructor(_props: VideoPickerProps)
     {
         super(_props);
-        this.handleSelection = this.handleSelection.bind(this);
+        this.selectVideo = this.selectVideo.bind(this);
 
+        this.videoApi = new VideoApi();
         const layouts: Layouts = {
             lg: [],
             md: [],
@@ -73,13 +63,25 @@ export default class VideoPicker extends React.Component<VideoPickerProps, Video
             xs: [],
             xxs: []
         };
-        let thumbnailPath = this.props.videoApi.getThumbnailApiAddress();
+        let thumbnailPath = this.videoApi.getThumbnailApiAddress();
 
 
         this.state = {
+            library: [],
             layouts: layouts,
             thumbnailPath: thumbnailPath
         };
+
+        this.videoApi.getVideos()
+            .then((videos: Array<Video>) =>
+            {
+                this.setState({
+                    library: videos
+                });
+            }).catch((error: any) =>
+            {
+                throw error;
+            });
     }
 
     /**
@@ -143,7 +145,7 @@ export default class VideoPicker extends React.Component<VideoPickerProps, Video
      */
     private createDOM(_elementCount: number): any
     {
-        if (typeof (this.props.library) === "undefined")
+        if (typeof (this.state.library) === "undefined")
         {
             return;
         }
@@ -151,7 +153,7 @@ export default class VideoPicker extends React.Component<VideoPickerProps, Video
 
         let thumbnail : string = "no_thumbnail.jpg";
         
-        this.props.library.forEach((video: Video, index: number) => 
+        this.state.library.forEach((video: Video, index: number) => 
         {
             if (video.thumbnail !== null && video.thumbnail !== "")
             {
@@ -165,7 +167,7 @@ export default class VideoPicker extends React.Component<VideoPickerProps, Video
                           src={thumbnail}
                           alt={video.name} 
                           onMouseDown={e => { 
-                            this.handleSelection(video);
+                            this.selectVideo(video);
                           }} />
                 </div>
             elements.push(elementDOM);
@@ -174,21 +176,16 @@ export default class VideoPicker extends React.Component<VideoPickerProps, Video
         return elements;
     };
 
-    /**
-     * @method handleSelection()
-     * @description: Once a video selection occurs this will update local state.
-     * @param _selectedVideo The selected video
-     */
-    private handleSelection(_selectedVideo: Video)
+    private selectVideo(_selectedVideo: Video)
     {
-        this.props.onSelectChange(_selectedVideo);
+        this.props.selectVideo(_selectedVideo);
     }
 
     render()
     {
 
 
-        if (typeof (this.props.library) === "undefined" || this.props.library.length === 0 || typeof (this.state.layouts) === "undefined")
+        if (typeof (this.state.library) === "undefined" || this.state.library.length === 0 || typeof (this.state.layouts) === "undefined")
         {
 
             return (
@@ -209,7 +206,7 @@ export default class VideoPicker extends React.Component<VideoPickerProps, Video
                     width={1200}
                     compactType={"horizontal"}
                 >
-                    {this.createDOM(VideoPicker.itemCount)}
+                    {this.createDOM(this.state.library.length)}
                 </ResponsiveReactGridLayout>
             </div>
         );
