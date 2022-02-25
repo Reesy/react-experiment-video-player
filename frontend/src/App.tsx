@@ -3,6 +3,8 @@ import React from 'react';
 import VideoPicker  from './components/VideoPicker';
 import { VideoPlayer } from './components/VideoPlayer';
 import { Video } from './interfaces/Video';
+import RoomPicker from './components/RoomPicker';
+import { Room } from './interfaces/Room';
 
 
 enum page
@@ -30,6 +32,7 @@ class App extends React.Component<AppProps, AppState>
     {
         super(props);
         this.selectVideo = this.selectVideo.bind(this);
+        this.selectRoom = this.selectRoom.bind(this);
 
         this.state = {
             page: page.home,
@@ -87,6 +90,11 @@ class App extends React.Component<AppProps, AppState>
         this.setState({page: page.video});
     };
 
+    //Callback from room picker.
+    private selectRoom = (room: Room) =>
+    {
+        this.selectVideo(room.video);
+    };
 
     headerContent: React.ReactNode = (
         <header>
@@ -96,6 +104,8 @@ class App extends React.Component<AppProps, AppState>
                     this.setState({
                         page: page.home
                     });
+
+                    this.setState({currentVideo: {} as Video})
                 }}>
                 Home
             </button>
@@ -105,6 +115,8 @@ class App extends React.Component<AppProps, AppState>
                     this.setState({
                         page: page.room
                     });
+
+                    this.setState({currentVideo: {} as Video})
                 }}>
                 Rooms
             </button>
@@ -120,7 +132,9 @@ class App extends React.Component<AppProps, AppState>
 
     roomContent: React.ReactNode = (
         <div>
-            <h1>Room</h1>
+            <RoomPicker
+                selectRoom={this.selectRoom}
+            />
         </div>
     );
 };

@@ -14,7 +14,7 @@ interface SubtitlePickerState
 }
 class SubtitlePicker extends React.Component<SubtitlePickerProps, SubtitlePickerState> {
 
-    constructor(props: any)
+    constructor(props: SubtitlePickerProps)
     {
 	  super(props);
       this.selectSubtitle = this.selectSubtitle.bind(this);

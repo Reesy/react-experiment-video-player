@@ -1,14 +1,13 @@
 import React from "react";
 import { IVideoApi } from "../apis/IVideoApi";
+import { VideoApi } from "../apis/VideoApi";
 import { Room } from "../interfaces/Room";
 
 
 interface RoomProps 
 {
-    videoApi: IVideoApi;
-    roomSelection: (room: Room) => void;
+    selectRoom: (room: Room) => void;
 }
-
 
 interface RoomState
 {
@@ -17,13 +16,16 @@ interface RoomState
 
 export default class RoomPicker extends React.Component<RoomProps, RoomState>
 {
+    
+    private videoApi: IVideoApi;
 
-    constructor(_props: any)
+    constructor(_props: RoomProps)
     {
         super(_props);
 
-   
-        _props.videoApi.getRooms()
+        this.videoApi = new VideoApi();
+        
+        this.videoApi.getRooms()
             .then((response: any) => 
             {
                 this.setState({rooms: response});
@@ -63,7 +65,7 @@ export default class RoomPicker extends React.Component<RoomProps, RoomState>
                         {this.state.rooms.map((room: Room) =>
                             <li key={room.roomID}>
                                 <p>Video being watched: {room.roomName} </p>
-                                <button onClick={() => {this.props.roomSelection(room)}}> Join watch session. </button>
+                                <button onClick={() => {this.props.selectRoom(room)}}> Join watch session. </button>
                             </li>
                         )}
                     </ul>

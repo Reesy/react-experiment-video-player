@@ -28,24 +28,36 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
     // //I want the screen to re-render when props change
     public shouldComponentUpdate(nextProps: VideoPlayerProps, nextState: VideoPlayerState) 
     {
-        //Todo, make this call less.
-        let videoElement: any = document.getElementsByClassName('mainVideo')[0];
 
-        if(videoElement.paused)
+
+        // When a video prop is passed in, we'll check it against the video state and conditionally update.
+        // If a parent socket returns a new video we will compare the video position and if they are too far outside of a range we will try to update this one to the latest video position.
+        //if (nextProps.isPlaying !== this.props.video)
+
+        if (nextState.isPlaying !== this.state.isPlaying)
         {
-            videoElement.play();
+                    //Todo, make this call less.
+            let videoElement: any = document.getElementsByClassName('mainVideo')[0];
 
-        }
-        else
-        {
-            videoElement.pause();
+            if(videoElement.paused)
+            {
+                videoElement.play();
+
+            }
+            else
+            {
+                videoElement.pause();
+            }
+            return true;
         }
 
-        return true;
+
+
+        return false;
   
     };
 
-    constructor(props: any)
+    constructor(props: VideoPlayerProps)
     {
         super(props);
         this.setPlayOrPause = this.setPlayOrPause.bind(this);
