@@ -40,11 +40,7 @@ class App extends React.Component<AppProps, AppState>
     render()
     {
 
-        let videoContent: JSX.Element = 
-            <div className='videoPlayer'>
-                <VideoPlayer video={this.state.currentVideo}/>
-            </div>;
-
+        let videoContent: JSX.Element = <VideoPlayer video={this.state.currentVideo}/>
 
         let content = this.homeContent;
         switch (this.state.page)

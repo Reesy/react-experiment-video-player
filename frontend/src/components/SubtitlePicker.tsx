@@ -5,20 +5,27 @@ import { Subtitle } from '../interfaces/Subtitle';
 interface SubtitlePickerProps
 {
     subtitles: Array<Subtitle>
-    handleSubtitleSelection: (subtitle: Subtitle) => void;
+    selectSubtitle: (subtitle: Subtitle) => void;
 }
-class SubtitlePicker extends React.Component<SubtitlePickerProps, any> {
+
+interface SubtitlePickerState
+{
+    // currentSubtitle: Subtitle;
+}
+class SubtitlePicker extends React.Component<SubtitlePickerProps, SubtitlePickerState> {
 
     constructor(props: any)
     {
 	  super(props);
-      this.handleSelection = this.handleSelection.bind(this);
+      this.selectSubtitle = this.selectSubtitle.bind(this);
     }
 
     render() 
     {   
         const subtitles : Array<Subtitle> = this.props.subtitles;
         let subtitleContent;
+
+
         if(this.props.subtitles.length < 1)
         {
             subtitleContent = 
@@ -28,12 +35,13 @@ class SubtitlePicker extends React.Component<SubtitlePickerProps, any> {
         {
             subtitleContent = 
             <div>           
-                <select name="SubtitleChoice" onChange={this.handleSelection}>
-                    {subtitles.map((subtitle: any) => 
+                <select name="SubtitleChoice" onChange={this.selectSubtitle}>
+                    {subtitles.map((subtitle: Subtitle) => 
                     {
                         return <option key={subtitle.name}>{subtitle.language}</option>;
                     })}
                 </select>	
+                <p> There are {this.props.subtitles.length} subtitles </p>
             </div>
         }
         return (
@@ -48,9 +56,18 @@ class SubtitlePicker extends React.Component<SubtitlePickerProps, any> {
      * @description: Once a video selection occurs this will update local state.
      * @param event: The HTML event that triggered this function
      */
-	private handleSelection(event: any)
+	private selectSubtitle(event: any)
 	{
-		this.props.handleSubtitleSelection(event.target.value);
+        let selectedSubtitle: Subtitle = this.props.subtitles.find((subtitle: Subtitle) => {
+            return subtitle.language === event.target.value;
+        })!;
+        
+        if (typeof(selectedSubtitle) === 'undefined')
+        {
+            throw Error ("Subtitle not found");
+        };
+
+		this.props.selectSubtitle(selectedSubtitle);
     }
     
  

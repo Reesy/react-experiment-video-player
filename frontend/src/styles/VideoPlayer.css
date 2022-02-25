@@ -26,3 +26,10 @@
     cursor: pointer;
     font-size: 20px
 }
+.videoPlayer
+{
+    height: 360px;
+    width: 640px;
+    display: flex;
+}
+  
