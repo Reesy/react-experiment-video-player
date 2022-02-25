@@ -1,0 +1,28 @@
+.mainVideo
+{
+    /* position: absolute; */
+    background: black;
+    display: flex;
+    height: 360px;
+    width: 640px;
+    opacity: 0.5
+}
+
+.groupStyle
+{
+    display: flex;
+    margin-top: 335px;
+    background: white;
+    height: 25px;
+    width: 640px;
+    position: relative as relative
+}
+
+.buttonStyle
+{
+    background: none;
+    border: none;
+    color: grey;
+    cursor: pointer;
+    font-size: 20px
+}

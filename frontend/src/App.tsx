@@ -1,5 +1,7 @@
+import './styles/App.css';
 import React from 'react';
 import VideoPicker  from './components/VideoPicker';
+import { VideoPlayer } from './components/VideoPlayer';
 import { Video } from './interfaces/Video';
 
 
@@ -37,6 +39,13 @@ class App extends React.Component<AppProps, AppState>
 
     render()
     {
+
+        let videoContent: JSX.Element = 
+            <div className='videoPlayer'>
+                <VideoPlayer video={this.state.currentVideo}/>
+            </div>;
+
+
         let content = this.homeContent;
         switch (this.state.page)
         {
@@ -44,7 +53,7 @@ class App extends React.Component<AppProps, AppState>
                 content = this.homeContent;
                 break;
             case page.video:
-                content = this.videoContent;
+                content = videoContent;
                 break;
             case page.room:
                 content = this.roomContent;
@@ -64,7 +73,6 @@ class App extends React.Component<AppProps, AppState>
                            </div>
         };
 
-
         return (
             <div className="App">
 
@@ -76,14 +84,12 @@ class App extends React.Component<AppProps, AppState>
         );
     };
 
-
     //Callback from the video picker.
     private selectVideo = (video: Video) =>
     {
         this.setState({currentVideo: video});
+        this.setState({page: page.video});
     };
-
-
 
 
     headerContent: React.ReactNode = (
@@ -116,19 +122,12 @@ class App extends React.Component<AppProps, AppState>
         </div>
     );
 
-    videoContent: React.ReactNode = (
-        <div>
-            <h1>Video</h1>
-        </div>
-    );
-
     roomContent: React.ReactNode = (
         <div>
             <h1>Room</h1>
         </div>
     );
-
-}
+};
 
 
 export default App;

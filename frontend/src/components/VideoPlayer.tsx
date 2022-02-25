@@ -1,77 +1,66 @@
 import React from 'react';
 import 'font-awesome/css/font-awesome.min.css';
+import "../styles/VideoPlayer.css"
 import { Video } from '../interfaces/Video';
+import { IVideoApi } from '../apis/IVideoApi';
+import { VideoApi } from '../apis/VideoApi';
 
 interface VideoPlayerProps 
 {
     video: Video;
-    updatePlayState: () => void;
 };
 
-class VideoPlayer extends React.Component<VideoPlayerProps, any> {
+interface VideoPlayerState
+{
+    isPlaying: boolean;
+    videoPosition: number;
+    videoPath: string;
+}
 
-    public buttonPlay: any;
-    
+class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
-    //I want the screen to re-render when props change
-    public shouldComponentUpdate(nextProps: VideoPlayerProps, nextState: any) 
+    private videoApi: IVideoApi;
+
+    // //I want the screen to re-render when props change
+    public shouldComponentUpdate(nextProps: VideoPlayerProps, nextState: VideoPlayerState) 
     {
-        
-        if (nextProps.video.playingState !== this.props.video.playingState) 
+        //Todo, make this call less.
+        let videoElement: any = document.getElementsByClassName('mainVideo')[0];
+
+        if(videoElement.paused)
         {
-            let videoElement: any = document.getElementsByClassName('mainVideo')[0];
-            if(videoElement.paused)
-            {
-                videoElement.play();
- 
-            }
-            else
-            {
-                videoElement.pause();
-            }
+            videoElement.play();
 
-            return true;
-        };
+        }
+        else
+        {
+            videoElement.pause();
+        }
 
-        return false;
+        return true;
+  
     };
 
     constructor(props: any)
     {
         super(props);
-        this.playOrPause = this.playOrPause.bind(this);
+        this.setPlayOrPause = this.setPlayOrPause.bind(this);
+        this.videoApi = new VideoApi();
+
+        let videoPath: string = this.videoApi.getVideoApiAddress();
+        
+        this.state = {
+            isPlaying: false,
+            videoPosition: 0,
+            videoPath: videoPath
+        };
+
+
     };
     
     render() 
     {
-        let videoStyle = 
-        {
-            position: "absolute" as "absolute",
-            background: "black",
-            display: "flex",
-            height: "360px",
-            width: "640px",
-            opacity: 0.5
-        }
 
-        let groupStyle: any = 
-        {
-            display: "flex",
-            marginTop: "335px",
-            background: "white",
-            height: "25px",
-            width: "640px",
-            position: "relative" as "relative"
-        }
-
-        let buttonStyle = 
-        {
-            background: "none",
-            border: "none",
-            color: "grey",
-            cursor: "pointer",
-            fontSize: "20px"
-        }
         //I want to get the current time from the video player:
         let videoElement: any = document.getElementsByClassName('mainVideo')[0];
 
@@ -92,14 +81,14 @@ class VideoPlayer extends React.Component<VideoPlayerProps, any> {
 
         return (
             <div> 
-                <video src={this.props.video.path} className="mainVideo" style={videoStyle}>
+                <video src={this.state.videoPath + "/" + this.props.video.path} className="mainVideo" >
                     <track kind="subtitles" src="test.vtt" label="English" srcLang="en" default />
                     <track kind="subtitles" src="test2.vtt" label="Spanish" srcLang="es" />
                 </video>
-                <div id="video-controls" className="controls" data-state="hidden" style={groupStyle}>
-                    <button id="playPause" type="button" onClick={this.playOrPause} className={this.props.video.playingState !== "paused" ? "fa fa-pause": "fa fa-play" } style={buttonStyle}></button>
-                    <button id="subtitle" type="button" className="fa fa-language" style={buttonStyle}></button>
-                    <button id="fs" type="button" onClick={this.setFullScreen} data-state="go-fullscreen" className="fa fa-expand" style={buttonStyle}></button>
+                <div id="video-controls" className="groupStyle" data-state="hidden">
+                    <button id="playPause" type="button" onClick={this.setPlayOrPause} className={this.state.isPlaying !== false ? "fa fa-pause buttonStyle": "fa fa-play buttonStyle" }></button>
+                    <button id="subtitle" type="button" className="fa fa-language buttonStyle"></button>
+                    <button id="fs" type="button" onClick={this.setFullScreen} data-state="go-fullscreen" className="fa fa-expand buttonStyle"></button>
                 </div>
                 <br></br>
                 <br></br>
@@ -113,12 +102,10 @@ class VideoPlayer extends React.Component<VideoPlayerProps, any> {
         );
     }
 
-    private playOrPause(event: any)
+    private setPlayOrPause(event: any)
     {
-
-        this.props.updatePlayState();
-
-    }
+        this.setState({isPlaying: !this.state.isPlaying});
+    };
 
     private setFullScreen(event: any)
     {
