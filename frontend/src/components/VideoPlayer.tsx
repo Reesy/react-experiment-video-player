@@ -10,6 +10,8 @@ import { Subtitle } from '../interfaces/Subtitle';
 interface VideoPlayerProps 
 {
     video: Video;
+    createRoom: (video: Video) => void;
+    broadcastVideoState: (video: Video) => void;
 };
 
 interface VideoPlayerState
@@ -141,6 +143,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
                     {currentSubtitleDisplay}
                 </div>
 
+                <button onClick={() => { this.props.createRoom(this.props.video)}}> Create Room</button>
             </div>
         );
     }
@@ -153,6 +156,18 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
     private setPlayOrPause(event: any)
     {
         this.setState({isPlaying: !this.state.isPlaying});
+
+        //Append video time to the object. 
+
+        //generate a new video objects based on the props and pass that up to the parent. I may need to add an exclusion to the shouldComponentUpdate
+        let updatedVideo: Video = this.props.video;
+
+        let videoElement: any = document.getElementsByClassName('mainVideo')[0];
+
+        let videoPosition = videoElement.currentTime;
+        console.log('VideoPosition: ' + videoPosition);
+        updatedVideo.videoPosition = videoPosition;
+        this.props.broadcastVideoState(updatedVideo);
     };
 
     private setFullScreen(event: any)

@@ -103,7 +103,7 @@ wss.on('connection', (ws: extendedWS) =>
     ws.on('message', (message) =>
     {
 
-        let data = JSON.parse(message.toString());
+        let data: Room = JSON.parse(message.toString());
 
         if (typeof (data.roomID) === 'undefined')
         {
@@ -136,16 +136,21 @@ wss.on('connection', (ws: extendedWS) =>
             }
             else
             {
+
+                //There may need to be some logic here to handle collisions between pause state and video position, maybe adding a time stamp to the message and diffing? 
                 currentlyPlaying =  room.video.playingState === playingState.playing ? playingState.paused : playingState.playing;
                 
                 let video: Video = room.video;
 
                 video.playingState = currentlyPlaying;
+                video.videoPosition = data.video.videoPosition;
     
                 rooms.updateRoomState(data.roomID, video);
     
 
             };
+
+            
 
 
             wss.clients.forEach((client: any) =>
