@@ -60,6 +60,12 @@ export class Rooms implements IRooms
         return this.rooms;
     }
     
+    public joinRoom(_roomID: string, _connectionID: string): void
+    {
+        let room = this.getRoom(_roomID);
+        room.connections.push(_connectionID);
+    };
+    
     public getRoom(_roomID: string): Room
     {   
 

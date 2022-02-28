@@ -90,6 +90,97 @@ interface extendedWS extends WebSocket
     connectionID: string;
 }
 
+
+let insertNewRoom = (data: Room, ws: extendedWS) => {
+    console.log('> room insertion called with : ', JSON.stringify(data, null, 2));
+    let connections: Array<string> = [];
+    connections.push(ws.connectionID);
+    //search if a room exists. 
+    rooms.addRoom(rooms.createRoom(data.roomID, data.roomName, data.video, connections));
+}
+
+let onClientUpdate = (data: Room, ws: extendedWS) => 
+{
+    console.log('> client update called with : ', JSON.stringify(data, null, 2));
+    let room: Room = rooms.getRoom(data.roomID);
+            
+    let currentlyPlaying: playingState = room.video.playingState;
+    //If current connection doesn't exist in connections, assume it's a join room event and add it.
+
+    if (room.connections.indexOf(ws.connectionID) === -1)
+    {
+        room.connections.push(ws.connectionID);
+    }
+    else
+    {
+
+        //There may need to be some logic here to handle collisions between pause state and video position, maybe adding a time stamp to the message and diffing? 
+        currentlyPlaying =  room.video.playingState === playingState.playing ? playingState.paused : playingState.playing;
+        
+        let video: Video = room.video;
+
+        video.playingState = currentlyPlaying;
+        video.videoPosition = data.video.videoPosition;
+
+        rooms.updateRoomState(data.roomID, video);
+
+
+    };
+
+    broadcastRoomToOtherClients(room, ws);
+  
+};
+
+
+
+let onJoinRoom = (_roomID: string, _connectionID: string) =>
+{
+
+    console.log('> Joining room called with roomID: ', _roomID, ' and connectionID', _connectionID);
+    rooms.joinRoom(_roomID, _connectionID);
+
+};
+
+
+//This will broadcast a message to all clients apart from the calling client. 
+let broadcastRoomToOtherClients = (room: Room, ws: extendedWS) =>
+{   
+    console.log('>> broadcast room called with. : ', JSON.stringify(room, null, 2));
+    wss.clients.forEach((client: any) =>
+    {
+        
+        //TODO: There may need to be an extra check in here to avoid sending an update state to the same client (although this might be better) 
+        if (room.connections.includes(client.connectionID) && ws.connectionID !== client.connectionID)
+        {   
+            console.log("The room is:", JSON.stringify(room))
+            //We only broadcast the pause state for now, it might be that we also broadcast back the video position,
+            //Then on the client side we take that value and if it goes over a range we skip video position. 
+            
+            console.log('Sending message from ' + ws.connectionID + ' to ' + client.connectionID);
+            client.send(JSON.stringify(room));
+        }
+    });
+};
+
+let resynch = (_roomID: string) => 
+{
+
+    //I want to send a 'resynch' message to the (host client) aka the first element in the connections array.
+    let room: Room = rooms.getRoom(_roomID);
+    let connections: Array<string> = room.connections;
+    let hostConnection: string = connections[0];
+    
+    //Find a better way to type this 
+    wss.clients.forEach((client: any) =>
+    {
+        if (client.connectionID === hostConnection)
+        {
+            client.send(room);
+        }
+    });
+
+};
+
 wss.on('connection', (ws: extendedWS) =>
 {
 
@@ -97,76 +188,68 @@ wss.on('connection', (ws: extendedWS) =>
     if (typeof (ws.connectionID) === 'undefined')
     {
         ws.connectionID = uuidv4();
+        console.log('Connection established for the first time, decorating connection with the following connectionID: ',  ws.connectionID);
     };
 
 
     ws.on('message', (message) =>
     {
-
+        console.log('---------------------------------------------')
         let data: Room = JSON.parse(message.toString());
+        
 
-        if (typeof (data.roomID) === 'undefined')
+        //Check that the data is correct
+
+        if (typeof(data.roomName) === "undefined")
         {
-            //Message isn't of the correct format and this should through an error.
+            console.log('A socket message was sent with a wrong type: ');
+            console.log(JSON.stringify(data, null, 2));
 
-            throw new Error("Message is not of the correct format");
-        };
+            return; //Maybe this should be a throw event. 
 
+        }
 
         if (typeof (rooms.getRoom(data.roomID).roomID) === 'undefined')
         {
-
-            let connections: Array<string> = [];
-            connections.push(ws.connectionID);
-            //search if a room exists. 
-            rooms.addRoom(rooms.createRoom(data.roomID, data.roomName, data.video, connections));
+            //If no room exists, create one 
+            //return (nothing more is needed as there is no )
+            insertNewRoom(data, ws);
+            return;
 
         }
-        else
+        
+
+
+        //When we do not find the websocket in the rooms connections property. 
+        if (rooms.getRoom(data.roomID).connections.indexOf(ws.connectionID) === -1)
         {
-           
-            let room: Room = rooms.getRoom(data.roomID);
             
-            let currentlyPlaying: playingState = room.video.playingState;
-            //If current connection doesn't exist in connections, assume it's a join room event and add it.
+            //Join room event, resynch the room.
+            onJoinRoom(data.roomID, ws.connectionID);
 
-            if (room.connections.indexOf(ws.connectionID) === -1)
-            {
-                room.connections.push(ws.connectionID);
-            }
-            else
-            {
+            return; 
+        }
+        
 
-                //There may need to be some logic here to handle collisions between pause state and video position, maybe adding a time stamp to the message and diffing? 
-                currentlyPlaying =  room.video.playingState === playingState.playing ? playingState.paused : playingState.playing;
+        //video position or pause/playing update
+        //broadcast to all clients except the sender. 
+        // (compare room with message to check for diff)
+        onClientUpdate(data, ws);
+
+
+
+
                 
-                let video: Video = room.video;
+        //If re-synch required,
+        //send message to host (first element)    (will need to ping each client to make sure the host is still connected, pop off connections if gone)
+ 
 
-                video.playingState = currentlyPlaying;
-                video.videoPosition = data.video.videoPosition;
-    
-                rooms.updateRoomState(data.roomID, video);
-    
+        // if (typeof (data.roomID) === 'undefined')
+        // {
+        //     //Message isn't of the correct format and this should through an error.
 
-            };
-
-            
-
-
-            wss.clients.forEach((client: any) =>
-            {
-                
-                //TODO: There may need to be an extra check in here to avoid sending an update state to the same client (although this might be better) 
-                if (room.connections.includes(client.connectionID))
-                {   
-                    //We only broadcast the pause state for now, it might be that we also broadcast back the video position,
-                    //Then on the client side we take that value and if it goes over a range we skip video position. 
-                    console.log('Sending message from ' + ws.connectionID + ' to ' + client.connectionID);
-                    client.send(currentlyPlaying);
-                }
-            });
-        };
-
+        //     throw new Error("Message is not of the correct format");
+        // };
 
     });
 

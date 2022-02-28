@@ -105,7 +105,16 @@ class App extends React.Component<AppProps, AppState>
     //Callback from room picker.
     private selectRoom = (room: Room) =>
     {
+
+        console.log('The room is: ', JSON.stringify(room));
         this.selectVideo(room.video);
+        this.setState({currentRoom: room});
+
+        //send room to server, it should fetch the state from the host and rebroadcast it, to here aswell. 
+        this.sendSocketData(JSON.stringify(room));
+
+
+
     };
 
     private sendSocketData = (data: any) =>
@@ -130,8 +139,13 @@ class App extends React.Component<AppProps, AppState>
     };
 
     private roomListener = (data: any) =>
-    {
+    {      
         console.log('data received from socket', data);
+        
+        
+        let _receivedRoom: Room = JSON.parse(data);
+        console.log('The room ID is: ', _receivedRoom.roomID);
+
     };
 
     private createRoom = (_video: Video) =>
@@ -187,8 +201,9 @@ class App extends React.Component<AppProps, AppState>
     {   
 
         //Check if there is a valid current room, return if not as there is no shared room session to broadcast too
-        if (typeof(this.state.currentRoom) === 'undefined')
+        if (typeof(this.state.currentRoom) === 'undefined' || typeof(this.state.currentRoom.roomID) === 'undefined')
         {
+            console.log('BroadcastVideoState called but no room was set for this client');
             return;
         }
         //Ensure the currentVideo matches the one passed in. 

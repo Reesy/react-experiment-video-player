@@ -11,6 +11,8 @@ export interface IRooms
 
     getRoom(_roomID: string): Room
 
+    joinRoom(_roomID: string, _connectionID: string): void
+
     createRoom(roomID: string, 
                roomName: string,
                video: Video,
