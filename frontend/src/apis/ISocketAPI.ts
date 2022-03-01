@@ -6,6 +6,7 @@ export interface ISocketAPI
 
     addListener(callback: Function): void;
 
-    close(): void;
+    removeListener(callback: Function): void; 
 
-}
+    close(): void;
+};

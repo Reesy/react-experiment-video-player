@@ -31,7 +31,7 @@ export default class VideoPicker extends React.Component<VideoPickerProps, Video
 
     static getDerivedStateFromProps(nextProps: VideoPickerProps, prevState: VideoPickerState)
     {
-        console.log('Inside derived state from props');
+        //console.log('Inside derived state from props');
         if (prevState.library.length !== prevState.layouts["lg"].length)
         {
 

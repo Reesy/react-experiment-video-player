@@ -103,7 +103,7 @@ let onClientUpdate = (data: Room, ws: extendedWS) =>
 {
     console.log('> client update called with : ', JSON.stringify(data, null, 2));
     let room: Room = rooms.getRoom(data.roomID);
-            
+    room.resynch = false; //This prevents a feedback loop, will need to do this better by distinguishing between sockets.
     let currentlyPlaying: playingState = room.video.playingState;
     //If current connection doesn't exist in connections, assume it's a join room event and add it.
 
@@ -131,16 +131,36 @@ let onClientUpdate = (data: Room, ws: extendedWS) =>
   
 };
 
-
-
+//If re-synch required,
+//send message to host (first element)    (will need to ping each client to make sure the host is still connected, pop off connections if gone)
 let onJoinRoom = (_roomID: string, _connectionID: string) =>
 {
 
     console.log('> Joining room called with roomID: ', _roomID, ' and connectionID', _connectionID);
     rooms.joinRoom(_roomID, _connectionID);
 
+    resynch(_roomID); // mutated.
 };
 
+
+let resynch = (_roomID: string) => 
+{
+
+    //I want to send a 'resynch' message to the (host client) aka the first element in the connections array.
+    let _room: Room = rooms.getRoom(_roomID);
+    let connections: Array<string> = _room.connections;
+    let hostConnection: string = connections[0];
+    _room.resynch = true;
+    //Find a better way to type this 
+    wss.clients.forEach((client: any) =>
+    {
+        if (client.connectionID === hostConnection)
+        {
+            client.send(JSON.stringify(_room)); // This doesn't need to send the whole object back maybe just a trigger to resynch. <<<<<<< TODO TODO 
+        }
+    });
+
+};
 
 //This will broadcast a message to all clients apart from the calling client. 
 let broadcastRoomToOtherClients = (room: Room, ws: extendedWS) =>
@@ -152,7 +172,7 @@ let broadcastRoomToOtherClients = (room: Room, ws: extendedWS) =>
         //TODO: There may need to be an extra check in here to avoid sending an update state to the same client (although this might be better) 
         if (room.connections.includes(client.connectionID) && ws.connectionID !== client.connectionID)
         {   
-            console.log("The room is:", JSON.stringify(room))
+         //   console.log("The room is:", JSON.stringify(room))
             //We only broadcast the pause state for now, it might be that we also broadcast back the video position,
             //Then on the client side we take that value and if it goes over a range we skip video position. 
             
@@ -162,24 +182,6 @@ let broadcastRoomToOtherClients = (room: Room, ws: extendedWS) =>
     });
 };
 
-let resynch = (_roomID: string) => 
-{
-
-    //I want to send a 'resynch' message to the (host client) aka the first element in the connections array.
-    let room: Room = rooms.getRoom(_roomID);
-    let connections: Array<string> = room.connections;
-    let hostConnection: string = connections[0];
-    
-    //Find a better way to type this 
-    wss.clients.forEach((client: any) =>
-    {
-        if (client.connectionID === hostConnection)
-        {
-            client.send(room);
-        }
-    });
-
-};
 
 wss.on('connection', (ws: extendedWS) =>
 {
@@ -209,10 +211,11 @@ wss.on('connection', (ws: extendedWS) =>
 
         }
 
+         //If no room exists, create one 
+
         if (typeof (rooms.getRoom(data.roomID).roomID) === 'undefined')
         {
-            //If no room exists, create one 
-            //return (nothing more is needed as there is no )
+           
             insertNewRoom(data, ws);
             return;
 
@@ -235,21 +238,6 @@ wss.on('connection', (ws: extendedWS) =>
         //broadcast to all clients except the sender. 
         // (compare room with message to check for diff)
         onClientUpdate(data, ws);
-
-
-
-
-                
-        //If re-synch required,
-        //send message to host (first element)    (will need to ping each client to make sure the host is still connected, pop off connections if gone)
- 
-
-        // if (typeof (data.roomID) === 'undefined')
-        // {
-        //     //Message isn't of the correct format and this should through an error.
-
-        //     throw new Error("Message is not of the correct format");
-        // };
 
     });
 

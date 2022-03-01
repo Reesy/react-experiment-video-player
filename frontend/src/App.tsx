@@ -102,20 +102,75 @@ class App extends React.Component<AppProps, AppState>
         this.setState({page: page.video});
     };
 
-    //Callback from room picker.
+  
     private selectRoom = (room: Room) =>
     {
-
-        console.log('The room is: ', JSON.stringify(room));
+        console.log('xXxXXXXXXXXXXXXFAFAFA --------- SELECT ROOM CALLED ---------- xXxXXXXXXXXXXXX');
+       // console.log('The room is: ', JSON.stringify(room));
         this.selectVideo(room.video);
-        this.setState({currentRoom: room});
+        this.setState({currentRoom: room}); //Maybe this isn't required? 
+
+
+        //We want to listen for a response from the server
+        //but we do NOT wish to update the video state, another listener will be added for that. 
+        this.addSocketListener(this.receiveJoinConfirmation);
+      //  this.SocketAPI.addListener(this.joinListener);
 
         //send room to server, it should fetch the state from the host and rebroadcast it, to here aswell. 
+        //Instead of sending the entire state, maybe we just need to send the roomID.
         this.sendSocketData(JSON.stringify(room));
+
+
+        //maybe we should destruct the video object on ther room, all the server really needs is the roomID.
+        //Do I also need to nuke the first listener?
 
 
 
     };
+
+    //
+    private receiveJoinConfirmation = (data: any) =>
+    {
+        console.log(' --- Received join confirmation --- ');
+
+        //We want to add a listener for the resynch that will occur on the server side. 
+        this.addSocketListener(this.receiveRoomState);
+        
+        console.log(' --- Removing join confirmation listener --- ');
+        //We no longer wish to listen for this response, remove the listener.
+        this.SocketAPI.removeListener(this.receiveJoinConfirmation);
+
+
+
+        //After we receive a confirm from the server we want to send off a request triggering a resynch.
+        this.sendSocketData(JSON.stringify(this.state.currentRoom));
+
+    
+
+
+    };
+
+    //This is added on create room, or after a response is returned from the server after room selection.
+    private receiveRoomState = (data: any) =>
+    {
+
+        console.log(' --- Receive room state, this will blindly merge the video state. --- ');
+        let _receivedRoom: Room = JSON.parse(data);
+
+        
+        if (typeof(_receivedRoom.resynch) !== 'undefined' && _receivedRoom.resynch === true)
+        {
+            //A new client has joined and this client has been designated the host, the server will grab the room state and if it's appropriate will send it to the new client.
+            console.log('>> Resynch event called, room state from is mostly garbage, not applying new room state but sending current state back to the server for a rebroadcast. ')
+            this.sendSocketData(JSON.stringify(this.state.currentRoom));
+            return; 
+        }
+        
+        console.log('The room is: ', JSON.stringify(_receivedRoom));
+        this.selectVideo(_receivedRoom.video);
+
+    };
+
 
     private sendSocketData = (data: any) =>
     {
@@ -138,15 +193,19 @@ class App extends React.Component<AppProps, AppState>
     
     };
 
-    private roomListener = (data: any) =>
-    {      
-        console.log('data received from socket', data);
-        
-        
-        let _receivedRoom: Room = JSON.parse(data);
-        console.log('The room ID is: ', _receivedRoom.roomID);
 
-    };
+    // private joinListener = (data: any) =>
+    // {
+    //     console.log('>Join listener called');
+    //     console.log('>data received from socket', data);
+    //     //As the server will do a resynch, one of these maybe shouldn't update the video state but just the room state, then the other listener will handle the video state change.
+       
+    //     let _receivedRoom: Room = JSON.parse(data);
+    //     console.log('The room ID is: ', _receivedRoom.roomID);
+
+    //     //Maybe add the room listener here at the end for the join room event. 
+
+    // }
 
     private createRoom = (_video: Video) =>
     {   
@@ -175,7 +234,7 @@ class App extends React.Component<AppProps, AppState>
         let newRoom: Room = {
             roomID: randomNumber.toString(),
             roomName: this.state.currentVideo.name,
-            video: this.state.currentVideo,
+            video: this.state.currentVideo
         };
 
         //Apply room state, this will only exist in two scenarios.
@@ -184,7 +243,7 @@ class App extends React.Component<AppProps, AppState>
         this.setState({currentRoom: newRoom});
         
         //Apply a listener to the socket with a callback
-        this.addSocketListener(this.roomListener);
+        this.addSocketListener(this.receiveRoomState);
 
         //Send it through the socket 
         this.sendSocketData(JSON.stringify(newRoom));

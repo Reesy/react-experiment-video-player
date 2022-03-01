@@ -60,6 +60,10 @@ export class SocketAPI implements ISocketAPI
         this.listeners.push(callback);
     };
 
+    removeListener(callback: Function): void
+    {
+        this.listeners.splice(this.listeners.indexOf(callback), 1);
+    };
 
     close(): void
     {

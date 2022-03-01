@@ -6,4 +6,5 @@ export interface Room
     roomName: string;
     video: Video;
     connections: Array<string>;
+    resynch?: boolean;
 };
