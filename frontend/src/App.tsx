@@ -145,8 +145,8 @@ class App extends React.Component<AppProps, AppState>
         //After we receive a confirm from the server we want to send off a request triggering a resynch.
         this.sendSocketData(JSON.stringify(this.state.currentRoom));
 
-    
-
+        console.log('The room is: ', data);
+    //    this.selectVideo(_receivedRoom.video);
 
     };
 
@@ -193,38 +193,9 @@ class App extends React.Component<AppProps, AppState>
     
     };
 
-
-    // private joinListener = (data: any) =>
-    // {
-    //     console.log('>Join listener called');
-    //     console.log('>data received from socket', data);
-    //     //As the server will do a resynch, one of these maybe shouldn't update the video state but just the room state, then the other listener will handle the video state change.
-       
-    //     let _receivedRoom: Room = JSON.parse(data);
-    //     console.log('The room ID is: ', _receivedRoom.roomID);
-
-    //     //Maybe add the room listener here at the end for the join room event. 
-
-    // }
-
     private createRoom = (_video: Video) =>
     {   
    
-        // this.currentRoom = newRoom;
-        // websocket.send(JSON.stringify(newRoom));
-        // console.log('Websocket opened');
-        // {
-        //     roomID: "2ec57289-dc91-4ca4-a6c9-dce02d378789",
-        //     roomName: "Grease.mp4",
-        //     video: {
-        //       name: "Grease.mp4",
-        //       baseName: "Grease",
-        //       path: "http://localhost:3050/Grease.mp4",
-        //       playingState: "paused",
-        //       videoPosition: 0,
-        //     },
-        //   }
-
         //Generate an initial room object here using the video object 
         this.setState({currentVideo: _video})
 
@@ -247,13 +218,7 @@ class App extends React.Component<AppProps, AppState>
 
         //Send it through the socket 
         this.sendSocketData(JSON.stringify(newRoom));
-        //Apply a listener to the socket with a callback
-        
-        
-        //Mutate video state through the callback 
-
-        // console.log('Inside create room')
-    }
+    };
 
 
     private broadcastVideoState = (video: Video) =>
