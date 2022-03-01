@@ -40,7 +40,7 @@ class App extends React.Component<AppProps, AppState>
         this.selectVideo = this.selectVideo.bind(this);
         this.selectRoom = this.selectRoom.bind(this);
         this.createRoom = this.createRoom.bind(this);
-        this.broadcastVideoState = this.broadcastVideoState.bind(this);
+        this.updateCurrentRoom = this.updateCurrentRoom.bind(this);
 
         this.state = {
             page: page.home,
@@ -49,12 +49,16 @@ class App extends React.Component<AppProps, AppState>
         };
     }
 
+    public shouldComponentUpdate(nextProps: AppProps, nextState: AppState)
+    {   
+        return true;
+    };
     render()
     {
 
         let videoContent: JSX.Element = <VideoPlayer video={this.state.currentVideo}
                                                      createRoom={this.createRoom}
-                                                     broadcastVideoState={this.broadcastVideoState}
+                                                     updateCurrentRoom={this.updateCurrentRoom}
                                                      />
 
         let content = this.homeContent;
@@ -80,6 +84,7 @@ class App extends React.Component<AppProps, AppState>
             temporaryLog = <div> 
                              <p>Video Name: {this.state.currentVideo.name} </p>
                              <p>Video playing: {this.state.currentVideo.playingState} </p>
+                             <p>Video position: {this.state.currentVideo.videoPosition} </p>
                              <p>Video path {this.state.currentVideo.path} </p>
                            </div>
         };
@@ -221,8 +226,10 @@ class App extends React.Component<AppProps, AppState>
     };
 
 
-    private broadcastVideoState = (video: Video) =>
+    private updateCurrentRoom = (video: Video) =>
     {   
+        //Ensure the currentVideo matches the one passed in. 
+        this.setState({currentVideo: video});
 
         //Check if there is a valid current room, return if not as there is no shared room session to broadcast too
         if (typeof(this.state.currentRoom) === 'undefined' || typeof(this.state.currentRoom.roomID) === 'undefined')
@@ -230,8 +237,7 @@ class App extends React.Component<AppProps, AppState>
             console.log('BroadcastVideoState called but no room was set for this client');
             return;
         }
-        //Ensure the currentVideo matches the one passed in. 
-        this.setState({currentVideo: video});
+  
 
         //If there is merge the video state with the room state
         let updatedRoom: Room = this.state.currentRoom;
