@@ -19,34 +19,35 @@ interface VideoPlayerState
     videoServerLocation: string //This will be the location of the server location, I.E localhost:3050/ but not the actual video path.
     currentSubtitle: Subtitle; //This will always be client dependent, the server doesn't care
 }
-
+ 
 class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
     private videoApi: IVideoApi;
 
-
-    // componentDidUpdate(prevProps: VideoPlayerProps, prevState: VideoPlayerState, snapshot: any) 
-    // {
-    //     console.log("ComponentDid update", prevProps);
-    // };
-
-
-    // getSnapshotBeforeUpdate(prevProps: VideoPlayerProps, prevState: VideoPlayerState)
-    // {
-    //     console.log("getSnapshotBeforeUpdate", prevProps);
-    //     return prevProps
-    // };
-
-    // //I want the screen to re-render when props change
     public shouldComponentUpdate(nextProps: VideoPlayerProps, nextState: VideoPlayerState) 
-    {
+    {   
 
-
-
-    
         if (this.props.video !== nextProps.video)
-        {   
+        {
             let videoElement: any = document.getElementsByClassName('mainVideo')[0];
+
+            let currentVideoPosition = videoElement.currentTime;
+
+            //If incoming is 0 we assume its a callback from a new join and we want to exit
+
+            //If there is more than a 2-3 second difference then we want to merge the nextProps state in. 
+
+            if ( (currentVideoPosition !== 0) && (Math.abs(currentVideoPosition - nextProps.video.videoPosition) > 3) )
+            {
+                videoElement.currentTime = nextProps.video.videoPosition;
+
+                //Maybe I also need to setCurrentVideo here too, just so the state of the app matches when there's a change.?
+                console.log('CurrentVideoPosition: ' + currentVideoPosition + " NextProps.video.videoPosition: " + nextProps.video.videoPosition);
+                console.log('math.floor currentVideoPosition: ' + Math.floor(currentVideoPosition) + " math.floor nextProps.video.videoPosition: " + Math.floor(nextProps.video.videoPosition));
+            }
+
+
+            
             if (nextProps.video.playingState === pauseState.playing)
             {
                 videoElement.play();
@@ -59,43 +60,11 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
             console.log('There was a change of state triggered');
             return true;
 
-        }
+        };
+ 
         return false;
+
     };
-    // {   
-
-    //     // if (this.state.video.playingState !== nextProps.video.playingState)
-    //     // {
-    //     //     let videoElement: any = document.getElementsByClassName('mainVideo')[0];
-
-
-
-
-
-            
-    //     //     // if (nextProps.video.playingState === pauseState.playing)
-    //     //     // {
-    //     //     //     videoElement.play();
-    //     //     // }
-    //     //     // else
-    //     //     // {
-    //     //     //     videoElement.pause();
-    //     //     // }
-
-    //     //     return true;
-    //     // }
-
-
-    //     // if (Math.floor(this.state.video.videoPosition) !== Math.floor(nextState.video.videoPosition))
-    //     // {
-    //     //     return true;
-    //     // };
-
-
-
-    //     // return false;
-  
-    // };
 
     constructor(props: VideoPlayerProps)
     {
@@ -106,50 +75,46 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
         this.videoApi = new VideoApi();
 
-        let videoLocation : string = this.videoApi.getVideoApiAddress();
-        
-        this.state = 
+        let videoLocation: string = this.videoApi.getVideoApiAddress();
+
+        this.state =
         {
             videoServerLocation: videoLocation,
             currentSubtitle: {} as Subtitle // This will be set by the subtitle picker, we conditionally render if this object is empty or not. 
         };
 
-
     };
 
-    
 
-
-    
     render() 
     {
 
         let subtitleContent: JSX.Element = <div> No subtitles </div>;
 
         let currentSubtitleDisplay: JSX.Element = <div> No subtitle selected </div>;
-        
-        if (typeof(this.state.currentSubtitle) !== 'undefined')
+
+        if (typeof (this.state.currentSubtitle) !== 'undefined')
         {
             currentSubtitleDisplay = <div> {this.state.currentSubtitle.name} </div>;
         }
-        
-        if (typeof(this.props.video.subtitles) !== 'undefined')
+
+        if (typeof (this.props.video.subtitles) !== 'undefined')
         {
-            subtitleContent = <SubtitlePicker 
-                                    subtitles={this.props.video.subtitles} 
-                                    selectSubtitle={this.selectSubtitle}    
-                                />
+            subtitleContent = <SubtitlePicker
+                subtitles={this.props.video.subtitles}
+                selectSubtitle={this.selectSubtitle}
+            />
         }
         return (
             <div>
                 <div className='videoPlayer'>
-                    <div> 
+                    <div>
                         <video src={this.state.videoServerLocation + "/" + this.props.video.path} className="mainVideo" onTimeUpdate={this.onVideoProgress}>
                             <track kind="subtitles" src="test.vtt" label="English" srcLang="en" default />
                             <track kind="subtitles" src="test2.vtt" label="Spanish" srcLang="es" />
                         </video>
                         <div id="video-controls" className="groupStyle" data-state="hidden">
-                            <button id="playPause" type="button" onClick={this.setPlayOrPause} className={this.props.video.playingState !== pauseState.paused ? "fa fa-pause buttonStyle": "fa fa-play buttonStyle" }></button>
+                            <button id="playPause" type="button" onClick={this.setPlayOrPause} className={this.props.video.playingState !== pauseState.paused ? "fa fa-pause buttonStyle" : "fa fa-play buttonStyle"}></button>
                             <button id="subtitle" type="button" className="fa fa-language buttonStyle"></button>
                             <button id="fs" type="button" onClick={this.setFullScreen} data-state="go-fullscreen" className="fa fa-expand buttonStyle"></button>
                         </div>
@@ -158,8 +123,6 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
                         <br></br>
                         <br></br>
                         <p>currentTime: {this.props.video.videoPosition}</p>
-                        {/* <p>duration: {duration}</p>
-                        <p>percentage: {percentage}</p> */}
                     </div>
                 </div>
                 <div className='toolbar'>
@@ -167,76 +130,48 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
                     {currentSubtitleDisplay}
                 </div>
 
-                <button onClick={() => { this.props.createRoom(this.props.video)}}> Create Room</button>
+                <button onClick={() => { this.props.createRoom(this.props.video) }}> Create Room</button>
             </div>
         );
     }
 
     private selectSubtitle(subtitle: Subtitle)
     {
-        this.setState({currentSubtitle: subtitle});
+        this.setState({ currentSubtitle: subtitle });
     };
 
     private setPlayOrPause(event: any)
-    {   
+    {
+        let _updatedVideoPlayState = JSON.parse(JSON.stringify(this.props.video));
 
-        let _updatedVideoState = JSON.parse(JSON.stringify(this.props.video));
-        
-        _updatedVideoState.playingState = this.props.video.playingState === pauseState.paused ? pauseState.playing : pauseState.paused;
+        _updatedVideoPlayState.playingState = this.props.video.playingState === pauseState.paused ? pauseState.playing : pauseState.paused;
 
-        this.props.updateCurrentRoom(_updatedVideoState);
+        let videoElement: any = document.getElementsByClassName('mainVideo')[0];
 
-        // let videoElement: any = document.getElementsByClassName('mainVideo')[0];
-        // let 
-        // _newVideoChange.playingState = this.state.video.playingState === pauseState.paused ? pauseState.playing : pauseState.paused;
+        _updatedVideoPlayState.videoPosition = videoElement.currentTime;
 
-
-
-
-        // let _newVideoChange: Video = JSON.parse(JSON.stringify(this.state.video));
-
-
-  
-
-
-        // this.setState({video: _newVideoChange});
-
-
-        // this.setState({video: _newVideoChange});
-
-        //Append video time to the object. 
-
-        // //generate a new video objects based on the props and pass that up to the parent. I may need to add an exclusion to the shouldComponentUpdate
-        // let updatedVideo: Video = this.props.video;
-
-    
-
-        // let videoPosition = videoElement.currentTime;
-        // console.log('VideoPosition: ' + videoPosition);
-        // updatedVideo.videoPosition = videoPosition;
-        
+        this.props.updateCurrentRoom(_updatedVideoPlayState);
     };
 
     private onVideoProgress(event: any)
     {
 
-        //This is NASTY maybe not needed.
+        console.log('Video position: ' + event.target.currentTime);
+        // //This is NASTY maybe not needed.
+        // let _updateVideoProgress: Video = JSON.parse(JSON.stringify(this.props.video));
+        // _updateVideoProgress.videoPosition = event.target.currentTime;
 
-        // let _newVideoChange: Video = JSON.parse(JSON.stringify(this.state.video));
-        // _newVideoChange.videoPosition = event.target.currentTime;
-
-        // this.setState({video: _newVideoChange});
-
-    }
+        // this.props.updateCurrentRoom(_updateVideoProgress);
+    };
 
     private setFullScreen(event: any)
     {
         let videoElement: any = document.getElementsByClassName('mainVideo')[0];
-        if(videoElement.requestFullscreen)
+        if (videoElement.requestFullscreen)
         {
             videoElement.requestFullscreen();
         }
-        else if(videoElement.mozRequestFullScreen)
+        else if (videoElement.mozRequestFullScreen)
         {
             videoElement.mozRequestFullScreen();
         }

@@ -133,7 +133,6 @@ class App extends React.Component<AppProps, AppState>
 
     };
 
-    //
     private receiveJoinConfirmation = (data: any) =>
     {
         console.log(' --- Received join confirmation --- ');
@@ -145,8 +144,8 @@ class App extends React.Component<AppProps, AppState>
         //We no longer wish to listen for this response, remove the listener.
         this.SocketAPI.removeListener(this.receiveJoinConfirmation);
 
-
-
+        //TODO
+        //Is there any point in sending the room state here?
         //After we receive a confirm from the server we want to send off a request triggering a resynch.
         this.sendSocketData(JSON.stringify(this.state.currentRoom));
 
