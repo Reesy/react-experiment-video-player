@@ -23,28 +23,19 @@ export class Rooms implements IRooms
                 break;
             }
         }
-        // let room = this.getRoom(_roomID);
+
 
 
         return;
-        // //Search this.rooms for room with room id and replace with video state
-        // let room = this.rooms.find((room) => room.roomID === _roomID)
-
-        // if (typeof(room) !== 'undefined')
-        // {
-        //     room.videoState = _videoState;
-        // }
 
     }
 
 
-    createRoom(roomID: string, roomName: string, video: Video, connections: string[]): Room
+    public createRoom(roomID: string, video: Video): Room
     {
         let newRoom: Room = {
             roomID: roomID,
-            roomName: roomName,
-            video: video,
-            connections: connections
+            video: video
         };
         
         return newRoom;
@@ -59,12 +50,6 @@ export class Rooms implements IRooms
     {
         return this.rooms;
     }
-    
-    public joinRoom(_roomID: string, _connectionID: string): void
-    {
-        let room = this.getRoom(_roomID);
-        room.connections.push(_connectionID);
-    };
     
     public getRoom(_roomID: string): Room
     {   

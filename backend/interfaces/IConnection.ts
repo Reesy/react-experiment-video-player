@@ -1,7 +1,6 @@
 
-export interface IConnection
+export interface Connection
 {
-    connectionId: string;
-    userId: string;
-    userName: string;
+    roomID: string;
+    connectionIDs: string[];
 };

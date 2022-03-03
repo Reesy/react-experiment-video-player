@@ -9,6 +9,9 @@ import { Room } from "./interfaces/Room";
 import { Video } from "./interfaces/Video";
 import { v4 as uuidv4 } from 'uuid';
 import { playingState } from "./interfaces/Video";
+import { Connections } from "./services/Connections";
+import { IConnections } from "./interfaces/Connections";
+import { Connection } from "./interfaces/IConnection";
 
 
 const app = express();
@@ -26,7 +29,7 @@ let library = new Library.Library(contentDirectory, '', thumbnailDirectory);
 let cachedLibrary = library.getLibrary();
 
 let rooms: IRooms = new Rooms();
-
+let roomConnections: IConnections= new Connections();
 
 app.use((req, res, next) => 
 {
@@ -72,8 +75,11 @@ app.post('/api/room', (req: express.Request, res: express.Response) =>
 {
     let request = req.body;
 
-    let room: Room = rooms.createRoom(request.roomID, request.roomName, request.videoState, request.connections);
-
+ 
+    let room: Room = rooms.createRoom(request.roomID, request.videoState);
+    
+    roomConnections.createConnection(request.roomID, request.connectionID);
+    
     rooms.addRoom(room);
 
     res.send(room);
@@ -93,36 +99,40 @@ interface extendedWS extends WebSocket
 
 let insertNewRoom = (data: Room, ws: extendedWS) => {
     console.log('> room insertion called with : ', JSON.stringify(data, null, 2));
-    let connections: Array<string> = [];
-    connections.push(ws.connectionID);
-    //search if a room exists. 
-    rooms.addRoom(rooms.createRoom(data.roomID, data.roomName, data.video, connections));
+    rooms.addRoom(rooms.createRoom(data.roomID, data.video));
+    roomConnections.createConnection(data.roomID, ws.connectionID);
 }
 
 let onClientUpdate = (data: Room, ws: extendedWS) => 
 {
     console.log('> client update called with : ', JSON.stringify(data, null, 2));
+    
     let room: Room = rooms.getRoom(data.roomID);
     room.resynch = false; //This prevents a feedback loop, will need to do this better by distinguishing between sockets.
-    let currentlyPlaying: playingState = room.video.playingState;
+
     //If current connection doesn't exist in connections, assume it's a join room event and add it.
 
-    if (room.connections.indexOf(ws.connectionID) === -1)
+
+    let _connections: Connection = roomConnections.getConnection(data.roomID);
+
+
+    if (_connections.connectionIDs.indexOf(ws.connectionID) === -1)
     {
-        room.connections.push(ws.connectionID);
+      //  room.connections.push(ws.connectionID);
+        roomConnections.addConnection(data.roomID, ws.connectionID);
     }
     else
     {
 
-        //There may need to be some logic here to handle collisions between pause state and video position, maybe adding a time stamp to the message and diffing? 
-        currentlyPlaying =  room.video.playingState === playingState.playing ? playingState.paused : playingState.playing;
+        // //There may need to be some logic here to handle collisions between pause state and video position, maybe adding a time stamp to the message and diffing? 
+        // currentlyPlaying =  room.video.playingState === playingState.playing ? playingState.paused : playingState.playing;
         
-        let video: Video = room.video;
+        // let video: Video = room.video;
 
-        video.playingState = currentlyPlaying;
-        video.videoPosition = data.video.videoPosition;
+        // video.playingState = currentlyPlaying;
+        // video.videoPosition = data.video.videoPosition;
 
-        rooms.updateRoomState(data.roomID, video);
+        rooms.updateRoomState(data.roomID, room.video);
 
 
     };
@@ -137,7 +147,8 @@ let onJoinRoom = (_roomID: string, _connectionID: string) =>
 {
 
     console.log('> Joining room called with roomID: ', _roomID, ' and connectionID', _connectionID);
-    rooms.joinRoom(_roomID, _connectionID);
+    roomConnections.addConnection(_roomID, _connectionID);
+    // rooms.joinRoom(_roomID, _connectionID);
 
     resynch(_roomID); // mutated.
 };
@@ -148,8 +159,9 @@ let resynch = (_roomID: string) =>
 
     //I want to send a 'resynch' message to the (host client) aka the first element in the connections array.
     let _room: Room = rooms.getRoom(_roomID);
-    let connections: Array<string> = _room.connections;
-    let hostConnection: string = connections[0];
+
+    let hostConnection: string = roomConnections.getHost(_roomID);
+
     _room.resynch = true;
     //Find a better way to type this 
     wss.clients.forEach((client: any) =>
@@ -162,15 +174,17 @@ let resynch = (_roomID: string) =>
 
 };
 
+
 //This will broadcast a message to all clients apart from the calling client. 
 let broadcastRoomToOtherClients = (room: Room, ws: extendedWS) =>
 {   
     console.log('>> broadcast room called with. : ', JSON.stringify(room, null, 2));
     wss.clients.forEach((client: any) =>
     {
-        
+        let connectedClients: Connection = roomConnections.getConnection(room.roomID);
+        let connectedClientIDs: string[] = connectedClients.connectionIDs;
         //TODO: There may need to be an extra check in here to avoid sending an update state to the same client (although this might be better) 
-        if (room.connections.includes(client.connectionID) && ws.connectionID !== client.connectionID)
+        if (connectedClientIDs.includes(client.connectionID) && ws.connectionID !== client.connectionID)
         {   
          //   console.log("The room is:", JSON.stringify(room))
             //We only broadcast the pause state for now, it might be that we also broadcast back the video position,
@@ -221,10 +235,12 @@ wss.on('connection', (ws: extendedWS) =>
 
         }
         
-
+        let connections: Connection = roomConnections.getConnection(data.roomID);
 
         //When we do not find the websocket in the rooms connections property. 
-        if (rooms.getRoom(data.roomID).connections.indexOf(ws.connectionID) === -1)
+        
+        if (connections.connectionIDs.indexOf(ws.connectionID) === -1)
+        // if (rooms.getRoom(data.roomID).connections.indexOf(ws.connectionID) === -1)
         {
             
             //Join room event, resynch the room.
