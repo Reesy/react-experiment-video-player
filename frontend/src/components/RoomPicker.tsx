@@ -64,7 +64,7 @@ export default class RoomPicker extends React.Component<RoomProps, RoomState>
                     <ul>
                         {this.state.rooms.map((room: Room) =>
                             <li key={room.roomID}>
-                                <p>Video being watched: {room.roomName} </p>
+                                <p>Video being watched: {room.video.name} </p>
                                 <button onClick={() => {this.props.selectRoom(room)}}> Join watch session. </button>
                             </li>
                         )}

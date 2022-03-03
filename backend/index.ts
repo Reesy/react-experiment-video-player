@@ -202,7 +202,7 @@ wss.on('connection', (ws: extendedWS) =>
 
         //Check that the data is correct
 
-        if (typeof(data.roomName) === "undefined")
+        if (typeof(data.video.name) === "undefined")
         {
             console.log('A socket message was sent with a wrong type: ');
             console.log(JSON.stringify(data, null, 2));

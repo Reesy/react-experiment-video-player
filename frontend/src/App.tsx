@@ -208,7 +208,6 @@ class App extends React.Component<AppProps, AppState>
         let randomNumber = uuidv4();
         let newRoom: Room = {
             roomID: randomNumber.toString(),
-            roomName: this.state.currentVideo.name,
             video: this.state.currentVideo
         };
 
@@ -237,7 +236,7 @@ class App extends React.Component<AppProps, AppState>
             return;
         }
   
-
+        //TODO, check if this merge is ok and if a deep clone is needed instead kinda looks correct
         //If there is merge the video state with the room state
         let updatedRoom: Room = this.state.currentRoom;
         updatedRoom.video = this.state.currentVideo;

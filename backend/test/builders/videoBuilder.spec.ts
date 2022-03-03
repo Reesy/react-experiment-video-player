@@ -68,11 +68,6 @@ describe("videoBuilder", () =>
                 chai.expect(result.path).to.equal(path.join('videohost', 'Interstellar.mp4'));
             });
 
-            it("Should return a video object with baseName as the extensionless filename", () =>
-            {
-                chai.expect(result.baseName).to.equal('Interstellar');
-            });
-
             it("Should not return a subtitles property", () =>
             {
                 chai.expect(result.subtitles).to.be.undefined;
@@ -102,11 +97,6 @@ describe("videoBuilder", () =>
                 {
 
                     chai.expect(result.path).to.equal(path.join('videohost', 'skyfall.mp4'));
-                });
-
-                it("Should return a video object with baseName as the extensionless filename", () =>
-                {
-                    chai.expect(result.baseName).to.equal('skyfall');
                 });
 
                 it("Should return a subtitles array with one subtitle object", () =>
@@ -145,11 +135,6 @@ describe("videoBuilder", () =>
                 {
 
                     chai.expect(result.path).to.equal(path.join('videohost', 'Lost in translation.mp4'));
-                });
-
-                it("Should return a video object with baseName as the extensionless filename", () =>
-                {
-                    chai.expect(result.baseName).to.equal('Lost in translation');
                 });
 
                 it("Should return a subtitles array with 5 subtitle objects", () =>

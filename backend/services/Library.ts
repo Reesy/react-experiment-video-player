@@ -168,7 +168,7 @@ export class Library implements ILibrary
 
             if(__subtitles.length > 0)
             {
-                let matchedSubtitles: Subtitle[] = __subtitles.filter(sub => sub.target === video.baseName);
+                let matchedSubtitles: Subtitle[] = __subtitles.filter(sub => sub.target === video.name);
                 if(matchedSubtitles.length > 0)
                 {
                     video.subtitles = matchedSubtitles;

@@ -24,11 +24,9 @@ export class videoBuilder implements IvideoBuilder
     {
         let name = this.buildVideoName();
         let path = this.buildVideoPath();
-        let baseName = this.buildBaseName();
         let Video: Video = {
             name: name,
             path: path,
-            baseName: baseName,
             playingState: playingState.paused,
             videoPosition: 0
         }
@@ -67,23 +65,6 @@ export class videoBuilder implements IvideoBuilder
     private buildVideoPath(): string
     {
         return path.join(this.directory, this.fileName);
-    }
-
-    /**
-     * @private
-     * @name buildBaseName 
-     * @description This will return the base filename without any extensions to more easily map related subtitles
-     */
-    private buildBaseName(): string
-    {
-        let target = this.fileName.match(/[^.]*/);
-
-        if(target === null)
-        {
-            throw 'Basename could not be resolved'
-        }
-        return target[0]
-
     }
 
 }
