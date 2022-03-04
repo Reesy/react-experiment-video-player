@@ -1,6 +1,5 @@
 
 import { Room } from "./Room"
-import { Video } from "./Video";
 
 export interface IRooms
 {
@@ -12,8 +11,6 @@ export interface IRooms
     getRoom(_roomID: string): Room
 
     createRoom(roomID: string,
-               video: Video): Room
-
-    updateRoomState(_roomID: string, _video: Video): void
+               roomName: string): Room
 
 }

@@ -1,13 +1,13 @@
 import { Subtitle } from "./Subtitle";
 
 
-export enum pauseState
+export enum playingState
 {
     paused = "paused",
     playing = "playing"
 };
 
-export interface Video
+export interface VideoResource
 {
     /**
      * The display name of the video
@@ -29,13 +29,20 @@ export interface Video
      */
     thumbnail?: string;
 
+};
+
+
+export interface VideoState
+{
     /**
      *  Enum describing if the video is currently playing or not
      */
-    playingState: pauseState;
+    playingState: playingState;
 
     /**
      *  Current time of the video
      */
     videoPosition: number;
-};
+
+
+}

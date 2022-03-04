@@ -1,5 +1,5 @@
 import { IvideoBuilder } from "../interfaces/IvideoBuilder";
-import { playingState, Video } from "../interfaces/Video";
+import { Video } from "../interfaces/Video";
 import { Subtitle } from "../interfaces/Subtitle";
 import path = require('path');
 
@@ -26,9 +26,7 @@ export class videoBuilder implements IvideoBuilder
         let path = this.buildVideoPath();
         let Video: Video = {
             name: name,
-            path: path,
-            playingState: playingState.paused,
-            videoPosition: 0
+            path: path
         }
         if(this.subtitles)
         {

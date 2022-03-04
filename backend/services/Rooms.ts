@@ -1,7 +1,5 @@
 import { IRooms } from "../interfaces/IRooms";
 import { Room } from "../interfaces/Room";
-import { Video } from "../interfaces/Video";
-
 
 export class Rooms implements IRooms
 {
@@ -12,30 +10,11 @@ export class Rooms implements IRooms
 
     }
     
-    public updateRoomState(_roomID: string, _video: Video): void
-    {
-
-        for (let room of this.rooms)
-        {
-            if (room.roomID === _roomID)
-            {
-                room.video = _video;
-                break;
-            }
-        }
-
-
-
-        return;
-
-    }
-
-
-    public createRoom(roomID: string, video: Video): Room
+    public createRoom(roomID: string, roomName: string): Room
     {
         let newRoom: Room = {
             roomID: roomID,
-            video: video
+            roomName: roomName
         };
         
         return newRoom;
