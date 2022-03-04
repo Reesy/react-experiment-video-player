@@ -1,10 +1,9 @@
-import { Video } from "../interfaces/Video";
+import { VideoResource } from "../interfaces/VideoResource";
 import { IVideoApi } from "./IVideoApi";
 import { request } from '../wrappers/request';
 import { IRequest } from "../wrappers/IRequest";
 import { IRequestOptions } from "../wrappers/IRequestOptions";
-import { Room } from "../interfaces/Room";
-
+import { RoomResource } from "../interfaces/RoomResource";
 
 export class VideoApi implements IVideoApi
 {
@@ -16,7 +15,7 @@ export class VideoApi implements IVideoApi
         this.APICaller = new request();
     }
     
-    public async getRooms(): Promise<Room[]>
+    public async getRooms(): Promise<RoomResource[]>
     {   
         const options: IRequestOptions = 
         {
@@ -25,16 +24,16 @@ export class VideoApi implements IVideoApi
         const uri = "http://localhost:3050/api/rooms";
 
         let serverResponse = await this.APICaller.get(uri, options);  
-        let roomArray: Array<Room> = serverResponse.data;
+        let roomArray: Array<RoomResource> = serverResponse.data;
         return roomArray;
       
     }
 
-    public async getRoom(_roomID: string): Promise<Room>
+    public async getRoom(_roomID: string): Promise<RoomResource>
     {
         throw new Error("Method not implemented.");
     }
-    public async postRoom(_room: Room): Promise<Room>
+    public async postRoom(_room: RoomResource): Promise<RoomResource>
     {
         throw new Error("Method not implemented.");
     }
@@ -43,7 +42,7 @@ export class VideoApi implements IVideoApi
         return "http://localhost:3050/";
     }
 
-    public async getVideos(): Promise<Array<Video>>
+    public async getVideos(): Promise<Array<VideoResource>>
     {   
         const options: IRequestOptions = 
         {
@@ -52,7 +51,7 @@ export class VideoApi implements IVideoApi
         const uri = "http://localhost:3050/api/video/library"
 
         let serverResponse = await this.APICaller.get(uri, options);  
-        let videoArray: Array<Video> = serverResponse.data;
+        let videoArray: Array<VideoResource> = serverResponse.data;
         return videoArray;
     }
 

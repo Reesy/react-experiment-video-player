@@ -2,7 +2,7 @@ import * as React from "react";
 import { Layout, Layouts, Responsive as ResponsiveGridLayout, WidthProvider } from "react-grid-layout";
 import { IVideoApi } from "../apis/IVideoApi";
 import { VideoApi } from "../apis/VideoApi";
-import { Video } from "../interfaces/Video";
+import { VideoResource } from "../interfaces/VideoResource";
 import '../styles/VideoPicker.css';
 
 const ResponsiveReactGridLayout = WidthProvider(ResponsiveGridLayout);
@@ -10,12 +10,12 @@ const ResponsiveReactGridLayout = WidthProvider(ResponsiveGridLayout);
 interface VideoPickerProps 
 {
     cols: {};
-    selectVideo: (video: Video) => void;
+    selectVideo: (video: VideoResource) => void;
 }
 
 interface VideoPickerState 
 {
-    library: Video[];
+    library: VideoResource[];
     layouts: Layouts;
     thumbnailPath: string
 }
@@ -73,7 +73,7 @@ export default class VideoPicker extends React.Component<VideoPickerProps, Video
         };
 
         this.videoApi.getVideos()
-            .then((videos: Array<Video>) =>
+            .then((videos: Array<VideoResource>) =>
             {
                 this.setState({
                     library: videos
@@ -153,7 +153,7 @@ export default class VideoPicker extends React.Component<VideoPickerProps, Video
 
         let thumbnail : string = "no_thumbnail.jpg";
         
-        this.state.library.forEach((video: Video, index: number) => 
+        this.state.library.forEach((video: VideoResource, index: number) => 
         {
             if (video.thumbnail !== null && video.thumbnail !== "")
             {
@@ -176,7 +176,7 @@ export default class VideoPicker extends React.Component<VideoPickerProps, Video
         return elements;
     };
 
-    private selectVideo(_selectedVideo: Video)
+    private selectVideo(_selectedVideo: VideoResource)
     {
         this.props.selectVideo(_selectedVideo);
     }

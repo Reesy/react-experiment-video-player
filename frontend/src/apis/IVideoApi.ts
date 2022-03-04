@@ -1,15 +1,15 @@
-import { Room } from "../interfaces/Room";
-import { Video} from "../interfaces/Video";
+import { RoomResource  } from "../interfaces/RoomResource";
+import { VideoResource } from "../interfaces/VideoResource";
 
 export interface IVideoApi
 {
-    getVideos(): Promise<Array<Video>>
+    getVideos(): Promise<Array<VideoResource>>
 
-    getRooms(): Promise<Array<Room>>
+    getRooms(): Promise<Array<RoomResource>>
 
-    getRoom(_roomID: string): Promise<Room>
+    getRoom(_roomID: string): Promise<RoomResource>
 
-    postRoom(_room: Room): Promise<Room>
+    postRoom(_room: RoomResource): Promise<RoomResource>
 
     getRoomApiAddress(): string;
 

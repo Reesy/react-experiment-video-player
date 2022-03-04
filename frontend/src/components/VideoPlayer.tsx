@@ -1,18 +1,13 @@
 import React from 'react';
 import 'font-awesome/css/font-awesome.min.css';
 import "../styles/VideoPlayer.css"
-import { pauseState, Video } from '../interfaces/Video';
+import { playingState, VideoState } from '../interfaces/VideoState';
+import { VideoResource } from '../interfaces/VideoResource';
 import { IVideoApi } from '../apis/IVideoApi';
 import { VideoApi } from '../apis/VideoApi';
 import { SubtitlePicker } from './SubtitlePicker';
 import { Subtitle } from '../interfaces/Subtitle';
-
-interface VideoPlayerProps 
-{
-    video: Video;
-    createRoom: (video: Video) => void;
-    updateCurrentRoom: (video: Video) => void;
-};
+import { VideoPlayerProps } from '../interfaces/VideoPlayerProps';
 
 interface VideoPlayerState
 {
@@ -27,7 +22,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
     public shouldComponentUpdate(nextProps: VideoPlayerProps, nextState: VideoPlayerState) 
     {   
 
-        if (this.props.video !== nextProps.video)
+        if (this.props.videoState !== nextProps.videoState)
         {
             let videoElement: any = document.getElementsByClassName('mainVideo')[0];
 
@@ -37,18 +32,18 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
             //If there is more than a 2-3 second difference then we want to merge the nextProps state in. 
 
-            if ( (currentVideoPosition !== 0) && (Math.abs(currentVideoPosition - nextProps.video.videoPosition) > 3) )
+            if ( (currentVideoPosition !== 0) && (Math.abs(currentVideoPosition - nextProps.videoState.videoPosition) > 3) )
             {
-                videoElement.currentTime = nextProps.video.videoPosition;
+                videoElement.currentTime = nextProps.videoState.videoPosition;
 
                 //Maybe I also need to setCurrentVideo here too, just so the state of the app matches when there's a change.?
-                console.log('CurrentVideoPosition: ' + currentVideoPosition + " NextProps.video.videoPosition: " + nextProps.video.videoPosition);
-                console.log('math.floor currentVideoPosition: ' + Math.floor(currentVideoPosition) + " math.floor nextProps.video.videoPosition: " + Math.floor(nextProps.video.videoPosition));
+                console.log('CurrentVideoPosition: ' + currentVideoPosition + " NextProps.video.videoPosition: " + nextProps.videoState.videoPosition);
+                console.log('math.floor currentVideoPosition: ' + Math.floor(currentVideoPosition) + " math.floor nextProps.video.videoPosition: " + Math.floor(nextProps.videoState.videoPosition));
             }
 
 
             
-            if (nextProps.video.playingState === pauseState.playing)
+            if (nextProps.videoState.playingState === playingState.playing)
             {
                 videoElement.play();
             }
@@ -98,10 +93,10 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
             currentSubtitleDisplay = <div> {this.state.currentSubtitle.name} </div>;
         }
 
-        if (typeof (this.props.video.subtitles) !== 'undefined')
+        if (typeof (this.props.videoResource.subtitles) !== 'undefined')
         {
             subtitleContent = <SubtitlePicker
-                subtitles={this.props.video.subtitles}
+                subtitles={this.props.videoResource.subtitles}
                 selectSubtitle={this.selectSubtitle}
             />
         }
@@ -109,12 +104,12 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
             <div>
                 <div className='videoPlayer'>
                     <div>
-                        <video src={this.state.videoServerLocation + "/" + this.props.video.path} className="mainVideo" onTimeUpdate={this.onVideoProgress}>
+                        <video src={this.state.videoServerLocation + "/" + this.props.videoResource.path} className="mainVideo" onTimeUpdate={this.onVideoProgress}>
                             <track kind="subtitles" src="test.vtt" label="English" srcLang="en" default />
                             <track kind="subtitles" src="test2.vtt" label="Spanish" srcLang="es" />
                         </video>
                         <div id="video-controls" className="groupStyle" data-state="hidden">
-                            <button id="playPause" type="button" onClick={this.setPlayOrPause} className={this.props.video.playingState !== pauseState.paused ? "fa fa-pause buttonStyle" : "fa fa-play buttonStyle"}></button>
+                            <button id="playPause" type="button" onClick={this.setPlayOrPause} className={this.props.videoState.playingState !== playingState.paused ? "fa fa-pause buttonStyle" : "fa fa-play buttonStyle"}></button>
                             <button id="subtitle" type="button" className="fa fa-language buttonStyle"></button>
                             <button id="fs" type="button" onClick={this.setFullScreen} data-state="go-fullscreen" className="fa fa-expand buttonStyle"></button>
                         </div>
@@ -122,7 +117,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
                         <br></br>
                         <br></br>
                         <br></br>
-                        <p>currentTime: {this.props.video.videoPosition}</p>
+                        <p>currentTime: {this.props.videoState.videoPosition}</p>
                     </div>
                 </div>
                 <div className='toolbar'>
@@ -130,7 +125,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
                     {currentSubtitleDisplay}
                 </div>
 
-                <button onClick={() => { this.props.createRoom(this.props.video) }}> Create Room</button>
+                <button onClick={() => { this.props.createRoom(this.props.videoState) }}> Create Room</button>
             </div>
         );
     }
@@ -142,15 +137,16 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
     private setPlayOrPause(event: any)
     {
-        let _updatedVideoPlayState = JSON.parse(JSON.stringify(this.props.video));
+        let _updatedVideoPlayState = JSON.parse(JSON.stringify(this.props.videoState));
 
-        _updatedVideoPlayState.playingState = this.props.video.playingState === pauseState.paused ? pauseState.playing : pauseState.paused;
+        _updatedVideoPlayState.playingState = this.props.videoState.playingState === playingState.paused ? playingState.playing : playingState.paused;
 
+        //Todo there might need to be a set video state here . 
         let videoElement: any = document.getElementsByClassName('mainVideo')[0];
 
         _updatedVideoPlayState.videoPosition = videoElement.currentTime;
 
-        this.props.updateCurrentRoom(_updatedVideoPlayState);
+        this.props.updateVideoState(_updatedVideoPlayState);
     };
 
     private onVideoProgress(event: any)

@@ -1,25 +1,23 @@
 import React from "react";
 import { IVideoApi } from "../apis/IVideoApi";
 import { VideoApi } from "../apis/VideoApi";
-import { Room } from "../interfaces/Room";
-
-
-interface RoomProps 
+import { RoomResource } from "../interfaces/RoomResource";
+interface RoomPickerProps 
 {
-    selectRoom: (room: Room) => void;
+    selectRoom: (room: RoomResource) => void;
 }
 
-interface RoomState
+interface RoomPickerState
 {
-    rooms: Array<Room>;
+    rooms: Array<RoomResource>;
 }
 
-export default class RoomPicker extends React.Component<RoomProps, RoomState>
+export default class RoomPicker extends React.Component<RoomPickerProps, RoomPickerState>
 {
     
     private videoApi: IVideoApi;
 
-    constructor(_props: RoomProps)
+    constructor(_props: RoomPickerProps)
     {
         super(_props);
 
@@ -29,28 +27,11 @@ export default class RoomPicker extends React.Component<RoomProps, RoomState>
             .then((response: any) => 
             {
                 this.setState({rooms: response});
-                //this.rooms = response.data;
-                //console.log(response);
             })
             .catch((err: any) => {
                 console.log(err)
             });
     };
-
-    // [
-    //     {
-    //         "roomID": "e704d5e7-ee51-4ade-9fed-3fda76ef7745",
-    //         "roomName": "7796da5574c19e239d4f5de4fbfe020f-480p.mp4",
-    //         "videoState": {
-    //             "videoPath": "http://localhost:3050/7796da5574c19e239d4f5de4fbfe020f-480p.mp4",
-    //             "playingState": "paused",
-    //             "videoPosition": 0
-    //         },
-    //         "connections": [
-    //             "be74d0ec-61e7-4a5a-8b14-432b6fa1ebef"
-    //         ]
-    //     }
-    // ]
 
     render(): React.ReactNode {
         
@@ -62,18 +43,15 @@ export default class RoomPicker extends React.Component<RoomProps, RoomState>
                 content = <div>
                     <h1>Rooms</h1>
                     <ul>
-                        {this.state.rooms.map((room: Room) =>
-                            <li key={room.roomID}>
-                                <p>Video being watched: {room.video.name} </p>
+                        {this.state.rooms.map((room: RoomResource) =>
+                            <li key={room.id}>
+                                <p>Video being watched: {room.name} </p>
                                 <button onClick={() => {this.props.selectRoom(room)}}> Join watch session. </button>
                             </li>
                         )}
                     </ul>
                         
                 </div>
-                
-                
-                // this.state.rooms[0].roomName;
             }
             else
             {
@@ -94,5 +72,4 @@ export default class RoomPicker extends React.Component<RoomProps, RoomState>
             </div>
         )
     }
-
 };
