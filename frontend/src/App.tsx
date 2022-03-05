@@ -3,7 +3,7 @@ import React from 'react';
 import VideoPicker  from './components/VideoPicker';
 import RoomPicker from './components/RoomPicker';
 import { VideoPlayer } from './components/VideoPlayer';
-import { VideoState } from './interfaces/VideoState';
+import { playingState, VideoState } from './interfaces/VideoState';
 import { VideoResource } from './interfaces/VideoResource';
 import { RoomResource } from './interfaces/RoomResource';
 import { ISocketAPI } from './apis/ISocketAPI';
@@ -24,7 +24,8 @@ interface AppState
     videoState: VideoState;
     videoResource: VideoResource;
     roomResource: RoomResource
-    roomState: RoomState;
+    roomID: string, 
+    connected: boolean;
 };
 
 
@@ -45,13 +46,20 @@ class App extends React.Component<AppProps, AppState>
         this.selectRoom = this.selectRoom.bind(this);
         this.createRoom = this.createRoom.bind(this);
         this.updateVideoState = this.updateVideoState.bind(this);
+        this.triggerBroadcast = this.triggerBroadcast.bind(this);
+
+        let _roomID = uuidv4();
 
         this.state = {
             page: page.home,
             videoResource: {} as VideoResource,
-            videoState: {} as VideoState,
+            videoState: { 
+                playingState: playingState.paused,
+                videoPosition: 0
+            },
             roomResource: {} as RoomResource,
-            roomState: {} as RoomState
+            roomID: _roomID,
+            connected: false
         };
     }
 
@@ -59,13 +67,16 @@ class App extends React.Component<AppProps, AppState>
     {   
         return true;
     };
+   
     render()
     {
 
         let videoContent: JSX.Element = <VideoPlayer videoState={this.state.videoState}
                                                      videoResource={this.state.videoResource}
                                                      createRoom={this.createRoom}
+                                                     triggerBroadcast={this.triggerBroadcast}
                                                      updateVideoState={this.updateVideoState}
+                                                     connected={this.state.connected}
                                                      />
 
         let content = this.homeContent;
@@ -115,7 +126,7 @@ class App extends React.Component<AppProps, AppState>
     };
 
   
-    private selectRoom = (roomResource: RoomResource) =>
+    private selectRoom = (_roomResource: RoomResource) =>
     {
         console.log('xXxXXXXXXXXXXXXFAFAFA --------- SELECT ROOM CALLED ---------- xXxXXXXXXXXXXXX');
        // console.log('The room is: ', JSON.stringify(room));
@@ -130,9 +141,12 @@ class App extends React.Component<AppProps, AppState>
 
         //send room to server, it should fetch the state from the host and rebroadcast it, to here aswell. 
         //Instead of sending the entire state, maybe we just need to send the roomID.
-        this.sendSocketData(roomResource.id);
+       
 
+        this.sendSocketData(JSON.stringify(_roomResource));
 
+        this.setState({connected: true});
+        this.setState({page: page.video});
         //maybe we should destruct the video object on ther room, all the server really needs is the roomID.
         //Do I also need to nuke the first listener?
 
@@ -154,38 +168,107 @@ class App extends React.Component<AppProps, AppState>
         //TODO
         //Is there any point in sending the room state here?
         //After we receive a confirm from the server we want to send off a request triggering a resynch.
-        this.sendSocketData("Resynch");
+       // this.sendSocketData("Resynch");
 
-        console.log('The room is: ', data);
-    //    this.selectVideo(_receivedRoom.video);
+       //TODO TODO TODO TODO // This could be a problem
+        
+
+    
+        // change this 
+        let _receivedRoom: RoomState = JSON.parse(data);
+        
+        let _videoResource: VideoResource =
+        {
+            name: _receivedRoom.name,
+            path: _receivedRoom.name
+        };
+
+        let _videoState: VideoState = _receivedRoom.videoState!; //Assume this is here for now?!
+
+        this.setState({videoResource: _videoResource});
+        this.setState({videoState: _videoState});
+
+        this.setState({page: page.video});
+        //'{"id":"6e7042ae-f2d8-426d-ba47-af6516cc948f","name":"Hairspray.mp4","videoState":{"videoPosition":6.97519,"playingState":"paused"}}'
+      
+        // this.sendSocketData("confirm");
+        // console.log('The room is: ', data);
+        // this.selectVideo(_receivedRoom.video);
 
     };
 
 
-    private receiveRoomState = (data: any) =>
+    private updateVideoState(_videoState: VideoState): void 
     {
-        throw "This needs to be reimplemented"
-    }
-    // //This is added on create room, or after a response is returned from the server after room selection.
+        //Ensure the currentVideo matches the one passed in. 
+        this.setState({videoState: _videoState});
+    };
+
+
+    private triggerBroadcast = () =>
+    {   
+
+        console.log('Broadcasting video state: ', this.state.videoState);
+
+
+
+        // //Check if there is a valid current room, return if not as there is no shared room session to broadcast too
+        // if (typeof(this.state.room) === 'undefined' || typeof(this.state.currentRoom.roomID) === 'undefined')
+        // {
+        //     console.log('BroadcastVideoState called but no room was set for this client');
+        //     return;
+        // }
+  
+        // //TODO, check if this merge is ok and if a deep clone is needed instead kinda looks correct
+        // //If there is merge the video state with the room state
+        // let updatedRoom: Room = this.state.currentRoom;
+        // updatedRoom.video = this.state.currentVideo;
+
+
+
+        // //Stringify and Send it through the socket 
+
+
+        // this.sendSocketData(JSON.stringify(updatedRoom));
+    };
+
+
     // private receiveRoomState = (data: any) =>
     // {
+    //     throw "This needs to be reimplemented"
+    // }
+    //This is added on create room, or after a response is returned from the server after room selection.
+    private receiveRoomState = (data: any) =>
+    {
 
-    //     console.log(' --- Receive room state, this will blindly merge the video state. --- ');
-    //     let _receivedRoom: Room = JSON.parse(data);
+        console.log(' --- Receive room state, this will blindly merge the video state. --- ');
+        
+        if (data.toString() === "Resynch")
+        {
+                //A new client has joined and this client has been designated the host, the server will grab the room state and if it's appropriate will send it to the new client.
+                console.log('>> Resynch event called, room state from is mostly garbage, not applying new room state but sending current state back to the server for a rebroadcast. ')
+                this.sendSocketData(JSON.stringify(this.createRoomState()));
+                return; 
+        }
+       
+       
+        let _receivedRoom: RoomState = JSON.parse(data);
 
         
-    //     if (typeof(_receivedRoom.resynch) !== 'undefined' && _receivedRoom.resynch === true)
-    //     {
-    //         //A new client has joined and this client has been designated the host, the server will grab the room state and if it's appropriate will send it to the new client.
-    //         console.log('>> Resynch event called, room state from is mostly garbage, not applying new room state but sending current state back to the server for a rebroadcast. ')
-    //         this.sendSocketData(JSON.stringify(this.state.currentRoom));
-    //         return; 
-    //     }
+        // if (typeof(_receivedRoom.resynch) !== 'undefined' && _receivedRoom.resynch === true)
+        // {
+        //     //A new client has joined and this client has been designated the host, the server will grab the room state and if it's appropriate will send it to the new client.
+        //     console.log('>> Resynch event called, room state from is mostly garbage, not applying new room state but sending current state back to the server for a rebroadcast. ')
+        //     this.sendSocketData(JSON.stringify(this.state.currentRoom));
+        //     return; 
+        // }
         
-    //     console.log('The room is: ', JSON.stringify(_receivedRoom));
-    //     this.selectVideo(_receivedRoom.video);
+        console.log('The room is: ', JSON.stringify(_receivedRoom));
 
-    // };
+     //   this.roo
+        //this.selectVideo(_receivedRoom.video);
+
+    };
 
 
     private sendSocketData = (data: any) =>
@@ -208,10 +291,38 @@ class App extends React.Component<AppProps, AppState>
         this.SocketAPI.addListener(listener);
     
     };
-    private createRoom = (_videoState: VideoState) =>
+    private createRoom = () =>
+    {   
+        this.setState({connected: true});
+        
+        //Apply a listener to the socket with a callback
+        this.addSocketListener(this.receiveRoomState);
+
+        //Send it through the socket 
+
+        let sockerParams: RoomState = this.createRoomState();
+
+        this.sendSocketData(JSON.stringify(sockerParams));
+       
+        return;
+    };
+
+
+
+    private createRoomState(): RoomState
     {
-        throw 'Needs to be reimplemented'
-    }
+ 
+        let _socketParams: RoomState = {
+            id: this.state.roomID,
+            name: this.state.videoResource.name,
+            videoState: this.state.videoState
+        };
+
+        return _socketParams;
+    };
+
+
+
     // private createRoom = (_videoState: VideoState) =>
     // {   
    
@@ -238,35 +349,6 @@ class App extends React.Component<AppProps, AppState>
     //     this.sendSocketData(JSON.stringify(newRoom));
     // };
 
-    private updateVideoState =  (_videoState: VideoState) =>
-    {
-
-    }
-
-    // private updateVideoState = (_videoState: VideoState) =>
-    // {   
-    //     //Ensure the currentVideo matches the one passed in. 
-    //     this.setState({videoState: _videoState});
-
-    //     //Check if there is a valid current room, return if not as there is no shared room session to broadcast too
-    //     if (typeof(this.state.room) === 'undefined' || typeof(this.state.currentRoom.roomID) === 'undefined')
-    //     {
-    //         console.log('BroadcastVideoState called but no room was set for this client');
-    //         return;
-    //     }
-  
-    //     //TODO, check if this merge is ok and if a deep clone is needed instead kinda looks correct
-    //     //If there is merge the video state with the room state
-    //     let updatedRoom: Room = this.state.currentRoom;
-    //     updatedRoom.video = this.state.currentVideo;
-
-
-
-    //     //Stringify and Send it through the socket 
-
-
-    //     this.sendSocketData(JSON.stringify(updatedRoom));
-    // };
 
     private establishConnection = () =>
     {
@@ -286,7 +368,6 @@ class App extends React.Component<AppProps, AppState>
                     this.setState({videoResource: {} as VideoResource})
                     this.setState({videoState: {} as VideoState })
                     this.setState({roomResource: {} as RoomResource})
-                    this.setState({roomState: {} as RoomState})
                 }}>
                 Home
             </button>
@@ -300,7 +381,6 @@ class App extends React.Component<AppProps, AppState>
                     this.setState({videoResource: {} as VideoResource})
                     this.setState({videoState: {} as VideoState })
                     this.setState({roomResource: {} as RoomResource})
-                    this.setState({roomState: {} as RoomState})
                 }}>
                 Rooms
             </button>

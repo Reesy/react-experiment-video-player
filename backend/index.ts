@@ -5,12 +5,12 @@ import Library = require('./services/Library');
 import path = require('path');
 import { Rooms } from "./services/Rooms";
 import { IRooms } from "./interfaces/IRooms";
-import { Room } from "./interfaces/Room";
+import { RoomResource } from "./interfaces/RoomResource";
+import { RoomState } from "./interfaces/RoomState";
 import { v4 as uuidv4 } from 'uuid';
 import { Connections } from "./services/Connections";
 import { IConnections } from "./interfaces/Connections";
 import { Connection } from "./interfaces/IConnection";
-import { ClientRequestParams } from "./interfaces/ClientRequestParams";
 
 
 const app = express();
@@ -75,7 +75,7 @@ app.post('/api/room', (req: express.Request, res: express.Response) =>
     let request = req.body;
 
  
-    let room: Room = rooms.createRoom(request.roomID, request.videoState);
+    let room: RoomResource = rooms.createRoom(request.roomID, request.videoState);
     
     roomConnections.createConnection(request.roomID, request.connectionID);
     
@@ -96,17 +96,17 @@ interface extendedWS extends WebSocket
 }
 
 
-let insertNewRoom = (data: ClientRequestParams, ws: extendedWS) => {
+let insertNewRoom = (data: RoomState, ws: extendedWS) => {
     console.log('> room insertion called with : ', JSON.stringify(data, null, 2));
-    rooms.addRoom(rooms.createRoom(data.roomID, data.video.name));
-    roomConnections.createConnection(data.roomID, ws.connectionID);
+    rooms.addRoom(rooms.createRoom(data.id, data.name));
+    roomConnections.createConnection(data.id, ws.connectionID);
 }
 
-let onClientUpdate = (data: ClientRequestParams, ws: extendedWS) => 
+let onClientUpdate = (data: RoomState, ws: extendedWS) => 
 {
     console.log('> client update called with : ', JSON.stringify(data, null, 2));
     
-    if (typeof(data.roomID) === 'undefined')
+    if (typeof(data.id) === 'undefined')
     {
         throw 'There was a failure onClientUpdate, roomID was undefined';
     };
@@ -120,7 +120,7 @@ let onClientUpdate = (data: ClientRequestParams, ws: extendedWS) =>
     // room.resynch = false; //This prevents a feedback loop, will need to do this better by distinguishing between sockets.
 
     // //If current connection doesn't exist in connections, assume it's a join room event and add it.
-    let _connections: Connection = roomConnections.getConnection(data.roomID);
+    let _connections: Connection = roomConnections.getConnection(data.id);
 
     let doesRoomExist: boolean =  _connections.connectionIDs.indexOf(ws.connectionID) !== -1;
     // if (presentRoom)
@@ -131,7 +131,7 @@ let onClientUpdate = (data: ClientRequestParams, ws: extendedWS) =>
     if (doesRoomExist === false)
     {
       //  room.connections.push(ws.connectionID);
-        roomConnections.addConnection(data.roomID, ws.connectionID);
+        roomConnections.addConnection(data.id, ws.connectionID);
     }
 
     
@@ -181,12 +181,12 @@ let resynch = (_roomID: string) =>
 //Todo: See if this is necessary.
 
 //This will broadcast a message to all clients apart from the calling client. 
-let broadcastRoomToOtherClients = (room: ClientRequestParams, ws: extendedWS) =>
+let broadcastRoomToOtherClients = (room: RoomState, ws: extendedWS) =>
 {   
     console.log('>> broadcast room called with. : ', JSON.stringify(room, null, 2));
     wss.clients.forEach((client: any) =>
     {
-        let connectedClients: Connection = roomConnections.getConnection(room.roomID);
+        let connectedClients: Connection = roomConnections.getConnection(room.id);
         let connectedClientIDs: string[] = connectedClients.connectionIDs;
         //TODO: There may need to be an extra check in here to avoid sending an update state to the same client (although this might be better) 
         if (connectedClientIDs.includes(client.connectionID) && ws.connectionID !== client.connectionID)
@@ -216,12 +216,13 @@ wss.on('connection', (ws: extendedWS) =>
     ws.on('message', (message) =>
     {
         console.log('---------------------------------------------')
-        let data: ClientRequestParams = JSON.parse(message.toString());
+
+        let data: RoomState = JSON.parse(message.toString());
         
 
         //Check that the data is correct
 
-        if (typeof(data.video.name) === "undefined")
+        if (typeof(data.name) === "undefined")
         {
             console.log('A socket message was sent with a wrong type: ');
             console.log(JSON.stringify(data, null, 2));
@@ -232,15 +233,14 @@ wss.on('connection', (ws: extendedWS) =>
 
          //If no room exists, create one 
 
-        if (typeof (rooms.getRoom(data.roomID).roomID) === 'undefined')
+        if (typeof (rooms.getRoom(data.id).id) === 'undefined')
         {
            
             insertNewRoom(data, ws);
             return;
-
         }
         
-        let connections: Connection = roomConnections.getConnection(data.roomID);
+        let connections: Connection = roomConnections.getConnection(data.id);
 
         //When we do not find the websocket in the rooms connections property. 
         
@@ -249,7 +249,7 @@ wss.on('connection', (ws: extendedWS) =>
         {
             
             //Join room event, resynch the room.
-            onJoinRoom(data.roomID, ws.connectionID);
+            onJoinRoom(data.id, ws.connectionID);
 
             return; 
         }

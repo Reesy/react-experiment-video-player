@@ -1,16 +1,16 @@
 
-import { Room } from "./Room"
+import { RoomResource } from "./RoomResource";
 
 export interface IRooms
 {
 
-    addRoom(_room: Room): void
+    addRoom(_room: RoomResource): void
     
-    getRooms(): Array<Room>
+    getRooms(): Array<RoomResource>
 
-    getRoom(_roomID: string): Room
+    getRoom(_roomID: string): RoomResource
 
     createRoom(roomID: string,
-               roomName: string): Room
+               roomName: string): RoomResource
 
 }

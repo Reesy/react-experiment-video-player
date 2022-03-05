@@ -1,44 +1,44 @@
 import { IRooms } from "../interfaces/IRooms";
-import { Room } from "../interfaces/Room";
+import { RoomResource } from "../interfaces/RoomResource";
 
 export class Rooms implements IRooms
 {
-    private rooms : Array<Room> = [];
+    private rooms : Array<RoomResource> = [];
     
     constructor()
     {
 
     }
     
-    public createRoom(roomID: string, roomName: string): Room
+    public createRoom(roomID: string, roomName: string): RoomResource
     {
-        let newRoom: Room = {
-            roomID: roomID,
-            roomName: roomName
+        let newRoom: RoomResource = {
+            id: roomID,
+            name: roomName
         };
         
         return newRoom;
     };
 
-    public addRoom(_room: Room): void
+    public addRoom(_room: RoomResource): void
     {
         this.rooms.push(_room);
     }
     
-    public getRooms(): Room[]
+    public getRooms(): RoomResource[]
     {
         return this.rooms;
     }
     
-    public getRoom(_roomID: string): Room
+    public getRoom(_roomID: string): RoomResource
     {   
 
-        let room = this.rooms.find(room => room.roomID === _roomID);
+        let room = this.rooms.find(room => room.id === _roomID);
 
 
         if (typeof(room) === "undefined")
         {
-            return {} as Room;
+            return {} as RoomResource;
         };  
        
         return room;
