@@ -24,7 +24,6 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
     public shouldComponentUpdate(nextProps: VideoPlayerProps, nextState: VideoPlayerState) 
     {   
 
-
         if (this.props.connected !== nextProps.connected)
         {
             return true;
@@ -34,17 +33,18 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
             //kind've a pass through/re-render (would be better if video state changes could be watched by react, will research later)
             return true; 
         }
+        
+        let videoElement: any = document.getElementsByClassName('mainVideo')[0];
+
+        if (typeof (videoElement) === "undefined")
+        {
+            //We have just received an initial state from the server, we have yet to render so we will just accept the state and render
+            return true;
+        };
+        let currentVideoPosition = videoElement.currentTime;
 
         if (this.props.videoState !== nextProps.videoState)
         {
-            let videoElement: any = document.getElementsByClassName('mainVideo')[0];
-
-            if (typeof (videoElement) === "undefined")
-            {
-                //We have just received an initial state from the server, we have yet to render so we will just accept the state and render
-                return true;
-            };
-            let currentVideoPosition = videoElement.currentTime;
 
             //This scenario is room join, therefore we want to just accept the state. 
             // if (currentVideoPosition === 0 && this.props.videoState.videoPosition !== 0)
@@ -66,7 +66,8 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
             //If there is more than a 2-3 second difference then we want to merge the nextProps state in. 
 
-            if ( (currentVideoPosition !== 0) && (Math.abs(currentVideoPosition - nextProps.videoState.videoPosition) > 3) )
+            // if ( (currentVideoPosition !== 0) && (Math.abs(currentVideoPosition - nextProps.videoState.videoPosition) > 3) )
+            if ( (Math.abs(currentVideoPosition - nextProps.videoState.videoPosition) > 3) )
             {
                 videoElement.currentTime = nextProps.videoState.videoPosition;
 
@@ -93,7 +94,9 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
             return true;
 
         };
- 
+        
+
+
         return false;
 
     };
@@ -121,25 +124,36 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
     render() 
     {
-        let videoElement: any = {
-            paused: true
-        }
-
+        let videoElement: any;
         if (typeof ( document.getElementsByClassName('mainVideo')[0]) !== "undefined")
         {
             videoElement = document.getElementsByClassName('mainVideo')[0];
+        
+
+            if (videoElement.currentTime === 0 && this.props.videoState.videoPosition !== 0)
+            {
+                if ( this.props.videoState.playingState === playingState.playing)
+                {
+                    videoElement.play();
+                }
+                else
+                {
+                    videoElement.pause();
+                }
+            };
+        
+        
+        }
+        else 
+        {
+            videoElement = {
+                paused: true
+            }
+    
         }
 
 
 
-
-
-
-
-
-
-
-        
         let subtitleContent: JSX.Element = <div> No subtitles </div>;
 
         let currentSubtitleDisplay: JSX.Element = <div> No subtitle selected </div>;
@@ -250,6 +264,18 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
     private onVideoProgress(event: any)
     {
         let _playingState: playingState = event.target.paused === true ? playingState.paused : playingState.playing;
+
+        if ( event.target.paused === true && this.props.videoState.playingState === playingState.playing)
+        {
+            //We have updated the play state through a socket message. 
+
+            _playingState = this.props.videoState.playingState;
+            event.target.play();
+        }
+        // else 
+        // {
+
+        // }
 
         let _videoState : VideoState = {
             videoPosition: event.target.currentTime,
