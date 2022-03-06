@@ -48,8 +48,6 @@ class App extends React.Component<AppProps, AppState>
         this.updateVideoState = this.updateVideoState.bind(this);
         this.triggerBroadcast = this.triggerBroadcast.bind(this);
 
-        let _roomID = uuidv4();
-
         this.state = {
             page: page.home,
             videoResource: {} as VideoResource,
@@ -58,7 +56,7 @@ class App extends React.Component<AppProps, AppState>
                 videoPosition: 0
             },
             roomResource: {} as RoomResource,
-            roomID: _roomID,
+            roomID: undefined!,
             connected: false
         };
     }
@@ -128,6 +126,7 @@ class App extends React.Component<AppProps, AppState>
   
     private selectRoom = (_roomResource: RoomResource) =>
     {
+        this.setState({roomID: _roomResource.id});
         this.addSocketListener(this.receiveJoinConfirmation);
         this.sendSocketData(JSON.stringify(_roomResource));
         this.setState({connected: true});
@@ -185,9 +184,18 @@ class App extends React.Component<AppProps, AppState>
         // updatedRoom.video = this.state.currentVideo;
 
 
+        if ( typeof(this.state.roomID) === 'undefined')
+        {
+            throw 'No roomID set for the client, this should either be generated when the host client creates a room, or passed in from the room picker.'
+        } 
 
-        // //Stringify and Send it through the socket 
-        let _roomState: RoomState = this.createRoomState();
+        let _roomState: RoomState = {
+            id: this.state.roomID,
+            name: this.state.videoResource.name,
+            videoState: this.state.videoState
+        };
+
+        //Todo, check if this is necessary when removing the change on the video picker.
         let _playingState: playingState = _roomState.videoState?.playingState === playingState.playing ? playingState.paused : playingState.playing;
         
         let _updatedRoomState: RoomState =
@@ -207,9 +215,15 @@ class App extends React.Component<AppProps, AppState>
     private receiveRoomState = (data: any) =>
     {
         if (data.toString() === "Resynch")
-        {
+        {          
+                let _roomState: RoomState = {
+                    id: this.state.roomID,
+                    name: this.state.videoResource.name,
+                    videoState: this.state.videoState
+                };
+
                 //A new client has joined and this client has been designated the host, the server will grab the room state and if it's appropriate will send it to the new client.
-                this.sendSocketData(JSON.stringify(this.createRoomState()));
+                this.sendSocketData(JSON.stringify(_roomState));
                 return; 
         }
        
@@ -262,27 +276,23 @@ class App extends React.Component<AppProps, AppState>
         this.addSocketListener(this.receiveRoomState);
 
         //Send it through the socket 
+        //This is a create room scenario so we wish to generate a roomID.
 
-        let sockerParams: RoomState = this.createRoomState();
-
-        this.sendSocketData(JSON.stringify(sockerParams));
+        //todo, move roomID creation to server. 
+        let _roomID = uuidv4();
+        let _roomState: RoomState = 
+        {
+            id: _roomID,
+            name: this.state.videoResource.name, //Name of room matches video. 
+            videoState: this.state.videoState
+        };
+        
+        this.setState({roomID: _roomID});
+        this.sendSocketData(JSON.stringify(_roomState));
        
         return;
     };
 
-
-
-    private createRoomState(): RoomState
-    {
- 
-        let _socketParams: RoomState = {
-            id: this.state.roomID,
-            name: this.state.videoResource.name,
-            videoState: this.state.videoState
-        };
-
-        return _socketParams;
-    };
 
     private establishConnection = () =>
     {
