@@ -164,25 +164,12 @@ class App extends React.Component<AppProps, AppState>
 
     private updateVideoState(_videoState: VideoState): void 
     {
-        //Ensure the currentVideo matches the one passed in. 
         this.setState({videoState: _videoState});
     };
 
 
-    private triggerBroadcast = () =>
+    private triggerBroadcast = (_videoState: VideoState) =>
     {   
-        // //Check if there is a valid current room, return if not as there is no shared room session to broadcast too
-        // if (typeof(this.state.room) === 'undefined' || typeof(this.state.currentRoom.roomID) === 'undefined')
-        // {
-        //     console.log('BroadcastVideoState called but no room was set for this client');
-        //     return;
-        // }
-  
-        // //TODO, check if this merge is ok and if a deep clone is needed instead kinda looks correct
-        // //If there is merge the video state with the room state
-        // let updatedRoom: Room = this.state.currentRoom;
-        // updatedRoom.video = this.state.currentVideo;
-
 
         if ( typeof(this.state.roomID) === 'undefined')
         {
@@ -192,24 +179,12 @@ class App extends React.Component<AppProps, AppState>
         let _roomState: RoomState = {
             id: this.state.roomID,
             name: this.state.videoResource.name,
-            videoState: this.state.videoState
+            videoState: _videoState
         };
 
-        //Todo, check if this is necessary when removing the change on the video picker.
-        let _playingState: playingState = _roomState.videoState?.playingState === playingState.playing ? playingState.paused : playingState.playing;
-        
-        let _updatedRoomState: RoomState =
-        {
-            id: _roomState.id,
-            name: _roomState.name,  
-            videoState: {
-                videoPosition: _roomState.videoState?.videoPosition!,
-                playingState: _playingState
-            }
-        }
-        console.log('Broadcasting video state: ', _updatedRoomState);
+        console.log('Broadcasting video state: ', _roomState);
 
-        this.sendSocketData(JSON.stringify(_updatedRoomState));
+        this.sendSocketData(JSON.stringify(_roomState));
     };
 
     private receiveRoomState = (data: any) =>

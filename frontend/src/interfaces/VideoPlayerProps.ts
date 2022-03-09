@@ -7,7 +7,7 @@ export interface VideoPlayerProps
     videoResource: VideoResource;
     videoState: VideoState;
     createRoom: (videoState: VideoState) => void;
-    triggerBroadcast: () => void;
+    triggerBroadcast: (_videoState: VideoState) => void;
     updateVideoState: (videoState: VideoState) => void;
     connected: boolean;
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { SyntheticEvent } from 'react';
 import 'font-awesome/css/font-awesome.min.css';
 import "../styles/VideoPlayer.css"
 import { playingState, VideoState } from '../interfaces/VideoState';
@@ -73,7 +73,8 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
     constructor(props: VideoPlayerProps)
     {
         super(props);
-        this.setPlayOrPause = this.setPlayOrPause.bind(this);
+        this.onPause = this.onPause.bind(this);
+        this.onPlay = this.onPlay.bind(this);
         this.selectSubtitle = this.selectSubtitle.bind(this);
         this.onVideoProgress = this.onVideoProgress.bind(this);
 
@@ -156,20 +157,10 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
             <div>
                 <div className='videoPlayer'>
                     <div>
-                        <video src={this.state.videoServerLocation + "/" + this.props.videoResource.path} className="mainVideo" onTimeUpdate={this.onVideoProgress}>
+                        <video src={this.state.videoServerLocation + "/" + this.props.videoResource.path} className="mainVideo" onTimeUpdate={this.onVideoProgress} onPause={this.onPause} onPlay={this.onPlay} controls>
                             <track kind="subtitles" src="test.vtt" label="English" srcLang="en" default />
                             <track kind="subtitles" src="test2.vtt" label="Spanish" srcLang="es" />
                         </video>
-                        <div id="video-controls" className="groupStyle" data-state="hidden">
-                            <button id="playPause" type="button" onClick={this.setPlayOrPause} className={videoElement.paused === true ? "fa fa-play buttonStyle": "fa fa-pause buttonStyle" }></button>
-                            <button id="subtitle" type="button" className="fa fa-language buttonStyle"></button>
-                            <button id="fs" type="button" onClick={this.setFullScreen} data-state="go-fullscreen" className="fa fa-expand buttonStyle"></button>
-                        </div>
-                        <br></br>
-                        <br></br>
-                        <br></br>
-                        <br></br>
-                        <p>Video player: currentTime: {this.props.videoState.videoPosition}</p>
                     </div>
                 </div>
                 <div className='toolbar'>
@@ -192,49 +183,63 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
         this.setState({ currentSubtitle: subtitle });
     };
 
-    private setPlayOrPause(event: any)
-    {   
-        let videoElement: any = document.getElementsByClassName('mainVideo')[0];
 
-        if (videoElement.currentTime === 0 && this.props.videoState.videoPosition !== 0)
+    private onPlay(event: SyntheticEvent<HTMLVideoElement>)
+    {
+        let _currentTime = event.currentTarget.currentTime;
+
+        if (_currentTime === 0 && this.props.videoState.videoPosition !== 0)
         {
-            videoElement.currentTime = this.props.videoState.videoPosition;
-        }
-        if ( videoElement.paused )
-        {
-            videoElement.play();
-        }
-        else
-        {
-            videoElement.pause();
+            _currentTime = this.props.videoState.videoPosition;
         }
 
         this.setState({ clicks: this.state.clicks + 1 });
-
-        let _videoPosition = videoElement.currentTime;
-        let _playingState: playingState = videoElement.paused === true ? playingState.paused : playingState.playing;
         
         let _videoState : VideoState = {
-            videoPosition: _videoPosition,
-            playingState: _playingState
+            videoPosition: _currentTime,
+            playingState: playingState.playing
         }
 
         this.props.updateVideoState(_videoState);
 
         if (this.props.connected === true)
         {
-            this.props.triggerBroadcast();
+            this.props.triggerBroadcast(_videoState);
         };
 
-    
     };
 
-    private onVideoProgress(event: any)
+    private onPause(event: SyntheticEvent<HTMLVideoElement>)
     {
-        let _playingState: playingState = event.target.paused === true ? playingState.paused : playingState.playing;
+        let _currentTime = event.currentTarget.currentTime;
+
+        if (_currentTime === 0 && this.props.videoState.videoPosition !== 0)
+        {
+            _currentTime = this.props.videoState.videoPosition;
+        }
+
+        this.setState({ clicks: this.state.clicks + 1 });
+        
+        let _videoState : VideoState = {
+            videoPosition: _currentTime,
+            playingState: playingState.paused
+        }
+
+        this.props.updateVideoState(_videoState);
+
+        if (this.props.connected === true)
+        {
+            this.props.triggerBroadcast(_videoState);
+        };
+
+    };
+
+    private onVideoProgress(event: SyntheticEvent<HTMLVideoElement>)
+    {
+        let _playingState: playingState = event.currentTarget.paused === true ? playingState.paused : playingState.playing;
 
         let _videoState : VideoState = {
-            videoPosition: event.target.currentTime,
+            videoPosition: event.currentTarget.currentTime,
             playingState: _playingState
         }
 
