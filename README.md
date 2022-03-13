@@ -43,14 +43,17 @@ Note: This code is in need of a big refactor, I inverted many SOLID principles a
 - [ ] Rescan host directories for updated content 
 - [ ] Clean up disconnected socket connections
 - [ ] Reassign 'host' when the host leaves (the socket who's videos state is grabbed when a new user joins the room)
-- [ ] Add a nginx.conf file
+- [x] Add a nginx.conf file
   - [ ] Add certificate, using certbot.
 - [ ] Add CORS ? 
-- [ ] Dockerise frontend
+- [x] Dockerise frontend
   - [ ] Narrow down files that should be in the docker image.
-- [ ] Dockerise backend
+- [x] Dockerise backend
   - [ ] Narrow down files that should be in the docker image.
-- [ ] Add docker-compose.yml
+- [x] Add docker-compose.yml
+- [ ] create environment variables for the location of static content, thumbnails, videos and subtitles
+  - [ ] wire changeable static content path into client
+  - [ ] add to compose.
 
 ## Jenkins CI/CD support
 It has Jenkins support, If you have a Jenkins server you can use the Jenkins github plugin to set up a job. It's much easier through blue-ocean. You can create a new pipeline, point it at your github repository and it will automatically build your project.
