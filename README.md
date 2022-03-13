@@ -8,9 +8,9 @@ The API server is run using NodeJS and checks the host machine for valid video v
 </br>
 
 # Quick build
-Building the backend server: [Building the API server](./backend/README.MD)
+Building the backend server: [Building the API server](./backend/README.md)
 </br>
-Building the frontend react app [Building the API server](./frontend/README.md)
+Building the frontend react app [Building the Client](./frontend/README.md)
 
 ## Current progress 
 
