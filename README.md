@@ -7,20 +7,30 @@ The API server is run using NodeJS and checks the host machine for valid video v
 
 </br>
 
+# Quick build
+Building the backend server: [Building the API server](./backend/README.MD)
+</br>
+Building the frontend react app [Building the API server](./frontend/README.md)
+
 ## Current progress 
 
 Note: This code is in need of a big refactor, I inverted many SOLID principles and didn't TDD 
 
 - [ ] CI/CD through Jenkins 
     - [x] Building API/backend
-    - [x] Testing API/backend
+    - [ ] Testing API/backend
+        - [x] Unit tests
+        - [ ] API tests
     - [x] Building Client/frontend
     - [ ] Testing API/backend
     - [ ] Full scale 'prod-like' end-to-end testing
+    - [ ] Add a build status badge to the top level readme
 - [x] Rest APIs for locating and serving content
     - [x] Videos
     - [x] Thumbnails
     - [x] Subtitles
+      - [ ] Read subtitles on subtitle builder (it regressed)
+      - [ ] Add API test to prevent regression.
 - [x] Video selection screen 
 - [x] Video player screen
     - [ ] Custom styling
@@ -44,5 +54,3 @@ Note: This code is in need of a big refactor, I inverted many SOLID principles a
 
 ## Jenkins CI/CD support
 It has Jenkins support, If you have a Jenkins server you can use the Jenkins github plugin to set up a job. It's much easier through blue-ocean. You can create a new pipeline, point it at your github repository and it will automatically build your project.
-
-

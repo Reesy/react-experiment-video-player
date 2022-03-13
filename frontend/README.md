@@ -1,6 +1,5 @@
 This project is a single page app that renders a HTML5 player and provides a choice on what video to play.
 
-This is purely for experimentation and personal learning of react.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
