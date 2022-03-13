@@ -9,7 +9,11 @@ export class VideoApi implements IVideoApi
 {
 
     private APICaller: IRequest
-    
+    private API_Path = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : "/";
+    private getLibraryAPI = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api/video/library` : '/api/video/library';
+    private getRoomsAPI = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api/rooms` : '/api/rooms';
+    // private getRoomAPI = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api/room` : '/api/room';
+
     constructor()
     {
         this.APICaller = new request();
@@ -21,7 +25,7 @@ export class VideoApi implements IVideoApi
         {
             method: "GET"
         }
-        const uri = "http://localhost:3050/api/rooms";
+        const uri = this.getRoomsAPI;
 
         let serverResponse = await this.APICaller.get(uri, options);  
         let roomArray: Array<RoomResource> = serverResponse.data;
@@ -39,7 +43,7 @@ export class VideoApi implements IVideoApi
     }
     public getRoomApiAddress(): string
     {
-        return "http://localhost:3050/";
+        throw new Error("Method not implemented.");
     }
 
     public async getVideos(): Promise<Array<VideoResource>>
@@ -48,7 +52,7 @@ export class VideoApi implements IVideoApi
         {
             method: "GET"
         }
-        const uri = "http://localhost:3050/api/video/library"
+        const uri = this.getLibraryAPI;
 
         let serverResponse = await this.APICaller.get(uri, options);  
         let videoArray: Array<VideoResource> = serverResponse.data;
@@ -57,12 +61,12 @@ export class VideoApi implements IVideoApi
 
     public getVideoApiAddress(): string
     {
-        return "http://localhost:3050/"
+        return this.API_Path;
     }
 
     public getThumbnailApiAddress(): string
     {
-        return "http://localhost:3050/"
+        return this.API_Path;
     }
 
 }

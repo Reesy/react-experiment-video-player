@@ -1,0 +1,9 @@
+FROM node:stretch-slim
+
+EXPOSE 3050
+
+EXPOSE 7070
+
+COPY . ./
+
+CMD ["node", "./dist/index.js"]

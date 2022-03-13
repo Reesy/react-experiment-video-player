@@ -10,7 +10,7 @@ The API server is run using NodeJS and checks the host machine for valid video v
 # Quick build
 Building the backend server: [Building the API server](./backend/README.md)
 </br>
-Building the frontend react app [Building the Client](./frontend/README.md)
+Building the frontend react app: [Building the Client](./frontend/README.md)
 
 ## Current progress 
 
@@ -45,7 +45,7 @@ Note: This code is in need of a big refactor, I inverted many SOLID principles a
 - [ ] Reassign 'host' when the host leaves (the socket who's videos state is grabbed when a new user joins the room)
 - [ ] Add a nginx.conf file
   - [ ] Add certificate, using certbot.
-- [ ] Update CORS to be less permissable, i.e add a prod mode. 
+- [ ] Add CORS ? 
 - [ ] Dockerise frontend
   - [ ] Narrow down files that should be in the docker image.
 - [ ] Dockerise backend

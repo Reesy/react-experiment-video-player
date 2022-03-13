@@ -5,7 +5,7 @@ export interface IRequest
 
     get(uri: string, options: IRequestOptions): Promise<any>
 
-    post(uri: string, options: IRequestOptions): Promise<any>
+    post(uri: string, data: any, options: IRequestOptions): Promise<any>
 
     put(uri: string, options: IRequestOptions): Promise<any>
 

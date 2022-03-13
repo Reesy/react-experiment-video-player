@@ -24,11 +24,11 @@ export class request implements IRequest
      * @param {string} uri 
      * @param {IRequestOptions} options 
      */
-    async post(uri: string, options: IRequestOptions)
+    async post(uri: string, data: any, options: IRequestOptions)
     {
         this.validateURI(uri);
         let transformedOptions = this.tranformOptions(options);
-        return axios.post(uri, transformedOptions);
+        return axios.post(uri, data, transformedOptions);
     }
     
     /**
