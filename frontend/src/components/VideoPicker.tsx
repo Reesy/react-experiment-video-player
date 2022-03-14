@@ -157,7 +157,7 @@ export default class VideoPicker extends React.Component<VideoPickerProps, Video
         {
             if (video.thumbnail !== null && video.thumbnail !== "")
             {
-                thumbnail = this.state.thumbnailPath + "/" + video.thumbnail;
+                thumbnail = this.state.thumbnailPath + video.thumbnail;
             }
             let offsetIndex = index + 1; //This is to offset the index to match the react-grid-layout's layout which starts at 1.
             let elementDOM: JSX.Element =

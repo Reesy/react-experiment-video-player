@@ -21,6 +21,7 @@ services:
       dockerfile: Dockerfile
     environment:
       REACT_APP_API_URL: backend
+      REACT_APP_RESOURCE_URL: backend
   nginx:
     depends_on:
       - frontend

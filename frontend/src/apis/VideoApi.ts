@@ -9,14 +9,21 @@ export class VideoApi implements IVideoApi
 {
 
     private APICaller: IRequest
-    private API_Path = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : "/";
     private getLibraryAPI = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api/video/library` : '/api/video/library';
     private getRoomsAPI = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api/rooms` : '/api/rooms';
+    private resource_path: string = process.env.REACT_APP_RESOURCE_URL ? process.env.REACT_APP_RESOURCE_URL : "/";
+
+    
     // private getRoomAPI = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api/room` : '/api/room';
 
     constructor()
     {
         this.APICaller = new request();
+
+        console.log("getLibraryAPI: " , this.getLibraryAPI);
+        console.log("getRoomsAPI: " , this.getRoomsAPI);
+        console.log("resource_path: " , this.resource_path);
+        
     }
     
     public async getRooms(): Promise<RoomResource[]>
@@ -61,12 +68,12 @@ export class VideoApi implements IVideoApi
 
     public getVideoApiAddress(): string
     {
-        return this.API_Path;
+        return this.resource_path;
     }
 
     public getThumbnailApiAddress(): string
     {
-        return this.API_Path;
+        return this.resource_path;
     }
 
 }

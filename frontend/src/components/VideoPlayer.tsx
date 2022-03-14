@@ -157,7 +157,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
             <div>
                 <div className='videoPlayer'>
                     <div>
-                        <video src={this.state.videoServerLocation + "/" + this.props.videoResource.path} className="mainVideo" onTimeUpdate={this.onVideoProgress} onPause={this.onPause} onPlay={this.onPlay} controls>
+                        <video src={this.state.videoServerLocation + this.props.videoResource.path} className="mainVideo" onTimeUpdate={this.onVideoProgress} onPause={this.onPause} onPlay={this.onPlay} controls>
                             <track kind="subtitles" src="test.vtt" label="English" srcLang="en" default />
                             <track kind="subtitles" src="test2.vtt" label="Spanish" srcLang="es" />
                         </video>
