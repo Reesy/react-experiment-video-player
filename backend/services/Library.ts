@@ -141,7 +141,7 @@ export class Library implements ILibrary
 
         });
 
-        return thumbnailFileName;
+        return this.serverDirectory ? this.serverDirectory + '/' + thumbnailFileName : thumbnailFileName;
     };
 
     private buildSubtitles(__subtitleFiles: Array<string>): Array<Subtitle>

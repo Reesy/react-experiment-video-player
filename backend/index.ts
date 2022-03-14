@@ -11,8 +11,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { Connections } from "./services/Connections";
 import { IConnections } from "./interfaces/Connections";
 import { Connection } from "./interfaces/IConnection";
+import { config } from "./config";
 
-
+console.log(config.serving_path);
 const app = express();
 const ServedVideoLocation = '../videos'
 const ServedThumbnailLocation = '../thumbnails'
@@ -22,10 +23,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 let contentDirectory = path.join(__dirname, ServedVideoLocation);
 let thumbnailDirectory = path.join(__dirname, ServedThumbnailLocation);
 
-app.use(express.static(contentDirectory));
-app.use(express.static(thumbnailDirectory));
+app.use('/' + config.serving_path, express.static(contentDirectory));
+app.use('/' + config.serving_path, express.static(thumbnailDirectory));
 
-let library = new Library.Library(contentDirectory, '', thumbnailDirectory);
+let library = new Library.Library(contentDirectory, config.serving_path, thumbnailDirectory);
 let cachedLibrary = library.getLibrary();
 
 let rooms: IRooms = new Rooms();

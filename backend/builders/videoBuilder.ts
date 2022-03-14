@@ -62,7 +62,7 @@ export class videoBuilder implements IvideoBuilder
      */
     private buildVideoPath(): string
     {
-        return path.join(this.directory, this.fileName);
+        return this.directory + "\/" + this.fileName;
     }
 
 }
