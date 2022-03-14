@@ -51,9 +51,9 @@ Note: This code is in need of a big refactor, I inverted many SOLID principles a
 - [x] Dockerise backend
   - [ ] Narrow down files that should be in the docker image.
 - [x] Add docker-compose.yml
-- [ ] create environment variables for the location of static content, thumbnails, videos and subtitles
-  - [ ] wire changeable static content path into client
-  - [ ] add to compose.
+- [x] create environment variables for the location of static content, thumbnails, videos and subtitles
+  - [x] wire changeable static content path into client
+  - [x] add to compose.
 
 ## Jenkins CI/CD support
 It has Jenkins support, If you have a Jenkins server you can use the Jenkins github plugin to set up a job. It's much easier through blue-ocean. You can create a new pipeline, point it at your github repository and it will automatically build your project.
