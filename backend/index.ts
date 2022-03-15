@@ -74,16 +74,18 @@ app.get('/api/room', (req: express.Request, res: express.Response) =>
 
 app.post('/api/room', (req: express.Request, res: express.Response) =>
 {
-    let request = req.body;
+    throw 'Not implemented'
+
+    // let request = req.body;
 
  
-    let room: RoomResource = rooms.createRoom(request.roomID, request.videoState);
+    // let room: RoomResource = rooms.createRoom(request.roomID, request.videoState);
     
-    roomConnections.createConnection(request.roomID, request.connectionID);
+    // roomConnections.createConnection(request.roomID, request.connectionID);
     
-    rooms.addRoom(room);
+    // rooms.addRoom(room);
 
-    res.send(room);
+    // res.send(room);
 
 });
 
@@ -100,7 +102,7 @@ interface extendedWS extends WebSocket
 
 let insertNewRoom = (data: RoomState, ws: extendedWS) => {
     console.log('> room insertion called with : ', JSON.stringify(data, null, 2));
-    rooms.addRoom(rooms.createRoom(data.id, data.name));
+    rooms.addRoom(rooms.createRoom(data.id, data.name, data.path));
     roomConnections.createConnection(data.id, ws.connectionID);
 }
 

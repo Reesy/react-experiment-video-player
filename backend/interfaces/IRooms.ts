@@ -11,6 +11,7 @@ export interface IRooms
     getRoom(_roomID: string): RoomResource
 
     createRoom(roomID: string,
-               roomName: string): RoomResource
+               roomName: string,
+               roomPath: string): RoomResource
 
 }

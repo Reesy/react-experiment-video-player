@@ -31,6 +31,7 @@ Note: This code is in need of a big refactor, I inverted many SOLID principles a
     - [x] Subtitles
       - [ ] Read subtitles on subtitle builder (it regressed)
       - [ ] Add API test to prevent regression.
+    - [ ] Make Thumbnail discovery do a deeper search and pick the highest evaluated match (instead of just accepting the first over the threashold)
 - [x] Video selection screen 
 - [x] Video player screen
     - [ ] Custom styling
@@ -40,6 +41,7 @@ Note: This code is in need of a big refactor, I inverted many SOLID principles a
     - [ ] Leave room/close socket
     - [ ] Show how many users are currently watching the video
     - [ ] Add ability for a private group watch, randomised 'password' key. 
+    - [ ] Create room should pass a 'resource id' and the other client should retrieve the resource from the videoAPI rather than funneling through the socket. 
 - [ ] Rescan host directories for updated content 
 - [ ] Clean up disconnected socket connections
 - [ ] Reassign 'host' when the host leaves (the socket who's videos state is grabbed when a new user joins the room)
@@ -54,6 +56,7 @@ Note: This code is in need of a big refactor, I inverted many SOLID principles a
 - [x] create environment variables for the location of static content, thumbnails, videos and subtitles
   - [x] wire changeable static content path into client
   - [x] add to compose.
+- [ ] Ensure excessive or missing '/' from configuration is handled correctly. 
 
 ## Jenkins CI/CD support
 It has Jenkins support, If you have a Jenkins server you can use the Jenkins github plugin to set up a job. It's much easier through blue-ocean. You can create a new pipeline, point it at your github repository and it will automatically build your project.

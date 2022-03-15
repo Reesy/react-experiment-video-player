@@ -10,11 +10,12 @@ export class Rooms implements IRooms
 
     }
     
-    public createRoom(roomID: string, roomName: string): RoomResource
+    public createRoom(roomID: string, roomName: string, roomPath: string): RoomResource
     {
         let newRoom: RoomResource = {
             id: roomID,
-            name: roomName
+            name: roomName,
+            path: roomPath
         };
         
         return newRoom;

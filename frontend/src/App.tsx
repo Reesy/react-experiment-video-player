@@ -126,7 +126,16 @@ class App extends React.Component<AppProps, AppState>
   
     private selectRoom = (_roomResource: RoomResource) =>
     {
+        
         this.setState({roomID: _roomResource.id});
+        
+        //Todo: Once we add a new service to the backend to pair roomIds with videoIDs we need to grab the resource from the API, for now its passed in. 
+        let selectedVideoResource: VideoResource =
+        {
+            name: _roomResource.name,
+            path: _roomResource.path
+        };
+        this.setState({videoResource: selectedVideoResource});
         this.addSocketListener(this.receiveJoinConfirmation);
         this.sendSocketData(JSON.stringify(_roomResource));
         this.setState({connected: true});
@@ -149,7 +158,7 @@ class App extends React.Component<AppProps, AppState>
         let _videoResource: VideoResource =
         {
             name: _receivedRoom.name,
-            path: _receivedRoom.name
+            path: _receivedRoom.path
         };
 
         let _videoState: VideoState = _receivedRoom.videoState!; //Assume this is here for now?!
@@ -179,6 +188,7 @@ class App extends React.Component<AppProps, AppState>
         let _roomState: RoomState = {
             id: this.state.roomID,
             name: this.state.videoResource.name,
+            path: this.state.videoResource.path,
             videoState: _videoState
         };
 
@@ -194,6 +204,7 @@ class App extends React.Component<AppProps, AppState>
                 let _roomState: RoomState = {
                     id: this.state.roomID,
                     name: this.state.videoResource.name,
+                    path: this.state.videoResource.path,
                     videoState: this.state.videoState
                 };
 
@@ -259,6 +270,7 @@ class App extends React.Component<AppProps, AppState>
         {
             id: _roomID,
             name: this.state.videoResource.name, //Name of room matches video. 
+            path: this.state.videoResource.path, //Path of room matches video.
             videoState: this.state.videoState
         };
         
