@@ -1,9 +1,11 @@
 # Use root/example as user/password credentials
 version: '3.1'
+#Notes
+# ports format: left side is the port exposed on the host, right side is internal to the container
 
 services:
   backend:
-    image: backend:latest
+    image: react-experiment-video-player-backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -13,7 +15,7 @@ services:
   frontend:
     depends_on:
       - backend
-    image: frontend:latest
+    image: react-experiment-video-player-frontend:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
