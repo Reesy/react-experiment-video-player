@@ -1,21 +1,48 @@
 # React-experiment-video-player
 
-# Description 
 A react based single page app that has a video selection screen, video player and a group watch feature using web sockets. 
 
 The API server is run using NodeJS and checks the host machine for valid video videos, subtitles and an associated thumbnail and serves it to the react frontend. It hosts REST based APIs to allow for the retrieval of the video, thumbnails and subtitles and it uses websockets to sync up a 'group watch' (called room) session. 
 
-</br>
 
-# Quick build
+Video Selection & Video player screens: 
+
+<img src="video_selector.png" style="width: 400px"><img src="video_player.png" style="width: 400px"> 
+
+Room selection screen:
+
+<img src="room_selector.png" style="width: 400px">
+
+Videos, thumbnails and subtitles are currently discoverable with this folder format
+
+```
+backend
+│   README.md
+│   builders
+|   constants
+|   ...
+│
+└───thumbnails
+│   │   videoExample1.jpg
+│   │   videoExample2.jpg
+└───videos
+    │   videoExample1.mp4/m4v
+    │   videoExample2.mp4/m4v
+    |   videoExample2.vtt   (subtitle file)
+```
+
+
+# Building
 Building the backend server: [Building the API server](./backend/README.md)
 </br>
 Building the frontend react app: [Building the Client](./frontend/README.md)
 
 ## Current progress 
 
-Note: This code is in need of a big refactor, I inverted many SOLID principles and didn't TDD 
-
+```
+Note: This code is currently being refactored for a refactoring guide I'm writing, with SOLID and TDD in mind. 
+The intent is to refactor and add acceptance criteria before adding new features (as listed below) 
+```
 - [ ] CI/CD through Jenkins 
     - [x] Building API/backend
     - [ ] Testing API/backend
