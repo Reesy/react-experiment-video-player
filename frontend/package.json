@@ -25,7 +25,7 @@
     "react-scripts": "^5.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "env REACT_APP_API_URL=http://localhost:3050 env REACT_APP_RESOURCE_URL=http://localhost:3050/ env REACT_APP_WS_URL=ws://localhost:7070/ws react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
