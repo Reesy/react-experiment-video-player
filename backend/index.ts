@@ -12,11 +12,15 @@ import { Connections } from "./services/Connections";
 import { IConnections } from "./interfaces/Connections";
 import { Connection } from "./interfaces/IConnection";
 import { config } from "./config";
+import LibraryAPI from "./apis/LibraryAPI";
+import RoomAPI from "./apis/RoomAPI";
 
 console.log(config.serving_path);
+
 const app = express();
 const ServedVideoLocation = '../videos'
 const ServedThumbnailLocation = '../thumbnails'
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -26,12 +30,6 @@ let thumbnailDirectory = path.join(__dirname, ServedThumbnailLocation);
 app.use('/' + config.serving_path, express.static(contentDirectory));
 app.use('/' + config.serving_path, express.static(thumbnailDirectory));
 
-let library = new Library.Library(contentDirectory, config.serving_path, thumbnailDirectory);
-let cachedLibrary = library.getLibrary();
-
-let rooms: IRooms = new Rooms();
-let roomConnections: IConnections= new Connections();
-
 app.use((req, res, next) => 
 {
     res.header("Access-Control-Allow-Origin", "*");
@@ -39,59 +37,20 @@ app.use((req, res, next) =>
     next();
 });
 
-app.get('/api/video/library', (req: express.Request, res: express.Response) =>
-{
-    console.log("Library api called from" + req.ip);
-    res.send(cachedLibrary);
-});
 
-app.get('/api/video/scanLibrary', (req: express.Request, res: express.Response) =>
-{
-    library.scanLibrary();
-    res.send("Beginning scan");
-});
+let library = new Library.Library(contentDirectory, config.serving_path, thumbnailDirectory);
+let libraryAPI = new LibraryAPI(app, library);
+
+let rooms: IRooms = new Rooms();
+let roomAPI = new RoomAPI(app, rooms);
 
 
-app.get('/api/rooms', (req: express.Request, res: express.Response) =>
-{
-    res.send(rooms.getRooms());
-});
-
-app.get('/api/room', (req: express.Request, res: express.Response) =>
-{
-    let roomID: any = req.query.roomID!;
-    try 
-    {
-        let room = rooms.getRoom(roomID);
-        res.send(room);
-    }
-    catch (error)
-    {
-        res.send(error);
-    };
-
-});
-
-app.post('/api/room', (req: express.Request, res: express.Response) =>
-{
-    throw 'Not implemented'
-
-    // let request = req.body;
-
- 
-    // let room: RoomResource = rooms.createRoom(request.roomID, request.videoState);
-    
-    // roomConnections.createConnection(request.roomID, request.connectionID);
-    
-    // rooms.addRoom(room);
-
-    // res.send(room);
-
-});
 
 console.log("Listening on port 3050");
 app.listen(3050);
 
+
+let roomConnections: IConnections= new Connections();
 const wss: WebSocket.Server = new WebSocket.Server({ port: 7070 });
 
 interface extendedWS extends WebSocket
