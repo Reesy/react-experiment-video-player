@@ -25,7 +25,56 @@ export default class RoomSocketAPI
         this.init();
     };
 
+
+     // Check if the WS has been decorated with a connectionID if not add one!
+    private decorateWebSocket(ws: extendedWS)
+    {
+        if (typeof (ws.connectionID) === 'undefined')
+        {
+            ws.connectionID = uuidv4();
+            console.log('Connection established for the first time, decorating connection with the following connectionID: ',  ws.connectionID);
+        };
+    };
+
+
+
     init()
+    {
+        this.wss.on('connection', (ws: extendedWS) =>
+        {
+            this.decorateWebSocket(ws);
+        
+            ws.on('message', (_message: string) =>
+            {
+                let message: any = JSON.parse(_message);
+
+                switch(message.type)
+                {
+                    case 'createRoom':
+                        this.insertNewRoom(message.data, ws);
+                        break;
+                    case 'updateRoom':
+                        this.onClientUpdate(message.data, ws);
+                        break;
+                    case 'joinRoom':
+                        this.onJoinRoom(message.data.id, ws.connectionID);
+                        break;
+                    default:
+                        console.log('> Unknown message type: ', message.type);
+                        break;
+                };
+
+            });
+            
+            ws.on('close', () =>
+            {
+                console.log('connection closed');
+            });
+        
+        });
+    };
+
+    initOld()
     {
 
         this.wss.on('connection', (ws: extendedWS) =>
@@ -100,8 +149,7 @@ export default class RoomSocketAPI
 
 
     }
-
-
+    
     insertNewRoom = (data: RoomState, ws: extendedWS) => {
         console.log('> room insertion called with : ', JSON.stringify(data, null, 2));
         this.rooms.addRoom(this.rooms.createRoom(data.id, data.name, data.path));

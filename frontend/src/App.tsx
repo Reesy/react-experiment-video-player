@@ -43,7 +43,7 @@ class App extends React.Component<AppProps, AppState>
     {
         super(props);
         this.selectVideo = this.selectVideo.bind(this);
-        this.selectRoom = this.selectRoom.bind(this);
+        this.joinRoom = this.joinRoom.bind(this);
         this.createRoom = this.createRoom.bind(this);
         this.updateVideoState = this.updateVideoState.bind(this);
         this.triggerBroadcast = this.triggerBroadcast.bind(this);
@@ -124,7 +124,7 @@ class App extends React.Component<AppProps, AppState>
     };
 
   
-    private selectRoom = (_roomResource: RoomResource) =>
+    private joinRoom = (_roomResource: RoomResource) =>
     {
         
         this.setState({roomID: _roomResource.id});
@@ -254,6 +254,7 @@ class App extends React.Component<AppProps, AppState>
         this.SocketAPI.addListener(listener);
     
     };
+    
     private createRoom = () =>
     {   
         this.setState({connected: true});
@@ -274,8 +275,14 @@ class App extends React.Component<AppProps, AppState>
             videoState: this.state.videoState
         };
         
+        let message = 
+        {
+            type: "create",
+            roomState: _roomState
+        };
+
         this.setState({roomID: _roomID});
-        this.sendSocketData(JSON.stringify(_roomState));
+        this.sendSocketData(JSON.stringify(message));
        
         return;
     };
@@ -328,7 +335,7 @@ class App extends React.Component<AppProps, AppState>
     roomContent: React.ReactNode = (
         <div>
             <RoomPicker
-                selectRoom={this.selectRoom}
+                selectRoom={this.joinRoom}
             />
         </div>
     );
