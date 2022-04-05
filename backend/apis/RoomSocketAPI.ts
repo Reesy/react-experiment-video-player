@@ -51,13 +51,13 @@ export default class RoomSocketAPI
                 switch(message.type)
                 {
                     case 'createRoom':
-                        this.insertNewRoom(message.data, ws);
+                        this.createRoom(message.roomState, ws);
                         break;
                     case 'updateRoom':
-                        this.onClientUpdate(message.data, ws);
+                        this.onClientUpdate(message.roomState, ws);
                         break;
                     case 'joinRoom':
-                        this.onJoinRoom(message.data.id, ws.connectionID);
+                        this.onJoinRoom(message.roomState.id, ws.connectionID);
                         break;
                     default:
                         console.log('> Unknown message type: ', message.type);
@@ -111,7 +111,7 @@ export default class RoomSocketAPI
                 if (typeof (this.rooms.getRoom(data.id).id) === 'undefined')
                 {
                    
-                    this.insertNewRoom(data, ws);
+                    this.createRoom(data, ws);
                     return;
                 }
                 
@@ -150,7 +150,7 @@ export default class RoomSocketAPI
 
     }
     
-    insertNewRoom = (data: RoomState, ws: extendedWS) => {
+    createRoom = (data: RoomState, ws: extendedWS) => {
         console.log('> room insertion called with : ', JSON.stringify(data, null, 2));
         this.rooms.addRoom(this.rooms.createRoom(data.id, data.name, data.path));
         this.roomConnections.createConnection(data.id, ws.connectionID);

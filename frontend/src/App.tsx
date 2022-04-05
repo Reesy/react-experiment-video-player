@@ -135,9 +135,16 @@ class App extends React.Component<AppProps, AppState>
             name: _roomResource.name,
             path: _roomResource.path
         };
+
+        let message = 
+        {
+            type: "joinRoom",
+            roomState: _roomResource
+        };
+
         this.setState({videoResource: selectedVideoResource});
         this.addSocketListener(this.receiveJoinConfirmation);
-        this.sendSocketData(JSON.stringify(_roomResource));
+        this.sendSocketData(JSON.stringify(message));
         this.setState({connected: true});
         this.setState({page: page.video});
     };
@@ -192,15 +199,21 @@ class App extends React.Component<AppProps, AppState>
             videoState: _videoState
         };
 
-        console.log('Broadcasting video state: ', _roomState);
+        let message = 
+        {
+            type: "updateRoom",
+            roomState: _roomState
+        }
+        console.log('Broadcasting video state: ', message);
 
-        this.sendSocketData(JSON.stringify(_roomState));
+        this.sendSocketData(JSON.stringify(message));
     };
 
     private receiveRoomState = (data: any) =>
     {
         if (data.toString() === "Resynch")
-        {          
+        {         
+                //This will only be called if this is the host client. 
                 let _roomState: RoomState = {
                     id: this.state.roomID,
                     name: this.state.videoResource.name,
@@ -208,8 +221,16 @@ class App extends React.Component<AppProps, AppState>
                     videoState: this.state.videoState
                 };
 
+                //TODO: Maybe it would be better to add a new 'type' property in the request so the server only rebroadcasts state to the joiner? 
+                //Maybe something like, 'resynch + current socket ID ? 
+                let message =
+                {
+                    type: "updateRoom",
+                    roomState: _roomState
+                }
+
                 //A new client has joined and this client has been designated the host, the server will grab the room state and if it's appropriate will send it to the new client.
-                this.sendSocketData(JSON.stringify(_roomState));
+                this.sendSocketData(JSON.stringify(message));
                 return; 
         }
        
@@ -254,7 +275,7 @@ class App extends React.Component<AppProps, AppState>
         this.SocketAPI.addListener(listener);
     
     };
-    
+
     private createRoom = () =>
     {   
         this.setState({connected: true});
@@ -277,7 +298,7 @@ class App extends React.Component<AppProps, AppState>
         
         let message = 
         {
-            type: "create",
+            type: "createRoom",
             roomState: _roomState
         };
 
