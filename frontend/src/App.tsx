@@ -149,6 +149,11 @@ class App extends React.Component<AppProps, AppState>
         this.setState({page: page.video});
     };
 
+    private roomSocketHandler = (data: any) =>
+    {
+
+    };
+
     private receiveJoinConfirmation = (data: any) =>
     {
         console.log(' --- Received join confirmation --- ');
@@ -211,6 +216,13 @@ class App extends React.Component<AppProps, AppState>
 
     private receiveRoomState = (data: any) =>
     {
+
+        //sending a keep alive achnowledgement
+        if (data.toString() === 'ping')
+        {
+            this.sendSocketData('pong');
+            return;
+        };
         if (data.toString() === "Resynch")
         {         
                 //This will only be called if this is the host client. 
