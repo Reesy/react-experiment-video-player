@@ -131,7 +131,10 @@ export default class RoomSocketAPI
 
             ws.on('close', () =>
             {
-                console.log('connection closed');
+
+                console.log('connection closed: ', ws.connectionID);
+                clearInterval(this.pingIntervals.get(ws.connectionID)!);
+                this.pingIntervals.delete(ws.connectionID);
             });
 
         });
