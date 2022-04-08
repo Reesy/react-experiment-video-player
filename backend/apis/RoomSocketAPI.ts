@@ -6,6 +6,9 @@ import { RoomState } from '../interfaces/RoomState';
 import { IRooms } from '../interfaces/IRooms';
 import { Connection } from '../interfaces/IConnection';
 
+type Timer = ReturnType<typeof setTimeout>
+type Interval = ReturnType<typeof setInterval>
+
 interface extendedWS extends WebSocket
 {
     connectionID: string;
@@ -17,7 +20,8 @@ export default class RoomSocketAPI
     private wss: WebSocket.Server;
     private roomConnections: IConnections;
     private rooms: IRooms;
-    private pingQueue: Map<string, NodeJS.Timeout>;
+    private responseTimers: Map<string, Timer>; //A timer for each connection, the passed in callback will be run if the timer elapses. 
+    private pingIntervals : Map<string, Interval>; //An interval for each connection, the passed in callback will be run every X seconds.
 
     constructor(_wss: WebSocket.Server, _rooms: IRooms)
     {
@@ -25,7 +29,8 @@ export default class RoomSocketAPI
         this.rooms = _rooms;
         this.wss = _wss;
         this.init();
-        this.pingQueue = new Map<string, NodeJS.Timeout>();
+        this.responseTimers = new Map<string, Timer>();
+        this.pingIntervals = new Map<string, Interval>();
     };
 
 
@@ -44,94 +49,37 @@ export default class RoomSocketAPI
     public achnowledgePing(connectionID: string)
     {
         console.log('Acknowledging response of connectionID : ', connectionID);
-        let currenthing: any = this.pingQueue.get(connectionID);
-        clearTimeout(currenthing);
+        let responseTimer: Timer = this.responseTimers.get(connectionID)!;
+        if (typeof(responseTimer) !== 'undefined')
+        {
+            clearTimeout(responseTimer);
+        };
 
     };
 
     public checkConnections(ws: extendedWS)
     {
-
         console.log('Pinging client with connectionID : ', ws.connectionID);
         ws.send('ping');
-
-        let websocketTimeout = setTimeout(() => 
+        
+        let websocketTimeout: Timer  = setTimeout(() => 
         {
+   
             console.log('Connection timed out ', ws.connectionID);
+
+            let timedOutInterval: Interval = this.pingIntervals.get(ws.connectionID)!;
+            
+            
+            clearInterval(timedOutInterval);
+
+            //As the connection has timed out, we no longer need the interval to call this function to send a ping.
+            this.pingIntervals.delete(ws.connectionID);
+
+            //We can also remove this from the responseTimers map.
+            this.responseTimers.delete(ws.connectionID);
         }, 5000);
 
-
-        if (!this.pingQueue.has(ws.connectionID))
-        {
-            this.pingQueue.set(ws.connectionID, websocketTimeout);
-        }
-
-
-
-        // function pong() {
-        //     clearTimeout(tm);
-        // }
-        // websocket_conn.onopen = function () {
-        //     setInterval(ping, 30000);
-        // }
-        // websocket_conn.onmessage = function (evt) {
-        //     var msg = evt.data;
-        //     if (msg == '__pong__') {
-        //         pong();
-        //         return;
-        //     }
-        //     //////-- other operation --//
-        // }
-
-
-
-
-        // // 
-
-        // this.wss.clients.forEach((client: any) =>
-        // {
-        //     // //Send a ping to the client
-        //     client.send("Ping");
-
-        //     client.on('pong', () =>
-        //     {
-        //         console.log('> Pong received from client: ', client.connectionID);
-        //     });
-
-
-        //     // //Wait 10 seconds for a response
-        //     // setTimeout(() =>
-        //     // {
-        //     //     // if (client.readyState === WebSocket.OPEN)
-        //     //     // {
-        //     //     //     console.log('Client ' + client.connectionID + ' is still connected');
-        //     //     // }
-        //     //     // else
-        //     //     // {
-        //     //     //     console.log('Client ' + client.connectionID + ' is not connected');
-        //     //     // }
-        //     // }, 10000);
-
-
-
-
-        //     // //Check if a response has been received
-        //     // client.on('pong', () =>
-        //     // {
-        //     //     console.log('> Pong received from client: ', client.connectionID);
-        //     // });
-
-
-
-        //     // //Check if the client has disconnected
-        //     // client.on('close', () =>
-        //     // {
-        //     //     console.log('Client disconnected');
-        //     //     this.roomConnections.removeConnection(client.connectionID);
-        //     // }
-        //     // );
-
-        // });
+        this.responseTimers.set(ws.connectionID, websocketTimeout);
     };
 
     init()
@@ -140,16 +88,20 @@ export default class RoomSocketAPI
         {
             this.decorateWebSocket(ws);
 
-
-            setInterval(() => 
+            //For a new connection, set up a timer to ping the client to check if it's still alive. 
+            let pingInterval: Interval = setInterval(() => 
             {
-                console.log('Calling checkConnections');
                 this.checkConnections(ws);
-            }, 3000);
-
+            }, 15000);
+            
+            //Store the ping interval so when we find the connection is disconnected we can end the interval,
+            //there wont be any point checking if we already know it's disconnected.
+            this.pingIntervals.set(ws.connectionID, pingInterval);
 
             ws.on('message', (_message: string) =>
             {
+
+                _message = _message.toString();
 
                 if (_message === 'pong')
                 {
