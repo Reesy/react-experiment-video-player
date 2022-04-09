@@ -218,8 +218,4 @@ export default class RoomSocketAPI
             }
         });
     };
-
-
 };
-
-

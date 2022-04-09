@@ -59,7 +59,7 @@ export class Connections implements IConnections
 
         if (roomID === "")
         {
-            throw 'Connection does not exist';
+            throw 'Room does not exist';
         }
 
         let _connection: Connection = this.connections.find(connection => connection.roomID === roomID)!;
@@ -86,7 +86,7 @@ export class Connections implements IConnections
 
     public addConnection(roomID: string, connectionID: string): void 
     {
-
+        this.roomConnectionFlatMap.set(connectionID, roomID);
         let connection: Connection = this.getConnection(roomID);
 
         if (typeof (connection.connectionIDs.find(connectionID => connectionID === connectionID)) === "undefined")
