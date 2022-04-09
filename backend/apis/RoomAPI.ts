@@ -1,12 +1,12 @@
 import express = require("express");
-import { IRooms } from "../interfaces/IRooms";
+import { IConnections } from "../interfaces/Connections";
 
 export default class RoomAPI 
 {
 
     private app: express.Application;
-    private rooms: IRooms;
-    constructor(_app: express.Application, _rooms: IRooms)
+    private rooms: IConnections;
+    constructor(_app: express.Application, _rooms: IConnections)
     {
         this.app = _app;
         this.rooms = _rooms;

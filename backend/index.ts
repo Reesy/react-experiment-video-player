@@ -3,12 +3,12 @@ import bodyParser = require('body-parser');
 import * as WebSocket from 'ws';
 import Library = require('./services/Library');
 import path = require('path');
-import { Rooms } from "./services/Rooms";
-import { IRooms } from "./interfaces/IRooms";
 import { config } from "./config";
 import LibraryAPI from "./apis/LibraryAPI";
 import RoomAPI from "./apis/RoomAPI";
 import RoomSocketAPI from "./apis/RoomSocketAPI";
+import { Connections } from "./services/Connections";
+import { IConnections } from "./interfaces/Connections";
 
 console.log(config.serving_path);
 
@@ -36,10 +36,8 @@ app.use((req, res, next) =>
 let library = new Library.Library(contentDirectory, config.serving_path, thumbnailDirectory);
 let libraryAPI = new LibraryAPI(app, library);
 
-let rooms: IRooms = new Rooms();
+let rooms: IConnections = new Connections();
 let roomAPI = new RoomAPI(app, rooms);
-
-
 
 console.log("Listening on port 3050");
 app.listen(3050);

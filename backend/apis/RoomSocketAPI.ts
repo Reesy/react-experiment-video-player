@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { IConnections } from '../interfaces/Connections';
 import { Connections } from '../services/Connections';
 import { RoomState } from '../interfaces/RoomState';
-import { IRooms } from '../interfaces/IRooms';
 import { Connection } from '../interfaces/IConnection';
 
 type Timer = ReturnType<typeof setTimeout>
@@ -19,14 +18,13 @@ export default class RoomSocketAPI
 {
     private wss: WebSocket.Server;
     private roomConnections: IConnections;
-    private rooms: IRooms;
     private responseTimers: Map<string, Timer>; //A timer for each connection, the passed in callback will be run if the timer elapses. 
     private pingIntervals : Map<string, Interval>; //An interval for each connection, the passed in callback will be run every X seconds.
 
-    constructor(_wss: WebSocket.Server, _rooms: IRooms)
+    constructor(_wss: WebSocket.Server, _rooms: IConnections)
     {
         this.roomConnections = new Connections();
-        this.rooms = _rooms;
+        this.roomConnections = _rooms;
         this.wss = _wss;
         this.init();
         this.responseTimers = new Map<string, Timer>();
@@ -57,7 +55,7 @@ export default class RoomSocketAPI
 
     };
 
-    public checkConnections(ws: extendedWS)
+    public keepAlive(ws: extendedWS)
     {
         console.log('Pinging client with connectionID : ', ws.connectionID);
         ws.send('ping');
@@ -66,17 +64,8 @@ export default class RoomSocketAPI
         {
    
             console.log('Connection timed out ', ws.connectionID);
+            this.removeConnection(ws);
 
-            let timedOutInterval: Interval = this.pingIntervals.get(ws.connectionID)!;
-            
-            
-            clearInterval(timedOutInterval);
-
-            //As the connection has timed out, we no longer need the interval to call this function to send a ping.
-            this.pingIntervals.delete(ws.connectionID);
-
-            //We can also remove this from the responseTimers map.
-            this.responseTimers.delete(ws.connectionID);
         }, 5000);
 
         this.responseTimers.set(ws.connectionID, websocketTimeout);
@@ -91,7 +80,7 @@ export default class RoomSocketAPI
             //For a new connection, set up a timer to ping the client to check if it's still alive. 
             let pingInterval: Interval = setInterval(() => 
             {
-                this.checkConnections(ws);
+                this.keepAlive(ws);
             }, 15000);
             
             //Store the ping interval so when we find the connection is disconnected we can end the interval,
@@ -133,17 +122,32 @@ export default class RoomSocketAPI
             {
 
                 console.log('connection closed: ', ws.connectionID);
-                clearInterval(this.pingIntervals.get(ws.connectionID)!);
-                this.pingIntervals.delete(ws.connectionID);
+                this.removeConnection(ws);
             });
 
         });
     };
 
+    removeConnection = (ws: extendedWS) =>
+    {
+        let timedOutInterval: Interval = this.pingIntervals.get(ws.connectionID)!;
+            
+            
+        clearInterval(timedOutInterval);
+
+        //As the connection has timed out, we no longer need the interval to call this function to send a ping.
+        this.pingIntervals.delete(ws.connectionID);
+
+        //We can also remove this from the responseTimers map.
+        this.responseTimers.delete(ws.connectionID);
+
+        this.roomConnections.removeConnection(ws.connectionID);
+    };
+
     createRoom = (data: RoomState, ws: extendedWS) =>
     {
         console.log('> room insertion called with : ', JSON.stringify(data, null, 2));
-        this.rooms.addRoom(this.rooms.createRoom(data.id, data.name, data.path));
+        this.roomConnections.addRoom(this.roomConnections.createRoom(data.id, data.name, data.path));
         this.roomConnections.createConnection(data.id, ws.connectionID);
     }
 
