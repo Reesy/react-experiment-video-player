@@ -77,6 +77,9 @@ export class Connections implements IConnections
         if (_connection.connectionIDs.length === 0)
         {
             this.connections.splice(this.connections.indexOf(_connection), 1);
+
+           this.rooms.splice(this.rooms.indexOf(this.rooms.find(room => room.id === roomID)!), 1);
+
         }
 
         this.roomConnectionFlatMap.delete(connectionID);
