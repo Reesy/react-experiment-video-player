@@ -165,10 +165,13 @@ export class Library implements ILibrary
         {
             let VideoBuilder: videoBuilder = new videoBuilder(videoFile, this.serverDirectory);
             let video = VideoBuilder.buildVideo(); 
+            let videoName = video.name;
+            let videoNameWithoutMP4Extention = videoName.replace('.mp4', '');
+            let videoNameWithoutMP4AndM4VExtention= videoNameWithoutMP4Extention.replace('.m4v', '');
 
             if(__subtitles.length > 0)
             {
-                let matchedSubtitles: Subtitle[] = __subtitles.filter(sub => sub.target === video.name);
+                let matchedSubtitles: Subtitle[] = __subtitles.filter(sub => sub.target === videoNameWithoutMP4AndM4VExtention);
                 if(matchedSubtitles.length > 0)
                 {
                     video.subtitles = matchedSubtitles;

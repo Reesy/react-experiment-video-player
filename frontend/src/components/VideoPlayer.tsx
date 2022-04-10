@@ -2,10 +2,8 @@ import React, { SyntheticEvent } from 'react';
 import 'font-awesome/css/font-awesome.min.css';
 import "../styles/VideoPlayer.css"
 import { playingState, VideoState } from '../interfaces/VideoState';
-import { VideoResource } from '../interfaces/VideoResource';
 import { IVideoApi } from '../apis/IVideoApi';
 import { VideoApi } from '../apis/VideoApi';
-import { SubtitlePicker } from './SubtitlePicker';
 import { Subtitle } from '../interfaces/Subtitle';
 import { VideoPlayerProps } from '../interfaces/VideoPlayerProps';
 
@@ -123,7 +121,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
 
 
-        let subtitleContent: JSX.Element = <div> No subtitles </div>;
+        let subtitleContent: JSX.Element[] = [];
 
         let currentSubtitleDisplay: JSX.Element = <div> No subtitle selected </div>;
 
@@ -142,11 +140,14 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
         if (typeof (this.props.videoResource.subtitles) !== 'undefined')
         {
-            subtitleContent = <SubtitlePicker
-                subtitles={this.props.videoResource.subtitles}
-                selectSubtitle={this.selectSubtitle}
-            />
-        }
+            subtitleContent = this.props.videoResource.subtitles.map((subtitle: Subtitle, index: number) =>
+            {
+                return (
+                    <track key={index} kind="subtitles" src={this.state.videoServerLocation + subtitle.path} label={subtitle.name} srcLang="en" />
+                )
+            });
+
+        };
 
 
         let mainContent: JSX.Element = <div> <p> Assigning you to a room, awaiting video state. </p> </div>;
@@ -157,14 +158,13 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
             <div>
                 <div className='videoPlayer'>
                     <div>
-                        <video src={this.state.videoServerLocation + this.props.videoResource.path} className="mainVideo" onTimeUpdate={this.onVideoProgress} onPause={this.onPause} onPlay={this.onPlay} controls>
-                            <track kind="subtitles" src="test.vtt" label="English" srcLang="en" default />
-                            <track kind="subtitles" src="test2.vtt" label="Spanish" srcLang="es" />
+                        <video src={this.state.videoServerLocation + this.props.videoResource.path} className="mainVideo" onTimeUpdate={this.onVideoProgress} onPause={this.onPause} onPlay={this.onPlay} crossOrigin="anonymous" controls>
+                            {subtitleContent}
                         </video>
                     </div>
                 </div>
                 <div className='toolbar'>
-                    {subtitleContent}
+    
                     {currentSubtitleDisplay}
                 </div>
                 {createRoomButton}

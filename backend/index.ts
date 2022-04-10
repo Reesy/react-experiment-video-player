@@ -22,8 +22,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 let contentDirectory = path.join(__dirname, ServedVideoLocation);
 let thumbnailDirectory = path.join(__dirname, ServedThumbnailLocation);
 
-app.use('/' + config.serving_path, express.static(contentDirectory));
-app.use('/' + config.serving_path, express.static(thumbnailDirectory));
 
 app.use((req, res, next) => 
 {
@@ -31,6 +29,9 @@ app.use((req, res, next) =>
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
+
+app.use('/' + config.serving_path, express.static(contentDirectory));
+app.use('/' + config.serving_path, express.static(thumbnailDirectory));
 
 
 let library = new Library.Library(contentDirectory, config.serving_path, thumbnailDirectory);

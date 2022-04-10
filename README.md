@@ -65,13 +65,13 @@ The intent is to refactor and add acceptance criteria before adding new features
 - [x] Room selection screen (for group watch)
     - [x] On joining, video playes from the current watching position of everyone else in the room
     - [x] Pause/play and video position changes are broadcast to everyone in the room.
-    - [ ] Leave room/close socket
+    - [x] Leave room/close socket
     - [ ] Show how many users are currently watching the video
     - [ ] Add ability for a private group watch, randomised 'password' key. 
     - [ ] Create room should pass a 'resource id' and the other client should retrieve the resource from the videoAPI rather than funneling through the socket. 
 - [ ] Rescan host directories for updated content 
-- [ ] Clean up disconnected socket connections
-- [ ] Reassign 'host' when the host leaves (the socket who's videos state is grabbed when a new user joins the room)
+- [x] Clean up disconnected socket connections
+- [x] Reassign 'host' when the host leaves (the socket who's videos state is grabbed when a new user joins the room)
 - [x] Add a nginx.conf file
   - [ ] Add certificate, using certbot.
 - [ ] Add CORS ? 
