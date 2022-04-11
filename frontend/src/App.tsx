@@ -10,6 +10,7 @@ import { ISocketAPI } from './apis/ISocketAPI';
 import { SocketAPI } from './apis/SocketAPI';
 import { v4 as uuidv4 } from 'uuid';
 import { RoomState } from './interfaces/RoomState';
+import { VideoApi } from './apis/VideoApi';
 
 enum page
 {
@@ -39,6 +40,8 @@ class App extends React.Component<AppProps, AppState>
 
     private SocketAPI!: ISocketAPI;
     private lastBroadcastTime: number;
+    private videoApi: VideoApi;
+
     constructor(props: AppProps)
     {
         super(props);
@@ -48,6 +51,7 @@ class App extends React.Component<AppProps, AppState>
         this.updateVideoState = this.updateVideoState.bind(this);
         this.triggerBroadcast = this.triggerBroadcast.bind(this);
 
+        this.videoApi = new VideoApi();
         this.lastBroadcastTime = 0;
         this.state = {
             page: page.home,
@@ -168,7 +172,7 @@ class App extends React.Component<AppProps, AppState>
 
         let _receivedRoom: RoomState = JSON.parse(data);
         
-        let _videoResource: VideoResource =
+        let _receevedRoomVideoResource: VideoResource =
         {
             name: _receivedRoom.name,
             path: _receivedRoom.path
@@ -176,10 +180,22 @@ class App extends React.Component<AppProps, AppState>
 
         let _videoState: VideoState = _receivedRoom.videoState!; //Assume this is here for now?!
 
-        this.setState({videoResource: _videoResource});
-        this.setState({videoState: _videoState});
-
-        this.setState({page: page.video});
+        this.videoApi.getVideos()
+            .then((videoResources: VideoResource[]) =>
+            {
+                videoResources.forEach((videoResource: VideoResource) => 
+                {
+                    if (_receevedRoomVideoResource.name === videoResource.name)
+                    {
+                        this.setState({videoResource: videoResource});
+                        this.setState({videoState: _videoState});
+                        this.setState({page: page.video});
+                    };
+                });
+        })
+        .catch((error: any) => {
+            throw error;
+        });
 
     };
 

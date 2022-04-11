@@ -1,5 +1,4 @@
 import fs  = require('fs');
-import path = require('path');
 import { ILibrary } from "../interfaces/ILibrary";
 import { Video } from "../interfaces/Video";
 import { videoBuilder } from "../builders/videoBuilder";
@@ -21,7 +20,6 @@ export class Library implements ILibrary
                 __serverDirectory: string,
                 __thumbnailDirectory: string)
     {
-        this.content = '';
         this.videoItemCache = [];
         this.thumbnailCache = [];
         this.contentDirectory = __contentDirectory;
