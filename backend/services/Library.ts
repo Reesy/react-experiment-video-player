@@ -11,8 +11,6 @@ let dice = require('fast-dice-coefficient');
 const thumbnailConfidence: number = 0.5; 
 export class Library implements ILibrary
 {
-    
-    private content: string;
     private videoItemCache: Array<Video>;
     private contentDirectory: string;
     private serverDirectory: string;
@@ -131,7 +129,7 @@ export class Library implements ILibrary
             
 
             let extenstionStrippedFile = element.replace('.jpg', '');
-         //   console.log('Simulariy between ' + strippedM4VExtention + ' and ' + extenstionStrippedFile + ' is ' + this.similarity(strippedM4VExtention, extenstionStrippedFile));
+
             if (this.similarity(extenstionStrippedFile, strippedM4VExtention) > thumbnailConfidence)
             {
                 thumbnailFileName = element;

@@ -186,8 +186,9 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
     private onPlay(event: SyntheticEvent<HTMLVideoElement>)
     {
+      
         let _currentTime = event.currentTarget.currentTime;
-
+        console.log('On play called, currentTime: ' + _currentTime);
         if (_currentTime === 0 && this.props.videoState.videoPosition !== 0)
         {
             _currentTime = this.props.videoState.videoPosition;
@@ -212,7 +213,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
     private onPause(event: SyntheticEvent<HTMLVideoElement>)
     {
         let _currentTime = event.currentTarget.currentTime;
-
+        console.log('On pause called, currentTime: ' + _currentTime);
         if (_currentTime === 0 && this.props.videoState.videoPosition !== 0)
         {
             _currentTime = this.props.videoState.videoPosition;

@@ -38,7 +38,7 @@ class App extends React.Component<AppProps, AppState>
 {
 
     private SocketAPI!: ISocketAPI;
-    
+    private lastBroadcastTime: number;
     constructor(props: AppProps)
     {
         super(props);
@@ -48,6 +48,7 @@ class App extends React.Component<AppProps, AppState>
         this.updateVideoState = this.updateVideoState.bind(this);
         this.triggerBroadcast = this.triggerBroadcast.bind(this);
 
+        this.lastBroadcastTime = 0;
         this.state = {
             page: page.home,
             videoResource: {} as VideoResource,
@@ -189,6 +190,9 @@ class App extends React.Component<AppProps, AppState>
     };
 
 
+
+
+
     private triggerBroadcast = (_videoState: VideoState) =>
     {   
 
@@ -209,9 +213,20 @@ class App extends React.Component<AppProps, AppState>
             type: "updateRoom",
             roomState: _roomState
         }
+    
+
         console.log('Broadcasting video state: ', message);
 
-        this.sendSocketData(JSON.stringify(message));
+       
+
+        if ((this.lastBroadcastTime + 100 < Date.now()) || (this.lastBroadcastTime === 0))
+        {
+            this.sendSocketData(JSON.stringify(message));
+            this.lastBroadcastTime = Date.now();
+        }
+
+       // this.sendSocketData(JSON.stringify(message));
+        this.lastBroadcastTime = Date.now();
     };
 
     private receiveRoomState = (data: any) =>
