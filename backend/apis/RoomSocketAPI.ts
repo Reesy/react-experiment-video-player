@@ -157,7 +157,8 @@ export default class RoomSocketAPI
 
         if (typeof (data.id) === 'undefined')
         {
-            throw 'There was a failure onClientUpdate, roomID was undefined';
+            console.log('There was a failure onClientUpdate, roomID was undefined');
+            return;
         };
 
         // //If current connection doesn't exist in connections, assume it's a join room event and add it.

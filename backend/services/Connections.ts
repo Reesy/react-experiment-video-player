@@ -16,7 +16,8 @@ export class Connections implements IConnections
 
         if (this.connections.find(connection => connection.roomID === roomID))
         {
-            throw 'Room already exists';
+            console.log('Room already exists');
+            return;
         }
         
         let newConnection: Connection = {
@@ -33,8 +34,8 @@ export class Connections implements IConnections
 
         if ( typeof(_connection) === "undefined")
         {
-            throw 'Room does not exist';
-        }
+            console.log('Room does not exist');
+        };
 
         return _connection;
      
@@ -59,7 +60,8 @@ export class Connections implements IConnections
 
         if (roomID === "")
         {
-            throw 'Room does not exist';
+            console.log('Room does not exist');
+            return;
         }
 
         let _connection: Connection = this.connections.find(connection => connection.roomID === roomID)!;
@@ -69,7 +71,8 @@ export class Connections implements IConnections
         if (index === -1)
 
         {
-            throw 'Connection does not exist';
+            console.log('Connection does not exist');
+            return;
         }
 
         _connection.connectionIDs.splice(index, 1);
@@ -94,7 +97,8 @@ export class Connections implements IConnections
 
         if (typeof (connection.connectionIDs.find(connectionID => connectionID === connectionID)) === "undefined")
         {
-            throw 'Connection has already been added';
+            console.log('Connection has already been added');
+            return;
         };
 
         connection.connectionIDs.push(connectionID);
@@ -104,7 +108,8 @@ export class Connections implements IConnections
     {
         if (this.connections.length === 0)
         {
-            throw 'No connections exist, this room should not exist';
+            console.log('No connections exist, this room should not exist');
+            return '';
         }
         return this.getConnection(roomID).connectionIDs[0];
     };
