@@ -195,7 +195,7 @@ export default class RoomSocketAPI
         {
             if (client.connectionID === hostConnection)
             {
-                client.send("Resynch");
+                client.send("resynch");
             }
         });
 
@@ -215,7 +215,13 @@ export default class RoomSocketAPI
                 //Then on the client side we take that value and if it goes over a range we skip video position. 
 
                 console.log('Sending message from ' + ws.connectionID + ' to ' + client.connectionID);
-                client.send(JSON.stringify(room));
+
+                let message: any =
+                {
+                    type: 'update',
+                    roomState: room
+                };
+                client.send(JSON.stringify(message));
             }
         });
     };

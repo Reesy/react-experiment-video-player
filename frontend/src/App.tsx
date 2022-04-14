@@ -148,7 +148,7 @@ class App extends React.Component<AppProps, AppState>
         };
 
         this.setState({videoResource: selectedVideoResource});
-        this.addSocketListener(this.receiveJoinConfirmation);
+        this.addSocketListener(this.roomSocketHandler);
         this.sendSocketData(JSON.stringify(message));
         this.setState({connected: true});
         this.setState({page: page.video});
@@ -156,57 +156,83 @@ class App extends React.Component<AppProps, AppState>
 
     private roomSocketHandler = (data: any) =>
     {
-
-    };
-
-    private receiveJoinConfirmation = (data: any) =>
-    {
-        console.log(' --- Received join confirmation --- ');
-
-        //We want to add a listener for the resynch that will occur on the server side. 
-        this.addSocketListener(this.receiveRoomState);
         
-        console.log(' --- Removing join confirmation listener --- ');
-        //We no longer wish to listen for this response, remove the listener.
-        this.SocketAPI.removeListener(this.receiveJoinConfirmation);
-
-        let _receivedRoom: RoomState = JSON.parse(data);
-        
-        let _receevedRoomVideoResource: VideoResource =
+        //sending a keep alive achnowledgement
+        if (data.toString() === 'ping')
         {
-            name: _receivedRoom.name,
-            path: _receivedRoom.path
+            this.sendSocketData('pong');
+            return;
         };
 
-        let _videoState: VideoState = _receivedRoom.videoState!; //Assume this is here for now?!
+        if (data.toString() === "resynch")
+        {         
+            this.sendResynchUpdate();
+            return; 
+        };
+        let message: any = JSON.parse(data);
 
-        this.videoApi.getVideos()
-            .then((videoResources: VideoResource[]) =>
-            {
-                videoResources.forEach((videoResource: VideoResource) => 
-                {
-                    if (_receevedRoomVideoResource.name === videoResource.name)
-                    {
-                        this.setState({videoResource: videoResource});
-                        this.setState({videoState: _videoState});
-                        this.setState({page: page.video});
-                    };
-                });
-        })
-        .catch((error: any) => {
-            throw error;
-        });
+        switch (message.type)
+        {
+            case 'update':
+                this.receiveUpdate(message.roomState);
+                break;
+            default:
+                console.log("Unknown message type");
+                break;
+               
+        };
+
 
     };
 
+    private receiveUpdate(_roomState: RoomState)
+    {
+        let _videoState: VideoState = _roomState.videoState!; //Assume this is here for now?!
+
+        this.setState({videoState: _videoState});
+
+        console.log('', JSON.stringify(_roomState));
+
+     //   this.videoApi.getVideos()
+    //         .then((videoResources: VideoResource[]) =>
+    //         {
+    //             videoResources.forEach((videoResource: VideoResource) => 
+    //             {
+    //                 if (_receevedRoomVideoResource.name === videoResource.name)
+    //                 {
+    //                     this.setState({videoResource: videoResource});
+    //                     this.setState({videoState: _videoState});
+    //                     this.setState({page: page.video});
+    //                 };
+    //             });
+    //     })
+    //     .catch((error: any) => {
+    //         throw error;
+    //     });
+    };
+
+    private sendResynchUpdate()
+    {
+        let _roomState: RoomState = {
+            id: this.state.roomID,
+            name: this.state.videoResource.name,
+            path: this.state.videoResource.path,
+            videoState: this.state.videoState
+        };
+
+        let message =
+        {
+            type: "updateRoom",
+            roomState: _roomState
+        }
+
+        this.sendSocketData(JSON.stringify(message));
+    };
 
     private updateVideoState(_videoState: VideoState): void 
     {
         this.setState({videoState: _videoState});
     };
-
-
-
 
 
     private triggerBroadcast = (_videoState: VideoState) =>
@@ -245,59 +271,6 @@ class App extends React.Component<AppProps, AppState>
         this.lastBroadcastTime = Date.now();
     };
 
-    private receiveRoomState = (data: any) =>
-    {
-
-        //sending a keep alive achnowledgement
-        if (data.toString() === 'ping')
-        {
-            this.sendSocketData('pong');
-            return;
-        };
-        if (data.toString() === "Resynch")
-        {         
-                //This will only be called if this is the host client. 
-                let _roomState: RoomState = {
-                    id: this.state.roomID,
-                    name: this.state.videoResource.name,
-                    path: this.state.videoResource.path,
-                    videoState: this.state.videoState
-                };
-
-                //TODO: Maybe it would be better to add a new 'type' property in the request so the server only rebroadcasts state to the joiner? 
-                //Maybe something like, 'resynch + current socket ID ? 
-                let message =
-                {
-                    type: "updateRoom",
-                    roomState: _roomState
-                }
-
-                //A new client has joined and this client has been designated the host, the server will grab the room state and if it's appropriate will send it to the new client.
-                this.sendSocketData(JSON.stringify(message));
-                return; 
-        }
-       
-        let _receivedRoom: RoomState = JSON.parse(data);
-
-        // let _videoResource: VideoResource =
-        // {
-        //     name: _receivedRoom.name,
-        //     path: _receivedRoom.name
-        // };
-
-         let _videoState: VideoState = _receivedRoom.videoState!; //Assume this is here for now?!
-
-        // this.setState({videoResource: _videoResource});
-        this.setState({videoState: _videoState});
-            
-
-
-        //TODO, in a pause/play event may need to reapply state here. 
-        console.log('The room is: ', JSON.stringify(_receivedRoom));
-
-    };
-
-
     private sendSocketData = (data: any) =>
     {
         if (typeof(this.SocketAPI) === 'undefined')
@@ -324,12 +297,8 @@ class App extends React.Component<AppProps, AppState>
         this.setState({connected: true});
         
         //Apply a listener to the socket with a callback
-        this.addSocketListener(this.receiveRoomState);
+        this.addSocketListener(this.roomSocketHandler);
 
-        //Send it through the socket 
-        //This is a create room scenario so we wish to generate a roomID.
-
-        //todo, move roomID creation to server. 
         let _roomID = uuidv4();
         let _roomState: RoomState = 
         {
