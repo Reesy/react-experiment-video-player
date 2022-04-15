@@ -3,14 +3,10 @@ import React from 'react';
 import VideoPicker  from './components/VideoPicker';
 import RoomPicker from './components/RoomPicker';
 import { VideoPlayer } from './components/VideoPlayer';
-import { playingState, VideoState } from './interfaces/VideoState';
 import { VideoResource } from './interfaces/VideoResource';
 import { RoomResource } from './interfaces/RoomResource';
-import { ISocketAPI } from './apis/ISocketAPI';
-import { SocketAPI } from './apis/SocketAPI';
-import { v4 as uuidv4 } from 'uuid';
-import { RoomState } from './interfaces/RoomState';
 import { VideoApi } from './apis/VideoApi';
+import { IVideoApi } from './apis/IVideoApi';
 
 enum page
 {
@@ -22,7 +18,6 @@ enum page
 interface AppState
 {
     page: page;
-    videoState: VideoState;
     videoResource: VideoResource;
     roomResource: RoomResource
     roomID: string, 
@@ -37,29 +32,16 @@ interface AppProps
 
 class App extends React.Component<AppProps, AppState>
 {
-
-    private SocketAPI!: ISocketAPI;
-    private lastBroadcastTime: number;
-    private videoApi: VideoApi;
-
+    private videoApi: IVideoApi;
+    
     constructor(props: AppProps)
     {
         super(props);
         this.selectVideo = this.selectVideo.bind(this);
-        this.joinRoom = this.joinRoom.bind(this);
-        this.createRoom = this.createRoom.bind(this);
-        this.updateVideoState = this.updateVideoState.bind(this);
-        this.triggerBroadcast = this.triggerBroadcast.bind(this);
-
         this.videoApi = new VideoApi();
-        this.lastBroadcastTime = 0;
         this.state = {
             page: page.home,
             videoResource: {} as VideoResource,
-            videoState: { 
-                playingState: playingState.paused,
-                videoPosition: 0
-            },
             roomResource: {} as RoomResource,
             roomID: undefined!,
             connected: false
@@ -74,12 +56,8 @@ class App extends React.Component<AppProps, AppState>
     render()
     {
 
-        let videoContent: JSX.Element = <VideoPlayer videoState={this.state.videoState}
-                                                     videoResource={this.state.videoResource}
-                                                     createRoom={this.createRoom}
-                                                     triggerBroadcast={this.triggerBroadcast}
-                                                     updateVideoState={this.updateVideoState}
-                                                     connected={this.state.connected}
+        let videoContent: JSX.Element = <VideoPlayer videoResource={this.state.videoResource}
+                                                    roomID={this.state.roomID}
                                                      />
 
         let content = this.homeContent;
@@ -104,8 +82,8 @@ class App extends React.Component<AppProps, AppState>
         {
             temporaryLog = <div> 
                              <p>Video Name: {this.state.videoResource.name} </p>
-                             <p>Video playing: {this.state.videoState.playingState} </p>
-                             <p>Video position: {this.state.videoState.videoPosition} </p>
+            
+                        
                              <p>Video path {this.state.videoResource.path} </p>
                            </div>
         };
@@ -131,201 +109,51 @@ class App extends React.Component<AppProps, AppState>
   
     private joinRoom = (_roomResource: RoomResource) =>
     {
+        this.videoApi.getVideos()
+            .then((videoResources: VideoResource[]) =>
+            {
+                videoResources.forEach((videoResource: VideoResource) => 
+                {
+                    if (_roomResource.name === videoResource.name)
+                    {
+                        this.setState({videoResource: videoResource});
+                        this.setState({roomID: _roomResource.id});
+                        this.setState({page: page.video});
+                    };
+                });
+        })
+        .catch((error: any) => {
+            throw error;
+        });
+
+
+
+
+
+    //     this.setState({roomID: _roomResource.id});
         
-        this.setState({roomID: _roomResource.id});
-        
-        //Todo: Once we add a new service to the backend to pair roomIds with videoIDs we need to grab the resource from the API, for now its passed in. 
-        let selectedVideoResource: VideoResource =
-        {
-            name: _roomResource.name,
-            path: _roomResource.path
-        };
+    //     //Todo: Once we add a new service to the backend to pair roomIds with videoIDs we need to grab the resource from the API, for now its passed in. 
+    //     let selectedVideoResource: VideoResource =
+    //     {
+    //         name: _roomResource.name,
+    //         path: _roomResource.path
+    //     };
 
-        let message = 
-        {
-            type: "joinRoom",
-            roomState: _roomResource
-        };
+    //     let message = 
+    //     {
+    //         type: "joinRoom",
+    //         roomState: _roomResource
+    //     };
 
-        this.setState({videoResource: selectedVideoResource});
-        this.addSocketListener(this.roomSocketHandler);
-        this.sendSocketData(JSON.stringify(message));
-        this.setState({connected: true});
-        this.setState({page: page.video});
-    };
-
-    private roomSocketHandler = (data: any) =>
-    {
-        
-        //sending a keep alive achnowledgement
-        if (data.toString() === 'ping')
-        {
-            this.sendSocketData('pong');
-            return;
-        };
-
-        if (data.toString() === "resynch")
-        {         
-            this.sendResynchUpdate();
-            return; 
-        };
-        let message: any = JSON.parse(data);
-
-        switch (message.type)
-        {
-            case 'update':
-                this.receiveUpdate(message.roomState);
-                break;
-            default:
-                console.log("Unknown message type");
-                break;
-               
-        };
-
-
-    };
-
-    private receiveUpdate(_roomState: RoomState)
-    {
-        let _videoState: VideoState = _roomState.videoState!; //Assume this is here for now?!
-
-        this.setState({videoState: _videoState});
-
-        console.log('', JSON.stringify(_roomState));
-
-     //   this.videoApi.getVideos()
-    //         .then((videoResources: VideoResource[]) =>
-    //         {
-    //             videoResources.forEach((videoResource: VideoResource) => 
-    //             {
-    //                 if (_receevedRoomVideoResource.name === videoResource.name)
-    //                 {
-    //                     this.setState({videoResource: videoResource});
-    //                     this.setState({videoState: _videoState});
-    //                     this.setState({page: page.video});
-    //                 };
-    //             });
-    //     })
-    //     .catch((error: any) => {
-    //         throw error;
-    //     });
-    };
-
-    private sendResynchUpdate()
-    {
-        let _roomState: RoomState = {
-            id: this.state.roomID,
-            name: this.state.videoResource.name,
-            path: this.state.videoResource.path,
-            videoState: this.state.videoState
-        };
-
-        let message =
-        {
-            type: "updateRoom",
-            roomState: _roomState
-        }
-
-        this.sendSocketData(JSON.stringify(message));
-    };
-
-    private updateVideoState(_videoState: VideoState): void 
-    {
-        this.setState({videoState: _videoState});
+    //     this.setState({videoResource: selectedVideoResource});
+    //     // this.addSocketListener(this.roomSocketHandler);
+    //    // this.SocketAPI.send(JSON.stringify(message));
+    //  //   this.setState({connected: true});
+       //  this.setState({page: page.video});
     };
 
 
-    private triggerBroadcast = (_videoState: VideoState) =>
-    {   
 
-        if ( typeof(this.state.roomID) === 'undefined')
-        {
-            throw 'No roomID set for the client, this should either be generated when the host client creates a room, or passed in from the room picker.'
-        } 
-
-        let _roomState: RoomState = {
-            id: this.state.roomID,
-            name: this.state.videoResource.name,
-            path: this.state.videoResource.path,
-            videoState: _videoState
-        };
-
-        let message = 
-        {
-            type: "updateRoom",
-            roomState: _roomState
-        }
-    
-
-        console.log('Broadcasting video state: ', message);
-
-       
-
-        if ((this.lastBroadcastTime + 100 < Date.now()) || (this.lastBroadcastTime === 0))
-        {
-            this.sendSocketData(JSON.stringify(message));
-            this.lastBroadcastTime = Date.now();
-        }
-
-       // this.sendSocketData(JSON.stringify(message));
-        this.lastBroadcastTime = Date.now();
-    };
-
-    private sendSocketData = (data: any) =>
-    {
-        if (typeof(this.SocketAPI) === 'undefined')
-        {
-            this.establishConnection();
-        }
-        
-        this.SocketAPI.send(data);
-    };
-
-    private addSocketListener = (listener: Function) =>
-    {
-        if (typeof(this.SocketAPI) === 'undefined')
-        {
-            this.establishConnection();
-        }
-
-        this.SocketAPI.addListener(listener);
-    
-    };
-
-    private createRoom = () =>
-    {   
-        this.setState({connected: true});
-        
-        //Apply a listener to the socket with a callback
-        this.addSocketListener(this.roomSocketHandler);
-
-        let _roomID = uuidv4();
-        let _roomState: RoomState = 
-        {
-            id: _roomID,
-            name: this.state.videoResource.name, //Name of room matches video. 
-            path: this.state.videoResource.path, //Path of room matches video.
-            videoState: this.state.videoState
-        };
-        
-        let message = 
-        {
-            type: "createRoom",
-            roomState: _roomState
-        };
-
-        this.setState({roomID: _roomID});
-        this.sendSocketData(JSON.stringify(message));
-       
-        return;
-    };
-
-
-    private establishConnection = () =>
-    {
-        console.log('Establishing connection');
-        this.SocketAPI = new SocketAPI();
-    };
 
     headerContent: React.ReactNode = (
         <header>
@@ -335,9 +163,7 @@ class App extends React.Component<AppProps, AppState>
                     this.setState({
                         page: page.home
                     });
-
                     this.setState({videoResource: {} as VideoResource})
-                    this.setState({videoState: {} as VideoState })
                     this.setState({roomResource: {} as RoomResource})
                 }}>
                 Home
@@ -348,9 +174,7 @@ class App extends React.Component<AppProps, AppState>
                     this.setState({
                         page: page.room
                     });
-
                     this.setState({videoResource: {} as VideoResource})
-                    this.setState({videoState: {} as VideoState })
                     this.setState({roomResource: {} as RoomResource})
                 }}>
                 Rooms
@@ -368,7 +192,7 @@ class App extends React.Component<AppProps, AppState>
     roomContent: React.ReactNode = (
         <div>
             <RoomPicker
-                selectRoom={this.joinRoom}
+               selectRoom={this.joinRoom}
             />
         </div>
     );

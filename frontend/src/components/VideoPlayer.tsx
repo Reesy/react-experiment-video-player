@@ -1,72 +1,33 @@
-import React, { SyntheticEvent } from 'react';
 import 'font-awesome/css/font-awesome.min.css';
 import "../styles/VideoPlayer.css"
+import React, { SyntheticEvent } from 'react';
 import { playingState, VideoState } from '../interfaces/VideoState';
 import { IVideoApi } from '../apis/IVideoApi';
 import { VideoApi } from '../apis/VideoApi';
 import { Subtitle } from '../interfaces/Subtitle';
 import { VideoPlayerProps } from '../interfaces/VideoPlayerProps';
+import { ISocketAPI } from '../apis/ISocketAPI';
+import { RoomState } from '../interfaces/RoomState';
+import { VideoResource } from '../interfaces/VideoResource';
+import { RoomResource } from '../interfaces/RoomResource';
+import { v4 as uuidv4 } from 'uuid';
+import { SocketAPI } from '../apis/SocketAPI';
 
 interface VideoPlayerState
 {
     videoServerLocation: string //This will be the location of the server location, I.E localhost:3050/ but not the actual video path.
     currentSubtitle: Subtitle; //This will always be client dependent, the server doesn't care
-    clicks: number;
+    videoResource: VideoResource;
+    roomResource: RoomResource
+    roomID: string, 
+    connected: boolean;
 }
  
 class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
     private videoApi: IVideoApi;
-
-    
-    public shouldComponentUpdate(nextProps: VideoPlayerProps, nextState: VideoPlayerState) 
-    {   
-
-        if (this.props.connected !== nextProps.connected)
-        {
-            return true;
-        }
-        if (this.state.clicks !== nextState.clicks)
-        {
-            //kind've a pass through/re-render (would be better if video state changes could be watched by react, will research later)
-            return true; 
-        }
-        
-        let videoElement: any = document.getElementsByClassName('mainVideo')[0];
-
-        if (typeof (videoElement) === "undefined")
-        {
-            //We have just received an initial state from the server, we have yet to render so we will just accept the state and render
-            return true;
-        };
-        let currentVideoPosition = videoElement.currentTime;
-
-        if ( videoElement.paused === true && nextProps.videoState.playingState === playingState.playing)
-        {
-            videoElement.play();
-        }
-
-        if ( videoElement.paused === false && nextProps.videoState.playingState === playingState.paused)
-        {
-            videoElement.pause();
-        }
-
-        if (this.props.videoState !== nextProps.videoState)
-        {
-            if ( (Math.abs(currentVideoPosition - nextProps.videoState.videoPosition) > 3) )
-            {
-                videoElement.currentTime = nextProps.videoState.videoPosition;
-                console.log('CurrentVideoPosition: ' + currentVideoPosition + " NextProps.video.videoPosition: " + nextProps.videoState.videoPosition);
-                console.log('math.floor currentVideoPosition: ' + Math.floor(currentVideoPosition) + " math.floor nextProps.video.videoPosition: " + Math.floor(nextProps.videoState.videoPosition));
-            }
-
-            return true;
-        };
-        
-
-        return false;
-
-    };
+    private SocketAPI!: ISocketAPI;
+    private lastBroadcastTime: number;
 
     constructor(props: VideoPlayerProps)
     {
@@ -74,61 +35,58 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
         this.onPause = this.onPause.bind(this);
         this.onPlay = this.onPlay.bind(this);
         this.selectSubtitle = this.selectSubtitle.bind(this);
-        this.onVideoProgress = this.onVideoProgress.bind(this);
+        // this.onVideoProgress = this.onVideoProgress.bind(this);
+        this.createRoom = this.createRoom.bind(this);
+        this.sendUpdatedVideoState = this.sendUpdatedVideoState.bind(this);
 
+  
         this.videoApi = new VideoApi();
-
+        this.lastBroadcastTime = 0;
         let videoLocation: string = this.videoApi.getVideoApiAddress();
+
+        let isConnected = typeof(this.props.roomID) !== 'undefined';
 
         this.state =
         {
             videoServerLocation: videoLocation,
             currentSubtitle: {} as Subtitle, // This will be set by the subtitle picker, we conditionally render if this object is empty or not. 
-            clicks: 0
-        };
+            connected: isConnected,
+            roomResource: {} as RoomResource,
+            roomID: this.props.roomID,
+            videoResource: {} as VideoResource
+        };  
+
+        if (isConnected)
+        {
+
+            let roomResource: RoomResource =
+            {
+                id: this.props.roomID,
+                name: this.props.videoResource.name,
+                path: this.props.videoResource.path,
+            }
+
+            let message = 
+            {
+                type: "joinRoom",
+                roomState: roomResource
+            };
+
+           // this.SocketAPI.send(JSON.stringify(message));
+            this.addSocketListener(this.roomSocketHandler);
+            this.SocketAPI.send(JSON.stringify(message));
+        }
 
     };
 
 
     render() 
     {
-        let videoElement: any;
-        if (typeof ( document.getElementsByClassName('mainVideo')[0]) !== "undefined")
-        {
-            videoElement = document.getElementsByClassName('mainVideo')[0];
-            
-            if (videoElement.currentTime === 0 && this.props.videoState.videoPosition !== 0)
-            {
-                if ( this.props.videoState.playingState === playingState.playing)
-                {
-                    videoElement.play();
-                }
-                else
-                {
-                    videoElement.pause();
-                }
-            };
-            
-        
-        }
-        else 
-        {
-            videoElement = {
-                paused: true
-            }
-    
-        }
-
-
-
         let subtitleContent: JSX.Element[] = [];
-
         let currentSubtitleDisplay: JSX.Element = <div> No subtitle selected </div>;
+        let createRoomButton: JSX.Element = <button onClick={() => { this.createRoom() }}> Create Room</button>
 
-        let createRoomButton: JSX.Element = <button onClick={() => { this.props.createRoom(this.props.videoState) }}> Create Room</button>
-
-
-        if (this.props.connected)
+        if (this.state.connected)
         {
             createRoomButton = <div> </div>
         }
@@ -158,7 +116,9 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
             <div>
                 <div className='videoPlayer'>
                     <div>
-                        <video src={this.state.videoServerLocation + this.props.videoResource.path} className="mainVideo" onTimeUpdate={this.onVideoProgress} onPause={this.onPause} onPlay={this.onPlay} crossOrigin="anonymous" controls>
+                        <video src={this.state.videoServerLocation + this.props.videoResource.path} className="mainVideo" 
+                        // onTimeUpdate={this.onVideoProgress} 
+                        onPause={this.onPause} onPlay={this.onPlay} crossOrigin="anonymous" controls>
                             {subtitleContent}
                         </video>
                     </div>
@@ -187,79 +147,228 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
     private onPlay(event: SyntheticEvent<HTMLVideoElement>)
     {
       
-        let _currentTime = event.currentTarget.currentTime;
-        console.log('On play called, currentTime: ' + _currentTime);
-        if (_currentTime === 0 && this.props.videoState.videoPosition !== 0)
+        if (this.state.connected === true)
         {
-            _currentTime = this.props.videoState.videoPosition;
-        }
+            let _currentTime = event.currentTarget.currentTime;
 
-        this.setState({ clicks: this.state.clicks + 1 });
-        
-        let _videoState : VideoState = {
-            videoPosition: _currentTime,
-            playingState: playingState.playing
-        }
+            console.log('On play called, currentTime: ' + _currentTime);
+    
+            let _videoState : VideoState = {
+                videoPosition: _currentTime,
+                playingState: playingState.playing
+            };
 
-        this.props.updateVideoState(_videoState);
-
-        if (this.props.connected === true)
-        {
-            this.props.triggerBroadcast(_videoState);
+            this.sendUpdatedVideoState(_videoState);
         };
 
     };
 
     private onPause(event: SyntheticEvent<HTMLVideoElement>)
     {
-        let _currentTime = event.currentTarget.currentTime;
-        console.log('On pause called, currentTime: ' + _currentTime);
-        if (_currentTime === 0 && this.props.videoState.videoPosition !== 0)
-        {
-            _currentTime = this.props.videoState.videoPosition;
-        }
+  
+        if (this.state.connected === true)
+        {      
+            let _currentTime = event.currentTarget.currentTime;
 
-        this.setState({ clicks: this.state.clicks + 1 });
-        
-        let _videoState : VideoState = {
-            videoPosition: _currentTime,
-            playingState: playingState.paused
-        }
+            console.log('On pause called, currentTime: ' + _currentTime);
+    
+            let _videoState : VideoState = {
+                videoPosition: _currentTime,
+                playingState: playingState.paused
+            };
 
-        this.props.updateVideoState(_videoState);
-
-        if (this.props.connected === true)
-        {
-            this.props.triggerBroadcast(_videoState);
+            this.sendUpdatedVideoState(_videoState);
         };
 
     };
 
-    private onVideoProgress(event: SyntheticEvent<HTMLVideoElement>)
-    {
-        let _playingState: playingState = event.currentTarget.paused === true ? playingState.paused : playingState.playing;
+    // private onVideoProgress(event: SyntheticEvent<HTMLVideoElement>)
+    // {
+    //     let _playingState: playingState = event.currentTarget.paused === true ? playingState.paused : playingState.playing;
 
-        let _videoState : VideoState = {
-            videoPosition: event.currentTarget.currentTime,
+    //     let _videoState : VideoState = {
+    //         videoPosition: event.currentTarget.currentTime,
+    //         playingState: _playingState
+    //     }
+
+    //     this.updateVideoState(_videoState)
+    // };
+
+    private createRoom = () =>
+    {   
+        this.setState({connected: true});
+        
+        //Apply a listener to the socket with a callback
+        this.addSocketListener(this.roomSocketHandler);
+
+        let _roomID = uuidv4();
+        let _roomState: RoomState = 
+        {
+            id: _roomID,
+            name: this.props.videoResource.name, //Name of room matches video. 
+            path: this.props.videoResource.path, //Path of room matches video.
+            videoState: this.getVideoStateFromVideoElement()
+        };
+        
+        let message = 
+        {
+            type: "createRoom",
+            roomState: _roomState
+        };
+
+        this.setState({roomID: _roomID});
+        this.SocketAPI.send(JSON.stringify(message));
+       
+        return;
+    };
+
+    private addSocketListener = (listener: Function) =>
+    {
+        if (typeof(this.SocketAPI) === 'undefined')
+        {
+            this.establishConnection();
+        }
+        this.SocketAPI.addListener(listener);
+    };
+
+
+    private establishConnection = () =>
+    {
+        console.log('Establishing connection');
+        this.SocketAPI = new SocketAPI();
+    };
+
+    private sendResynchUpdate()
+    {
+        let _roomState: RoomState = {
+            id: this.state.roomID,
+            name: this.props.videoResource.name,
+            path: this.props.videoResource.path,
+            videoState: this.getVideoStateFromVideoElement()
+        };
+
+        let message =
+        {
+            type: "updateRoom",
+            roomState: _roomState
+        }
+
+        this.SocketAPI.send(JSON.stringify(message));
+    };
+
+    private getVideoStateFromVideoElement(): VideoState
+    {
+        let videoElement: any;
+        if (typeof ( document.getElementsByClassName('mainVideo')[0]) === "undefined")
+        {
+            throw new Error('Video element not found');
+        };
+        
+        videoElement = document.getElementsByClassName('mainVideo')[0];
+
+        let _playingState: playingState = videoElement.paused === true ? playingState.paused : playingState.playing;
+
+        let videoState : VideoState = {
+            videoPosition: videoElement.currentTime,
             playingState: _playingState
         }
 
-        this.props.updateVideoState(_videoState)
+        return videoState;
+
     };
 
-    private setFullScreen(event: any)
+    private setVideoElementState(videoState: VideoState)
     {
+        if (typeof ( document.getElementsByClassName('mainVideo')[0]) === "undefined")
+        {
+            throw new Error('Video element not found');
+        };
         let videoElement: any = document.getElementsByClassName('mainVideo')[0];
-        if (videoElement.requestFullscreen)
+
+        videoElement.currentTime = videoState.videoPosition;
+
+        if (videoState.playingState === playingState.playing)
         {
-            videoElement.requestFullscreen();
+            videoElement.play();
         }
-        else if (videoElement.mozRequestFullScreen)
+        else
         {
-            videoElement.mozRequestFullScreen();
-        }
+            videoElement.pause();
+        };
+
     }
 
-}
+    private sendUpdatedVideoState = (_videoState: VideoState) =>
+    {   
+
+        if ( typeof(this.state.roomID) === 'undefined')
+        {
+            throw 'No roomID set for the client, this should either be generated when the host client creates a room, or passed in from the room picker.'
+        } 
+
+        let _roomState: RoomState = {
+            id: this.state.roomID,
+            name: this.state.videoResource.name,
+            path: this.state.videoResource.path,
+            videoState: _videoState
+        };
+
+        let message = 
+        {
+            type: "updateRoom",
+            roomState: _roomState
+        }
+    
+        console.log('Broadcasting video state: ', message);
+
+        if ((this.lastBroadcastTime + 100 < Date.now()) || (this.lastBroadcastTime === 0))
+        {
+            this.SocketAPI.send(JSON.stringify(message));
+            this.lastBroadcastTime = Date.now();
+        }
+
+        this.lastBroadcastTime = Date.now();
+    };
+
+    private receiveUpdate(_roomState: RoomState)
+    {
+        if (this.getVideoStateFromVideoElement() !== _roomState.videoState)
+        {
+            this.setVideoElementState(_roomState.videoState!);
+        };
+
+    };
+
+    private roomSocketHandler = (data: any) =>
+    {
+        
+        if (data.toString() === 'ping')
+        {
+            this.SocketAPI.send('pong');
+            return;
+        };
+
+        if (data.toString() === "resynch")
+        {         
+            this.sendResynchUpdate();
+            return; 
+        };
+
+        let message: any = JSON.parse(data);
+
+        switch (message.type)
+        {
+            case 'update':
+                this.receiveUpdate(message.roomState);
+                break;
+            default:
+                console.log("Unknown message type");
+                break;
+               
+        };
+
+    };
+
+};
 
 export { VideoPlayer }
