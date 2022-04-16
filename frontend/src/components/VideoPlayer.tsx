@@ -19,10 +19,10 @@ interface VideoPlayerState
     currentSubtitle: Subtitle; //This will always be client dependent, the server doesn't care
     videoResource: VideoResource;
     roomResource: RoomResource
-    roomID: string, 
+    roomID: string,
     connected: boolean;
 }
- 
+
 class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
     private videoApi: IVideoApi;
@@ -35,16 +35,14 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
         this.onPause = this.onPause.bind(this);
         this.onPlay = this.onPlay.bind(this);
         this.selectSubtitle = this.selectSubtitle.bind(this);
-        // this.onVideoProgress = this.onVideoProgress.bind(this);
         this.createRoom = this.createRoom.bind(this);
         this.sendUpdatedVideoState = this.sendUpdatedVideoState.bind(this);
 
-  
         this.videoApi = new VideoApi();
         this.lastBroadcastTime = 0;
         let videoLocation: string = this.videoApi.getVideoApiAddress();
 
-        let isConnected = typeof(this.props.roomID) !== 'undefined';
+        let isConnected = typeof (this.props.roomID) !== 'undefined';
 
         this.state =
         {
@@ -54,7 +52,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
             roomResource: {} as RoomResource,
             roomID: this.props.roomID,
             videoResource: {} as VideoResource
-        };  
+        };
 
         if (isConnected)
         {
@@ -66,13 +64,12 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
                 path: this.props.videoResource.path,
             }
 
-            let message = 
+            let message =
             {
                 type: "joinRoom",
                 roomState: roomResource
             };
 
-           // this.SocketAPI.send(JSON.stringify(message));
             this.addSocketListener(this.roomSocketHandler);
             this.SocketAPI.send(JSON.stringify(message));
         }
@@ -112,23 +109,23 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
         if (typeof (this.props.videoResource.path) !== 'undefined') 
         {
-            mainContent = 
-            <div>
-                <div className='videoPlayer'>
-                    <div>
-                        <video src={this.state.videoServerLocation + this.props.videoResource.path} className="mainVideo" 
-                        // onTimeUpdate={this.onVideoProgress} 
-                        onPause={this.onPause} onPlay={this.onPlay} crossOrigin="anonymous" controls>
-                            {subtitleContent}
-                        </video>
+            mainContent =
+                <div>
+                    <div className='videoPlayer'>
+                        <div>
+                            <video src={this.state.videoServerLocation + this.props.videoResource.path} className="mainVideo"
+                                // onTimeUpdate={this.onVideoProgress} 
+                                onPause={this.onPause} onPlay={this.onPlay} crossOrigin="anonymous" controls>
+                                {subtitleContent}
+                            </video>
+                        </div>
                     </div>
+                    <div className='toolbar'>
+
+                        {currentSubtitleDisplay}
+                    </div>
+                    {createRoomButton}
                 </div>
-                <div className='toolbar'>
-    
-                    {currentSubtitleDisplay}
-                </div>
-                {createRoomButton}
-            </div>
 
         }
         return (
@@ -146,14 +143,14 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
     private onPlay(event: SyntheticEvent<HTMLVideoElement>)
     {
-      
+
         if (this.state.connected === true)
         {
             let _currentTime = event.currentTarget.currentTime;
 
             console.log('On play called, currentTime: ' + _currentTime);
-    
-            let _videoState : VideoState = {
+
+            let _videoState: VideoState = {
                 videoPosition: _currentTime,
                 playingState: playingState.playing
             };
@@ -165,14 +162,14 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
     private onPause(event: SyntheticEvent<HTMLVideoElement>)
     {
-  
+
         if (this.state.connected === true)
-        {      
+        {
             let _currentTime = event.currentTarget.currentTime;
 
             console.log('On pause called, currentTime: ' + _currentTime);
-    
-            let _videoState : VideoState = {
+
+            let _videoState: VideoState = {
                 videoPosition: _currentTime,
                 playingState: playingState.paused
             };
@@ -182,49 +179,37 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
     };
 
-    // private onVideoProgress(event: SyntheticEvent<HTMLVideoElement>)
-    // {
-    //     let _playingState: playingState = event.currentTarget.paused === true ? playingState.paused : playingState.playing;
-
-    //     let _videoState : VideoState = {
-    //         videoPosition: event.currentTarget.currentTime,
-    //         playingState: _playingState
-    //     }
-
-    //     this.updateVideoState(_videoState)
-    // };
-
     private createRoom = () =>
-    {   
-        this.setState({connected: true});
-        
+    {
+        this.setState({ connected: true });
+
         //Apply a listener to the socket with a callback
         this.addSocketListener(this.roomSocketHandler);
 
         let _roomID = uuidv4();
-        let _roomState: RoomState = 
+        let _roomState: RoomState =
         {
             id: _roomID,
             name: this.props.videoResource.name, //Name of room matches video. 
             path: this.props.videoResource.path, //Path of room matches video.
             videoState: this.getVideoStateFromVideoElement()
         };
-        
-        let message = 
+
+        let message =
         {
             type: "createRoom",
             roomState: _roomState
         };
 
-        this.setState({roomID: _roomID});
+        this.setState({ roomID: _roomID });
         this.SocketAPI.send(JSON.stringify(message));
-       
+
         return;
     };
 
     private addSocketListener = (listener: Function) =>
     {
-        if (typeof(this.SocketAPI) === 'undefined')
+        if (typeof (this.SocketAPI) === 'undefined')
         {
             this.establishConnection();
         }
@@ -259,16 +244,16 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
     private getVideoStateFromVideoElement(): VideoState
     {
         let videoElement: any;
-        if (typeof ( document.getElementsByClassName('mainVideo')[0]) === "undefined")
+        if (typeof (document.getElementsByClassName('mainVideo')[0]) === "undefined")
         {
             throw new Error('Video element not found');
         };
-        
+
         videoElement = document.getElementsByClassName('mainVideo')[0];
 
         let _playingState: playingState = videoElement.paused === true ? playingState.paused : playingState.playing;
 
-        let videoState : VideoState = {
+        let videoState: VideoState = {
             videoPosition: videoElement.currentTime,
             playingState: _playingState
         }
@@ -279,7 +264,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
     private setVideoElementState(videoState: VideoState)
     {
-        if (typeof ( document.getElementsByClassName('mainVideo')[0]) === "undefined")
+        if (typeof (document.getElementsByClassName('mainVideo')[0]) === "undefined")
         {
             throw new Error('Video element not found');
         };
@@ -299,12 +284,12 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
     }
 
     private sendUpdatedVideoState = (_videoState: VideoState) =>
-    {   
+    {
 
-        if ( typeof(this.state.roomID) === 'undefined')
+        if (typeof (this.state.roomID) === 'undefined')
         {
             throw 'No roomID set for the client, this should either be generated when the host client creates a room, or passed in from the room picker.'
-        } 
+        }
 
         let _roomState: RoomState = {
             id: this.state.roomID,
@@ -313,12 +298,12 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
             videoState: _videoState
         };
 
-        let message = 
+        let message =
         {
             type: "updateRoom",
             roomState: _roomState
         }
-    
+
         console.log('Broadcasting video state: ', message);
 
         if ((this.lastBroadcastTime + 100 < Date.now()) || (this.lastBroadcastTime === 0))
@@ -341,7 +326,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
 
     private roomSocketHandler = (data: any) =>
     {
-        
+
         if (data.toString() === 'ping')
         {
             this.SocketAPI.send('pong');
@@ -349,9 +334,9 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
         };
 
         if (data.toString() === "resynch")
-        {         
+        {
             this.sendResynchUpdate();
-            return; 
+            return;
         };
 
         let message: any = JSON.parse(data);
@@ -364,7 +349,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps, VideoPlayerState> {
             default:
                 console.log("Unknown message type");
                 break;
-               
+
         };
 
     };
