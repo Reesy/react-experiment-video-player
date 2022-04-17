@@ -126,33 +126,7 @@ class App extends React.Component<AppProps, AppState>
             throw error;
         });
 
-
-
-
-
-    //     this.setState({roomID: _roomResource.id});
-        
-    //     //Todo: Once we add a new service to the backend to pair roomIds with videoIDs we need to grab the resource from the API, for now its passed in. 
-    //     let selectedVideoResource: VideoResource =
-    //     {
-    //         name: _roomResource.name,
-    //         path: _roomResource.path
-    //     };
-
-    //     let message = 
-    //     {
-    //         type: "joinRoom",
-    //         roomState: _roomResource
-    //     };
-
-    //     this.setState({videoResource: selectedVideoResource});
-    //     // this.addSocketListener(this.roomSocketHandler);
-    //    // this.SocketAPI.send(JSON.stringify(message));
-    //  //   this.setState({connected: true});
-       //  this.setState({page: page.video});
     };
-
-
 
 
     headerContent: React.ReactNode = (
