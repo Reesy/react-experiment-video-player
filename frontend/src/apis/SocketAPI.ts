@@ -5,7 +5,7 @@ export class SocketAPI implements ISocketAPI
 {
     private websocket: WebSocket;
     private listeners: Array<Function>;
-    private ws_path: string = process.env.REACT_APP_WS_URL ? process.env.REACT_APP_WS_URL : `ws://${window.location.host}/ws`; 
+    private ws_path: string = process.env.REACT_APP_WS_URL ? process.env.REACT_APP_WS_URL : `wss://${window.location.host}/ws`; 
 
     constructor()
     {
