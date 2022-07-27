@@ -137,6 +137,7 @@ The intent is to refactor and add acceptance criteria before adding new features
   - [x] add to compose.
 - [ ] Ensure excessive or missing '/' from configuration is handled correctly. 
 - [x] Customise websocket path by configuration.
+- [ ] Add a sync API, but with debounce (once every 5 minutes)
 
 ## Jenkins CI/CD support
 It has Jenkins support, If you have a Jenkins server you can use the Jenkins github plugin to set up a job. It's much easier through blue-ocean. You can create a new pipeline, point it at your github repository and it will automatically build your project.
